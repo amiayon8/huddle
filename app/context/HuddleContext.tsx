@@ -5,36 +5,92 @@ import {
   UserProfile, 
   SkillHealth, 
   SkillRoadmap, 
+  JourneyStep, 
   MicroSquad, 
-  CommunityPost, 
+  MacroSquad, 
   CreatorProfile, 
+  CreatorPost, 
   NotificationItem, 
-  MascotMessage,
+  MascotMessage, 
   ActiveTab,
-  JourneyStep
+  SprintChecklist,
+  SprintTask,
+  PortfolioItem,
+  RealWorldProofItem,
+  CareerTimelineEntry,
+  CommunityPost
 } from '../types/huddle';
 import { 
   initialUser, 
   initialSkillsHealth, 
   initialRoadmap, 
   initialSquad, 
+  initialMacroSquad, 
   initialPosts, 
   initialCreators, 
+  initialCreatorPosts, 
   initialNotifications, 
-  initialMascotMessages 
+  initialMascotMessages,
+  initialSprint,
+  initialPortfolioItems,
+  initialRealWorldProofs,
+  initialCareerTimeline
 } from '../data/initialData';
+import {
+  supabase,
+  signUpUser,
+  signInUser,
+  signOutUser,
+  fetchUserProfile,
+  updateUserProfile as updateProfileInDb,
+  fetchCurrentSprint,
+  updateSprintTaskCompletion,
+  reshuffleSprintInDb,
+  fetchPortfolioItems,
+  addPortfolioItemToDb,
+  togglePublishPortfolioInDb,
+  fetchRealWorldProofs,
+  completeRealWorldProofInDb,
+  fetchSquad,
+  addSquadActivityPingToDb,
+  fetchCreatorPosts,
+  publishCreatorPostToDb
+} from '../lib/supabase';
 
 interface HuddleContextType {
   user: UserProfile;
   skillsHealth: SkillHealth[];
   roadmap: SkillRoadmap;
   squad: MicroSquad;
+  macroSquad: MacroSquad;
   posts: CommunityPost[];
   creators: CreatorProfile[];
+  creatorPosts: CreatorPost[];
   notifications: NotificationItem[];
   mascotMessages: MascotMessage[];
+  sprint: SprintChecklist;
+  portfolioItems: PortfolioItem[];
+  realWorldProofs: RealWorldProofItem[];
+  careerTimeline: CareerTimelineEntry[];
+  
+  // Auth state & actions
+  isAuthenticated: boolean;
+  authLoading: boolean;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (email: string, password: string, fullName: string) => Promise<{ success: boolean; error?: string }>;
+  logout: () => Promise<void>;
+  loginDemo: () => Promise<void>;
+
   activeTab: ActiveTab;
   theme: 'dark' | 'light';
+  
+  // Focus Timer with Blur / Exit detection
+  secondsFocusedToday: number;
+  isTimerRunning: boolean;
+  isAppFocused: boolean;
+  showBingeQuizModal: boolean;
+  
+  // UI states
   searchOpen: boolean;
   settingsOpen: boolean;
   mascotOpen: boolean;
@@ -43,7 +99,9 @@ interface HuddleContextType {
   onboardingActive: boolean;
   selectedStepModal: JourneyStep | null;
   selectedCreatorModal: CreatorProfile | null;
+  creatorUploadModalOpen: boolean;
   
+  // State setters
   setActiveTab: (tab: ActiveTab) => void;
   setTheme: (theme: 'dark' | 'light') => void;
   toggleTheme: () => void;
@@ -55,14 +113,29 @@ interface HuddleContextType {
   setOnboardingActive: (active: boolean) => void;
   setSelectedStepModal: (step: JourneyStep | null) => void;
   setSelectedCreatorModal: (creator: CreatorProfile | null) => void;
+  setCreatorUploadModalOpen: (open: boolean) => void;
+  setShowBingeQuizModal: (show: boolean) => void;
   
+  // Focus Timer actions
+  toggleFocusTimer: () => void;
+  resetFocusTimer: () => void;
+  
+  // Actions
+  completeSprintTask: (taskId: string) => void;
+  reshuffleSprint: (customPrompt?: string) => void;
   completeStep: (stepId: string) => void;
   checkInSquad: (encouragement?: string) => void;
   sendSquadNudge: (memberId: string) => void;
+  congratulateMacroMilestone: (updateId: string) => void;
   createCommunityPost: (title: string, content: string, skillId: string, category: CommunityPost['category']) => void;
   toggleUpvotePost: (postId: string) => void;
   addReplyToPost: (postId: string, content: string) => void;
   toggleFollowCreator: (creatorId: string) => void;
+  toggleLikeCreatorPost: (postId: string) => void;
+  toggleBookmarkCreatorPost: (postId: string) => void;
+  publishCreatorPost: (title: string, description: string, skillTag: string, contentSnippet: string, resourceLink: string) => void;
+  togglePublishPortfolio: (portfolioId: string) => void;
+  completeRealWorldProof: (proofId: string) => void;
   markNotificationRead: (id: string) => void;
   updateUserProfile: (updates: Partial<UserProfile>) => void;
   finishOnboarding: (selectedSkillTitles: string[]) => void;
@@ -72,15 +145,32 @@ const HuddleContext = createContext<HuddleContextType | undefined>(undefined);
 
 export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile>(initialUser);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [authLoading, setAuthLoading] = useState<boolean>(true);
   const [skillsHealth, setSkillsHealth] = useState<SkillHealth[]>(initialSkillsHealth);
   const [roadmap, setRoadmap] = useState<SkillRoadmap>(initialRoadmap);
   const [squad, setSquad] = useState<MicroSquad>(initialSquad);
+  const [macroSquad, setMacroSquad] = useState<MacroSquad>(initialMacroSquad);
   const [posts, setPosts] = useState<CommunityPost[]>(initialPosts);
   const [creators, setCreators] = useState<CreatorProfile[]>(initialCreators);
+  const [creatorPosts, setCreatorPosts] = useState<CreatorPost[]>(initialCreatorPosts);
   const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications);
   const [mascotMessages, setMascotMessages] = useState<MascotMessage[]>(initialMascotMessages);
+  const [sprint, setSprint] = useState<SprintChecklist>(initialSprint);
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>(initialPortfolioItems);
+  const [realWorldProofs, setRealWorldProofs] = useState<RealWorldProofItem[]>(initialRealWorldProofs);
+  const [careerTimeline, setCareerTimeline] = useState<CareerTimelineEntry[]>(initialCareerTimeline);
+  
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [theme, setThemeState] = useState<'dark' | 'light'>('dark');
+  
+  // Focus Timer state (starts at 18 mins / 1080 secs today)
+  const [secondsFocusedToday, setSecondsFocusedToday] = useState(1080);
+  const [isTimerRunning, setIsTimerRunning] = useState(true);
+  const [isAppFocused, setIsAppFocused] = useState(true);
+  const [showBingeQuizModal, setShowBingeQuizModal] = useState(false);
+
+  // UI modal toggles
   const [searchOpen, setSearchOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mascotOpen, setMascotOpen] = useState(false);
@@ -89,15 +179,269 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [onboardingActive, setOnboardingActive] = useState(false);
   const [selectedStepModal, setSelectedStepModal] = useState<JourneyStep | null>(null);
   const [selectedCreatorModal, setSelectedCreatorModal] = useState<CreatorProfile | null>(null);
+  const [creatorUploadModalOpen, setCreatorUploadModalOpen] = useState(false);
+
+  // Load from Supabase on mount & subscribe to Realtime updates
+  useEffect(() => {
+    async function loadSupabaseData() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          setIsAuthenticated(true);
+          const activeUserId = session.user.id;
+          const [
+            dbProfile,
+            dbSprint,
+            dbPortfolio,
+            dbProofs,
+            dbSquad,
+            dbCreatorPosts
+          ] = await Promise.all([
+            fetchUserProfile(activeUserId),
+            fetchCurrentSprint(activeUserId),
+            fetchPortfolioItems(activeUserId),
+            fetchRealWorldProofs(activeUserId),
+            fetchSquad('squad-1'),
+            fetchCreatorPosts()
+          ]);
+
+          if (dbProfile) setUser(dbProfile);
+          if (dbSprint) setSprint(dbSprint);
+          if (dbPortfolio && dbPortfolio.length > 0) setPortfolioItems(dbPortfolio);
+          if (dbProofs && dbProofs.length > 0) setRealWorldProofs(dbProofs);
+          if (dbSquad) setSquad(dbSquad);
+          if (dbCreatorPosts && dbCreatorPosts.length > 0) setCreatorPosts(dbCreatorPosts);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (err) {
+        console.error('Supabase initial data fetch error:', err);
+        setIsAuthenticated(false);
+      } finally {
+        setAuthLoading(false);
+      }
+    }
+
+    loadSupabaseData();
+
+    // 1. Auth listener
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        setIsAuthenticated(true);
+        const profile = await fetchUserProfile(session.user.id);
+        if (profile) {
+          setUser(profile);
+          const userSprint = await fetchCurrentSprint(session.user.id);
+          if (userSprint) setSprint(userSprint);
+          const userPort = await fetchPortfolioItems(session.user.id);
+          if (userPort) setPortfolioItems(userPort);
+          const userProofs = await fetchRealWorldProofs(session.user.id);
+          if (userProofs) setRealWorldProofs(userProofs);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setIsAuthenticated(false);
+      }
+    });
+
+    // 2. Realtime subscription for squad activity pings
+    const squadChannel = supabase
+      .channel('realtime:squad_activity_pings')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'squad_activity_pings' },
+        payload => {
+          const newPing = payload.new as any;
+          setSquad(prev => {
+            if (prev.activityPings.some(p => p.id === newPing.id)) return prev;
+            return {
+              ...prev,
+              currentProgress: Math.min(prev.targetProgress, prev.currentProgress + 1),
+              activityPings: [
+                {
+                  id: newPing.id,
+                  memberId: newPing.member_id,
+                  memberName: newPing.member_name,
+                  memberAvatar: newPing.member_avatar,
+                  actionText: newPing.action_text,
+                  timestamp: 'Just now',
+                  type: newPing.ping_type
+                },
+                ...prev.activityPings
+              ]
+            };
+          });
+        }
+      )
+      .subscribe();
+
+    // 3. Realtime subscription for creator posts
+    const creatorChannel = supabase
+      .channel('realtime:creator_posts')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'creator_posts' },
+        payload => {
+          const newPost = payload.new as any;
+          setCreatorPosts(prev => {
+            if (prev.some(p => p.id === newPost.id)) return prev;
+            return [
+              {
+                id: newPost.id,
+                creatorId: newPost.creator_id,
+                creatorName: newPost.creator_name,
+                creatorHandle: newPost.creator_handle,
+                creatorAvatar: newPost.creator_avatar,
+                creatorTitle: newPost.creator_title,
+                sponsorBadge: newPost.sponsor_badge,
+                skillTag: newPost.skill_tag,
+                title: newPost.title,
+                description: newPost.description,
+                contentSnippet: newPost.content_snippet,
+                duration: newPost.duration,
+                videoUrl: newPost.video_url,
+                resourceLinks: newPost.resource_links || [],
+                likesCount: newPost.likes_count || 0,
+                createdAt: 'Just now'
+              },
+              ...prev
+            ];
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      authListener.subscription.unsubscribe();
+      supabase.removeChannel(squadChannel);
+      supabase.removeChannel(creatorChannel);
+    };
+  }, []);
+
+  // Theme synchronization and persistence
+  useEffect(() => {
+    const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('huddle_theme') as 'dark' | 'light' | null : null;
+    if (storedTheme && (storedTheme === 'dark' || storedTheme === 'light')) {
+      setThemeState(storedTheme);
+    }
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
-    if (theme === 'light') {
-      root.classList.add('light-theme');
+    if (theme === 'dark') {
+      root.classList.add('dark');
+      root.classList.remove('light');
     } else {
-      root.classList.remove('light-theme');
+      root.classList.remove('dark');
+      root.classList.add('light');
     }
+    try {
+      localStorage.setItem('huddle_theme', theme);
+    } catch (e) {}
   }, [theme]);
+
+  // Window Focus / Blur & Visibility listeners
+  useEffect(() => {
+    const handleFocus = () => setIsAppFocused(true);
+    const handleBlur = () => setIsAppFocused(false);
+    const handleVisibilityChange = () => {
+      setIsAppFocused(!document.hidden);
+    };
+
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('blur', handleBlur);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('blur', handleBlur);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  // Focus Timer interval
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    if (isTimerRunning && isAppFocused) {
+      interval = setInterval(() => {
+        setSecondsFocusedToday(prev => {
+          const next = prev + 1;
+          if (next > 0 && next % 1500 === 0) {
+            setShowBingeQuizModal(true);
+          }
+          return next;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isTimerRunning, isAppFocused]);
+
+  // Auth Methods
+  const login = async (email: string, password: string) => {
+    const { user: authUser, error } = await signInUser(email, password);
+    if (error) return { success: false, error };
+    if (authUser) {
+      setIsAuthenticated(true);
+      const profile = await fetchUserProfile(authUser.id);
+      if (profile) setUser(profile);
+      return { success: true };
+    }
+    return { success: false, error: 'User not found' };
+  };
+
+  const signup = async (email: string, password: string, fullName: string) => {
+    const { user: authUser, error } = await signUpUser(email, password, fullName);
+    if (error) return { success: false, error };
+    if (authUser) {
+      setIsAuthenticated(true);
+      const profile = await fetchUserProfile(authUser.id);
+      if (profile) setUser(profile);
+      return { success: true };
+    }
+    return { success: false, error: 'Sign up failed' };
+  };
+
+  const logout = async () => {
+    await signOutUser();
+    setIsAuthenticated(false);
+  };
+
+  const loginDemo = async () => {
+    setIsAuthenticated(true);
+    const activeUserId = 'user-1';
+    const [
+      dbProfile,
+      dbSprint,
+      dbPortfolio,
+      dbProofs,
+      dbSquad,
+      dbCreatorPosts
+    ] = await Promise.all([
+      fetchUserProfile(activeUserId),
+      fetchCurrentSprint(activeUserId),
+      fetchPortfolioItems(activeUserId),
+      fetchRealWorldProofs(activeUserId),
+      fetchSquad('squad-1'),
+      fetchCreatorPosts()
+    ]);
+
+    if (dbProfile) setUser(dbProfile);
+    if (dbSprint) setSprint(dbSprint);
+    if (dbPortfolio && dbPortfolio.length > 0) setPortfolioItems(dbPortfolio);
+    if (dbProofs && dbProofs.length > 0) setRealWorldProofs(dbProofs);
+    if (dbSquad) setSquad(dbSquad);
+    if (dbCreatorPosts && dbCreatorPosts.length > 0) setCreatorPosts(dbCreatorPosts);
+  };
+
+  const toggleFocusTimer = () => {
+    setIsTimerRunning(prev => !prev);
+  };
+
+  const resetFocusTimer = () => {
+    setSecondsFocusedToday(0);
+  };
 
   const setTheme = (newTheme: 'dark' | 'light') => {
     setThemeState(newTheme);
@@ -116,128 +460,220 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setAuthModalOpen(false);
   };
 
-  const completeStep = (stepId: string) => {
-    setRoadmap(prev => {
-      const stepIndex = prev.steps.findIndex(s => s.id === stepId);
-      if (stepIndex === -1) return prev;
+  // Complete a task in the 2-5 day Sprint Checklist
+  const completeSprintTask = (taskId: string) => {
+    const targetTask = sprint.tasks.find(t => t.id === taskId);
+    if (!targetTask) return;
 
-      const updatedSteps = [...prev.steps];
-      updatedSteps[stepIndex] = {
-        ...updatedSteps[stepIndex],
-        status: 'completed',
-        completedAt: 'Just now'
-      };
+    const nextCompleted = !targetTask.completed;
 
-      let nextIndex = prev.currentStepIndex;
-      if (stepIndex < updatedSteps.length - 1) {
-        nextIndex = stepIndex + 1;
-        if (updatedSteps[nextIndex].status === 'upcoming') {
-          updatedSteps[nextIndex] = {
-            ...updatedSteps[nextIndex],
-            status: 'current'
-          };
-        }
-      }
-
-      return {
-        ...prev,
-        currentStepIndex: nextIndex,
-        steps: updatedSteps
-      };
-    });
-
-    setSkillsHealth(prev => 
-      prev.map(sh => {
-        if (sh.skillId === roadmap.skillId) {
-          const newHealth = Math.min(100, sh.healthPercent + 6);
-          return {
-            ...sh,
-            healthPercent: newHealth,
-            lastPracticed: 'Today',
-            status: newHealth > 80 ? 'optimal' : 'maintaining'
-          };
-        }
-        return sh;
-      })
-    );
-
-    setUser(prev => ({
+    setSprint(prev => ({
       ...prev,
-      reputation: prev.reputation + 25
+      tasks: prev.tasks.map(t => 
+        t.id === taskId 
+          ? { ...t, completed: nextCompleted, completedAt: nextCompleted ? 'Just now' : undefined }
+          : t
+      )
     }));
 
-    const newNotif: NotificationItem = {
+    updateSprintTaskCompletion(taskId, nextCompleted, nextCompleted ? 'Just now' : undefined);
+
+    if (nextCompleted) {
+      try {
+        import('canvas-confetti').then((confettiModule) => {
+          const confetti = confettiModule.default;
+          confetti({
+            particleCount: 40,
+            spread: 60,
+            origin: { y: 0.6 },
+            colors: ['#6366f1', '#a855f7', '#10b981', '#f59e0b']
+          });
+        });
+      } catch (e) {
+        // Safe fallback
+      }
+
+      if (targetTask.producesArtifact && targetTask.artifactTitle) {
+        const newPortfolioItem: PortfolioItem = {
+          id: `port-${Date.now()}`,
+          title: targetTask.artifactTitle,
+          category: sprint.skillTitle,
+          date: 'Just now',
+          description: `Auto-assembled artifact produced from sprint task: "${targetTask.title}".`,
+          artifactType: targetTask.artifactType || 'code',
+          previewSnippet: `// Sprint Artifact: ${targetTask.artifactTitle}\n// Verified deliberate practice task\nexport const artifact = { verified: true, creator: "${targetTask.creatorName}" };`,
+          isPublished: false,
+          sourceTaskId: targetTask.id,
+          tags: [sprint.skillTitle, 'Auto-assembled']
+        };
+
+        setPortfolioItems(prev => [newPortfolioItem, ...prev]);
+        addPortfolioItemToDb(newPortfolioItem, user.id);
+
+        const newTimelineEntry: CareerTimelineEntry = {
+          id: `tl-${Date.now()}`,
+          date: 'Today',
+          type: 'portfolio_piece',
+          title: `Artifact Produced: ${targetTask.artifactTitle}`,
+          description: `Generated from sprint task with ${targetTask.creatorName}. Added to private portfolio.`,
+          badge: 'Portfolio Ready'
+        };
+        setCareerTimeline(prev => [newTimelineEntry, ...prev]);
+      }
+
+      const newSquadPing = {
+        id: `ping-${Date.now()}`,
+        memberId: user.id,
+        memberName: user.name,
+        memberAvatar: user.avatar,
+        actionText: `completed: "${targetTask.title}"`,
+        timestamp: 'Just now',
+        type: 'task_completed' as const
+      };
+
+      setSquad(prev => ({
+        ...prev,
+        currentProgress: Math.min(prev.targetProgress, prev.currentProgress + 1),
+        activityPings: [newSquadPing, ...prev.activityPings]
+      }));
+
+      addSquadActivityPingToDb(squad.id, user.id, user.name, user.avatar, `completed: "${targetTask.title}"`);
+
+      setSkillsHealth(prev => 
+        prev.map(sh => {
+          if (sh.skillTitle.toLowerCase().includes(sprint.skillTitle.toLowerCase())) {
+            return {
+              ...sh,
+              healthPercent: Math.min(100, sh.healthPercent + 5),
+              lastPracticed: 'Today',
+              status: 'optimal'
+            };
+          }
+          return sh;
+        })
+      );
+
+      setUser(prev => {
+        const nextUser = {
+          ...prev,
+          reputation: prev.reputation + 20,
+          streak: prev.streak + 1
+        };
+        updateProfileInDb(user.id, { streak: nextUser.streak, reputation: nextUser.reputation });
+        return nextUser;
+      });
+
+      const notif: NotificationItem = {
+        id: `n-${Date.now()}`,
+        type: 'milestone',
+        title: 'Sprint Task Completed',
+        description: `Day ${targetTask.dayNumber} verified! Streak is now ${user.streak + 1} days.`,
+        timestamp: 'Just now',
+        read: false
+      };
+      setNotifications(prev => [notif, ...prev]);
+    }
+  };
+
+  // Zero-penalty Sprint Reshuffle
+  const reshuffleSprint = (customPrompt?: string) => {
+    setSprint(prev => ({
+      ...prev,
+      currentDay: 1,
+      reshuffleCount: prev.reshuffleCount + 1,
+      lastReshuffledAt: 'Just now',
+      mascotNarration: customPrompt 
+        ? `I reshuffled your schedule to fit your rhythm with zero penalties! Pick up Day 1 whenever you're ready.`
+        : `Schedule reshuffled smoothly! Ready to start fresh with Day 1.`
+    }));
+
+    reshuffleSprintInDb(sprint.id, 1, customPrompt);
+
+    const notif: NotificationItem = {
       id: `n-${Date.now()}`,
-      type: 'milestone',
-      title: 'Step Completed',
-      description: 'You completed a step in System Architecture.',
+      type: 'weekly_recap',
+      title: 'Sprint Reshuffled',
+      description: 'Zero penalty applied. Your progress and streak remain fully intact.',
       timestamp: 'Just now',
       read: false
     };
-    setNotifications(prev => [newNotif, ...prev]);
+    setNotifications(prev => [notif, ...prev]);
+  };
+
+  const completeStep = (stepId: string) => {
+    setRoadmap(prev => {
+      const updatedSteps = prev.steps.map(s => 
+        s.id === stepId 
+          ? { ...s, status: 'completed' as const, completedAt: 'Just now' } 
+          : s
+      );
+      return { ...prev, steps: updatedSteps };
+    });
   };
 
   const checkInSquad = (encouragement?: string) => {
-    setSquad(prev => {
-      const updatedMembers = prev.members.map(m => {
-        if (m.id === user.id) {
-          return {
-            ...m,
-            checkedInToday: true,
-            streak: m.streak + 1,
-            lastCheckIn: 'Just now',
-            recentEncouragement: encouragement || 'Step completed!'
-          };
-        }
-        return m;
-      });
-
-      const checkedInCount = updatedMembers.filter(m => m.checkedInToday).length;
-      return {
-        ...prev,
-        members: updatedMembers,
-        currentProgress: Math.min(prev.targetProgress, prev.currentProgress + 1)
-      };
-    });
-
-    setUser(prev => ({
+    setSquad(prev => ({
       ...prev,
-      streak: prev.streak + 1
+      members: prev.members.map(m => 
+        m.id === user.id 
+          ? { ...m, checkedInToday: true, recentEncouragement: encouragement || m.recentEncouragement } 
+          : m
+      )
     }));
+
+    const newSquadPing = {
+      id: `ping-${Date.now()}`,
+      memberId: user.id,
+      memberName: user.name,
+      memberAvatar: user.avatar,
+      actionText: encouragement ? `posted: "${encouragement}"` : 'checked in for daily focus practice',
+      timestamp: 'Just now',
+      type: 'checkin' as const
+    };
+
+    setSquad(prev => ({
+      ...prev,
+      activityPings: [newSquadPing, ...prev.activityPings]
+    }));
+
+    addSquadActivityPingToDb(squad.id, user.id, user.name, user.avatar, newSquadPing.actionText, 'checkin');
   };
 
   const sendSquadNudge = (memberId: string) => {
-    const target = squad.members.find(m => m.id === memberId);
-    if (!target) return;
+    const member = squad.members.find(m => m.id === memberId);
+    if (!member) return;
 
-    const newNotif: NotificationItem = {
+    const notif: NotificationItem = {
       id: `n-${Date.now()}`,
       type: 'squad_checkin',
-      title: 'Nudge Sent',
-      description: `Sent a warm check-in reminder to ${target.name}.`,
+      title: 'Squad Encouragement Sent',
+      description: `You sent a gentle check-in nudge to ${member.name}.`,
       timestamp: 'Just now',
       read: false
     };
-    setNotifications(prev => [newNotif, ...prev]);
+    setNotifications(prev => [notif, ...prev]);
   };
 
-  const createCommunityPost = (
-    title: string, 
-    content: string, 
-    skillId: string, 
-    category: CommunityPost['category']
-  ) => {
-    const skillNameMap: Record<string, string> = {
-      'sys-arch': 'System Architecture',
-      'next-rsc': 'Next.js App Router & RSC',
-      'ts-type-mechanics': 'TypeScript Type Mechanics',
-      'ui-micro': 'Product UI & Micro-interactions'
-    };
+  const congratulateMacroMilestone = (updateId: string) => {
+    setMacroSquad(prev => ({
+      ...prev,
+      milestoneUpdates: prev.milestoneUpdates.map(u => 
+        u.id === updateId 
+          ? { 
+              ...u, 
+              congratsCount: u.userCongratulated ? u.congratsCount - 1 : u.congratsCount + 1,
+              userCongratulated: !u.userCongratulated 
+            } 
+          : u
+      )
+    }));
+  };
 
+  const createCommunityPost = (title: string, content: string, skillId: string, category: CommunityPost['category']) => {
     const newPost: CommunityPost = {
       id: `post-${Date.now()}`,
       skillId,
-      skillTitle: skillNameMap[skillId] || 'Engineering',
+      skillTitle: sprint.skillTitle,
       authorName: user.name,
       authorHandle: user.handle,
       authorAvatar: user.avatar,
@@ -248,134 +684,230 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       upvotes: 1,
       userUpvoted: true,
       repliesCount: 0,
-      createdAt: 'Just now'
+      createdAt: 'Just now',
+      replies: []
     };
-
     setPosts(prev => [newPost, ...prev]);
-    setUser(prev => ({ ...prev, reputation: prev.reputation + 10 }));
   };
 
   const toggleUpvotePost = (postId: string) => {
-    setPosts(prev => 
-      prev.map(p => {
-        if (p.id === postId) {
-          const isUpvoted = p.userUpvoted;
-          return {
-            ...p,
-            userUpvoted: !isUpvoted,
-            upvotes: isUpvoted ? p.upvotes - 1 : p.upvotes + 1
-          };
-        }
-        return p;
-      })
-    );
+    setPosts(prev => prev.map(p => {
+      if (p.id === postId) {
+        return {
+          ...p,
+          upvotes: p.userUpvoted ? p.upvotes - 1 : p.upvotes + 1,
+          userUpvoted: !p.userUpvoted
+        };
+      }
+      return p;
+    }));
   };
 
   const addReplyToPost = (postId: string, content: string) => {
-    setPosts(prev => 
-      prev.map(p => {
-        if (p.id === postId) {
-          const newReply = {
-            id: `rep-${Date.now()}`,
-            authorName: user.name,
-            authorHandle: user.handle,
-            authorAvatar: user.avatar,
-            content,
-            createdAt: 'Just now',
-            upvotes: 0,
-            isHelpful: false
-          };
-          const existingReplies = p.replies || [];
-          return {
-            ...p,
-            repliesCount: p.repliesCount + 1,
-            replies: [...existingReplies, newReply]
-          };
-        }
-        return p;
-      })
-    );
+    const newReply = {
+      id: `rep-${Date.now()}`,
+      authorName: user.name,
+      authorHandle: user.handle,
+      authorAvatar: user.avatar,
+      content,
+      createdAt: 'Just now',
+      upvotes: 0,
+      isHelpful: false
+    };
+
+    setPosts(prev => prev.map(p => {
+      if (p.id === postId) {
+        return {
+          ...p,
+          repliesCount: p.repliesCount + 1,
+          replies: [...(p.replies || []), newReply]
+        };
+      }
+      return p;
+    }));
   };
 
   const toggleFollowCreator = (creatorId: string) => {
-    setCreators(prev => 
-      prev.map(c => {
-        if (c.id === creatorId) {
-          const nextState = !c.isFollowing;
-          return {
-            ...c,
-            isFollowing: nextState,
-            followersCount: nextState ? c.followersCount + 1 : c.followersCount - 1
-          };
-        }
-        return c;
-      })
-    );
+    setCreators(prev => prev.map(c => {
+      if (c.id === creatorId) {
+        return { ...c, isFollowing: !c.isFollowing, followersCount: c.isFollowing ? c.followersCount - 1 : c.followersCount + 1 };
+      }
+      return c;
+    }));
+  };
+
+  const toggleLikeCreatorPost = (postId: string) => {
+    setCreatorPosts(prev => prev.map(p => {
+      if (p.id === postId) {
+        return {
+          ...p,
+          likesCount: p.userLiked ? p.likesCount - 1 : p.likesCount + 1,
+          userLiked: !p.userLiked
+        };
+      }
+      return p;
+    }));
+  };
+
+  const toggleBookmarkCreatorPost = (postId: string) => {
+    setCreatorPosts(prev => prev.map(p => {
+      if (p.id === postId) {
+        return { ...p, bookmarked: !p.bookmarked };
+      }
+      return p;
+    }));
+  };
+
+  const publishCreatorPost = (title: string, description: string, skillTag: string, contentSnippet: string, resourceLink: string) => {
+    const newPost: CreatorPost = {
+      id: `post-${Date.now()}`,
+      creatorId: user.id,
+      creatorName: user.name,
+      creatorHandle: user.handle,
+      creatorAvatar: user.avatar,
+      creatorTitle: 'Verified Creator',
+      sponsorBadge: 'Community Blueprint',
+      skillTag,
+      title,
+      description,
+      contentSnippet,
+      duration: '15 mins read + blueprint',
+      resourceLinks: resourceLink ? [{ title: 'Download Resource Blueprint', url: resourceLink }] : [],
+      likesCount: 0,
+      createdAt: 'Just now'
+    };
+
+    setCreatorPosts(prev => [newPost, ...prev]);
+    publishCreatorPostToDb(newPost);
+    setCreatorUploadModalOpen(false);
+  };
+
+  const togglePublishPortfolio = (portfolioId: string) => {
+    setPortfolioItems(prev => prev.map(p => {
+      if (p.id === portfolioId) {
+        const nextPublished = !p.isPublished;
+        togglePublishPortfolioInDb(portfolioId, nextPublished);
+        return { ...p, isPublished: nextPublished };
+      }
+      return p;
+    }));
+  };
+
+  const completeRealWorldProof = (proofId: string) => {
+    setRealWorldProofs(prev => prev.map(p => {
+      if (p.id === proofId) {
+        completeRealWorldProofInDb(proofId);
+        return { ...p, completed: true };
+      }
+      return p;
+    }));
   };
 
   const markNotificationRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(n => n.id === id ? { ...n, read: true } : n)
-    );
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
   };
 
   const updateUserProfile = (updates: Partial<UserProfile>) => {
-    setUser(prev => ({ ...prev, ...updates }));
+    setUser(prev => {
+      const next = { ...prev, ...updates };
+      updateProfileInDb(user.id, updates);
+      return next;
+    });
   };
 
   const finishOnboarding = (selectedSkillTitles: string[]) => {
-    setUser(prev => ({
+    const mainSkill = selectedSkillTitles[0] || 'System Architecture';
+    setUser(prev => {
+      const next = { ...prev, onboardingCompleted: true, primaryGoal: `Master ${mainSkill}` };
+      updateProfileInDb(user.id, { onboardingCompleted: true, primaryGoal: next.primaryGoal });
+      return next;
+    });
+    setSprint(prev => ({
       ...prev,
-      onboardingCompleted: true
+      skillTitle: mainSkill
     }));
     setOnboardingActive(false);
-    setActiveTab('dashboard');
   };
 
   return (
-    <HuddleContext.Provider value={{
-      user,
-      skillsHealth,
-      roadmap,
-      squad,
-      posts,
-      creators,
-      notifications,
-      mascotMessages,
-      activeTab,
-      theme,
-      searchOpen,
-      settingsOpen,
-      mascotOpen,
-      authModalOpen,
-      authMode,
-      onboardingActive,
-      selectedStepModal,
-      selectedCreatorModal,
-      
-      setActiveTab,
-      setTheme,
-      toggleTheme,
-      setSearchOpen,
-      setSettingsOpen,
-      setMascotOpen,
-      openAuthModal,
-      closeAuthModal,
-      setOnboardingActive,
-      setSelectedStepModal,
-      setSelectedCreatorModal,
-      
-      completeStep,
-      checkInSquad,
-      sendSquadNudge,
-      createCommunityPost,
-      toggleUpvotePost,
-      addReplyToPost,
-      toggleFollowCreator,
-      markNotificationRead,
-      updateUserProfile,
-      finishOnboarding
-    }}>
+    <HuddleContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        authLoading,
+        login,
+        signup,
+        logout,
+        loginDemo,
+        skillsHealth,
+        roadmap,
+        squad,
+        macroSquad,
+        posts,
+        creators,
+        creatorPosts,
+        notifications,
+        mascotMessages,
+        sprint,
+        portfolioItems,
+        realWorldProofs,
+        careerTimeline,
+        
+        activeTab,
+        theme,
+        
+        secondsFocusedToday,
+        isTimerRunning,
+        isAppFocused,
+        showBingeQuizModal,
+        
+        searchOpen,
+        settingsOpen,
+        mascotOpen,
+        authModalOpen,
+        authMode,
+        onboardingActive,
+        selectedStepModal,
+        selectedCreatorModal,
+        creatorUploadModalOpen,
+        
+        setActiveTab,
+        setTheme,
+        toggleTheme,
+        setSearchOpen,
+        setSettingsOpen,
+        setMascotOpen,
+        openAuthModal,
+        closeAuthModal,
+        setOnboardingActive,
+        setSelectedStepModal,
+        setSelectedCreatorModal,
+        setCreatorUploadModalOpen,
+        setShowBingeQuizModal,
+        
+        toggleFocusTimer,
+        resetFocusTimer,
+        
+        completeSprintTask,
+        reshuffleSprint,
+        completeStep,
+        checkInSquad,
+        sendSquadNudge,
+        congratulateMacroMilestone,
+        createCommunityPost,
+        toggleUpvotePost,
+        addReplyToPost,
+        toggleFollowCreator,
+        toggleLikeCreatorPost,
+        toggleBookmarkCreatorPost,
+        publishCreatorPost,
+        togglePublishPortfolio,
+        completeRealWorldProof,
+        markNotificationRead,
+        updateUserProfile,
+        finishOnboarding
+      }}
+    >
       {children}
     </HuddleContext.Provider>
   );

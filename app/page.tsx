@@ -1,65 +1,31 @@
 'use client';
 
-import React from 'react';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useHuddle } from './context/HuddleContext';
-import { Navbar } from './components/Navbar';
-import { MobileNav } from './components/MobileNav';
-import { DashboardView } from './components/DashboardView';
-import { JourneyView } from './components/JourneyView';
-import { SquadView } from './components/SquadView';
-import { CommunityView } from './components/CommunityView';
-import { CreatorView } from './components/CreatorView';
-import { ProgressView } from './components/ProgressView';
-import { PublicProfileView } from './components/PublicProfileView';
-import { AuthModal } from './components/AuthModal';
-import { OnboardingFlow } from './components/OnboardingFlow';
-import { MascotDrawer } from './components/MascotDrawer';
-import { SearchModal } from './components/SearchModal';
-import { SettingsModal } from './components/SettingsModal';
-import { StepDetailModal } from './components/StepDetailModal';
-import { CreatorDetailModal } from './components/CreatorDetailModal';
 
-export default function Home() {
-  const { activeTab } = useHuddle();
+export default function RootIndexPage() {
+  const router = useRouter();
+  const { isAuthenticated, authLoading } = useHuddle();
 
-  const renderActiveView = () => {
-    switch (activeTab) {
-      case 'dashboard':
-        return <DashboardView />;
-      case 'journey':
-        return <JourneyView />;
-      case 'squad':
-        return <SquadView />;
-      case 'community':
-        return <CommunityView />;
-      case 'creators':
-        return <CreatorView />;
-      case 'progress':
-        return <ProgressView />;
-      case 'profile':
-        return <PublicProfileView />;
-      default:
-        return <DashboardView />;
+  useEffect(() => {
+    if (!authLoading) {
+      if (isAuthenticated) {
+        router.replace('/app');
+      } else {
+        router.replace('/auth/login');
+      }
     }
-  };
+  }, [isAuthenticated, authLoading, router]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col font-sans transition-colors">
-      <Navbar />
-
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-20 md:pb-12">
-        {renderActiveView()}
-      </main>
-
-      <MobileNav />
-
-      <AuthModal />
-      <OnboardingFlow />
-      <MascotDrawer />
-      <SearchModal />
-      <SettingsModal />
-      <StepDetailModal />
-      <CreatorDetailModal />
+    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] flex items-center justify-center">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-xs animate-pulse">
+          H
+        </div>
+        <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      </div>
     </div>
   );
 }

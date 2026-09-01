@@ -1,17 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  X, 
-  CheckCircle2, 
-  Clock, 
-  BookOpen, 
-  ExternalLink, 
-  Sparkles, 
-  Check, 
-  Play, 
-  FileText, 
-  ListChecks, 
+import {
+  X,
+  CheckCircle2,
+  Clock,
+  BookOpen,
+  ExternalLink,
+  Sparkles,
+  Check,
+  Play,
+  FileText,
+  ListChecks,
   Award,
   Download
 } from 'lucide-react';
@@ -27,7 +27,7 @@ export const StepDetailModal: React.FC = () => {
   const step = selectedStepModal;
 
   const toggleCheckitem = (id: string) => {
-    setCompletedChecklist(prev => 
+    setCompletedChecklist(prev =>
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
   };
@@ -44,7 +44,7 @@ export const StepDetailModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-sm animate-in fade-in duration-150">
       <div className="w-full max-w-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-        
+
         <div className="px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
             <BookOpen className="w-4 h-4" />
@@ -82,7 +82,7 @@ export const StepDetailModal: React.FC = () => {
 
           {step.contentMarkdown && (
             <div className="p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-950/40 text-xs sm:text-sm text-zinc-800 dark:text-zinc-200 space-y-3 leading-relaxed">
-              <div className="font-mono text-xs whitespace-pre-wrap">
+              <div className=" text-xs whitespace-pre-wrap">
                 {step.contentMarkdown}
               </div>
             </div>
@@ -102,16 +102,14 @@ export const StepDetailModal: React.FC = () => {
                     <div
                       key={item.id}
                       onClick={() => toggleCheckitem(item.id)}
-                      className={`p-3.5 rounded-2xl border cursor-pointer flex items-center justify-between text-xs transition-all ${
-                        checked 
-                          ? 'border-emerald-200 dark:border-emerald-900/40 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-900 dark:text-emerald-300' 
+                      className={`p-3.5 rounded-2xl border cursor-pointer flex items-center justify-between text-xs transition-all ${checked
+                          ? 'border-emerald-200 dark:border-emerald-900/40 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-900 dark:text-emerald-300'
                           : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 text-zinc-800 dark:text-zinc-200'
-                      }`}
+                        }`}
                     >
                       <span>{item.text}</span>
-                      <div className={`w-5 h-5 rounded-lg flex items-center justify-center border ${
-                        checked ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-zinc-300 dark:border-zinc-600'
-                      }`}>
+                      <div className={`w-5 h-5 rounded-lg flex items-center justify-center border ${checked ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-zinc-300 dark:border-zinc-600'
+                        }`}>
                         {checked && <Check className="w-3.5 h-3.5" />}
                       </div>
                     </div>
@@ -127,9 +125,9 @@ export const StepDetailModal: React.FC = () => {
                 <Download className="w-4 h-4 text-indigo-500" />
                 Attached Code Resource Repository
               </div>
-              <a 
-                href={step.resourceUrl} 
-                target="_blank" 
+              <a
+                href={step.resourceUrl}
+                target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-1 font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
               >

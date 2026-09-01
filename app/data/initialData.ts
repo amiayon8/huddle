@@ -3,426 +3,558 @@ import {
   SkillHealth, 
   SkillRoadmap, 
   MicroSquad, 
+  MacroSquad,
   CommunityPost, 
   CreatorProfile, 
-  NotificationItem,
-  MascotMessage
+  CreatorPost, 
+  NotificationItem, 
+  MascotMessage, 
+  SprintChecklist, 
+  PortfolioItem, 
+  RealWorldProofItem, 
+  CareerTimelineEntry 
 } from '../types/huddle';
 
-export const initialUser: UserProfile = {
-  id: 'u-1',
-  name: 'Alex Rivera',
-  handle: '@alexrivera',
-  email: 'alex@huddle.dev',
-  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
-  bio: 'Building resilient backend systems and micro-interactions. Learning System Architecture and Modern React.',
-  streak: 5,
-  maxStreak: 14,
-  reputation: 340,
-  squadId: 'sq-1',
-  onboardingCompleted: true,
-  joinedDate: 'October 2025',
-  privacy: {
-    showStreak: true,
-    showSquad: true,
-    showReputation: true,
-    publicProfile: true,
-  }
-};
-
-export const initialSkillsHealth: SkillHealth[] = [
-  {
-    skillId: 'sys-arch',
-    skillTitle: 'System Architecture',
-    category: 'Engineering',
-    healthPercent: 88,
-    decayRate: '-2% / day',
-    lastPracticed: 'Today',
-    status: 'optimal',
-  },
-  {
-    skillId: 'next-rsc',
-    skillTitle: 'Next.js App Router & RSC',
-    category: 'Frontend',
-    healthPercent: 94,
-    decayRate: '-1% / day',
-    lastPracticed: 'Yesterday',
-    status: 'optimal',
-  },
-  {
-    skillId: 'ts-type-mechanics',
-    skillTitle: 'TypeScript Type Mechanics',
-    category: 'Languages',
-    healthPercent: 62,
-    decayRate: '-4% / day',
-    lastPracticed: '4 days ago',
-    status: 'decaying',
-  },
-  {
-    skillId: 'ui-micro',
-    skillTitle: 'Product UI & Micro-interactions',
-    category: 'Design',
-    healthPercent: 78,
-    decayRate: '-2% / day',
-    lastPracticed: '2 days ago',
-    status: 'maintaining',
-  }
-];
-
-export const initialRoadmap: SkillRoadmap = {
-  skillId: 'sys-arch',
-  skillTitle: 'System Architecture',
-  skillIcon: 'Cpu',
-  currentStepIndex: 2,
-  totalSteps: 6,
-  milestones: [
-    { id: 'm-1', title: 'Caching Foundations', stepNumber: 1, reached: true },
-    { id: 'm-2', title: 'Event-Driven Patterns', stepNumber: 3, reached: false },
-    { id: 'm-3', title: 'Database Partitioning', stepNumber: 5, reached: false },
-    { id: 'm-4', title: 'Zero-Downtime Deployments', stepNumber: 6, reached: false }
-  ],
-  steps: [
-    {
-      id: 'step-1',
-      skillId: 'sys-arch',
-      stepNumber: 1,
-      title: 'Core Trade-offs in Distributed Caching',
-      description: 'Understand cache invalidation strategies, read-through vs write-behind patterns, and evicted key policies.',
-      estimatedMinutes: 15,
-      type: 'article',
-      creatorName: 'Elena Rostova',
-      creatorHandle: '@elenarostova',
-      creatorAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=250&q=80',
-      contentMarkdown: `### Distributed Caching Best Practices\n\nWhen scaling backend microservices, Redis or Memcached serve as the primary caching tier. Key decisions involve balancing latency against consistency.\n\n* **Write-Through Caching**: Ensures database and cache are updated simultaneously, providing strong read consistency at the cost of higher write latency.\n* **Write-Behind (Write-Back)**: Acknowledges writes immediately to cache while async workers persist data asynchronously to primary storage.\n* **Cache Stamps & Thundering Herd**: Mitigate stampedes by using probabilistic early expiration or mutex locks during cache misses.`,
-      status: 'completed',
-      completedAt: 'Yesterday'
-    },
-    {
-      id: 'step-2',
-      skillId: 'sys-arch',
-      stepNumber: 2,
-      title: 'Rate Limiting Algorithms & Sliding Windows',
-      description: 'Compare Token Bucket, Leaky Bucket, and Fixed Window algorithms for high-throughput public APIs.',
-      estimatedMinutes: 20,
-      type: 'checklist',
-      creatorName: 'Elena Rostova',
-      creatorHandle: '@elenarostova',
-      creatorAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=250&q=80',
-      checklistItems: [
-        { id: 'c-1', text: 'Evaluate memory overhead of sliding window log vs sliding window counter', completed: true },
-        { id: 'c-2', text: 'Implement Redis atomic script for burst protection', completed: true },
-        { id: 'c-3', text: 'Configure rate limit headers (X-RateLimit-Remaining, Retry-After)', completed: true }
-      ],
-      status: 'completed',
-      completedAt: 'Yesterday'
-    },
-    {
-      id: 'step-3',
-      skillId: 'sys-arch',
-      stepNumber: 3,
-      title: 'Event-Driven Architecture with Message Queues',
-      description: 'Implement idempotent event consumers using RabbitMQ/Kafka patterns to ensure at-least-once message delivery.',
-      estimatedMinutes: 18,
-      type: 'article',
-      creatorName: 'Elena Rostova',
-      creatorHandle: '@elenarostova',
-      creatorAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=250&q=80',
-      contentMarkdown: `### Designing Idempotent Message Consumers\n\nIn event-driven systems, network retries make duplicate message delivery inevitable. To maintain data integrity, every queue consumer must be idempotent.\n\n#### Key Principles:\n1. **Deduplication Keys**: Store unique event UUIDs in Redis with TTL before processing payload.\n2. **Outbox Pattern**: Avoid dual-write race conditions by writing domain state changes and outbox events inside a single SQL transaction.\n3. **Dead Letter Queues**: Route unhandled exceptions after N retries to DLQ for manual inspection and telemetry reporting.`,
-      checklistItems: [
-        { id: 'c-4', text: 'Understand Outbox Pattern dual-write prevention', completed: false },
-        { id: 'c-5', text: 'Define Dead Letter Queue retry backoff thresholds', completed: false },
-        { id: 'c-6', text: 'Verify idempotent consumer database constraint check', completed: false }
-      ],
-      resourceUrl: 'https://github.com/huddle-samples/event-driven-patterns',
-      status: 'current'
-    },
-    {
-      id: 'step-4',
-      skillId: 'sys-arch',
-      stepNumber: 4,
-      title: 'Sharding & Database Read Replicas',
-      description: 'Master horizontal database partition keys, replica lag handling, and query routing strategies.',
-      estimatedMinutes: 25,
-      type: 'video',
-      creatorName: 'Elena Rostova',
-      creatorHandle: '@elenarostova',
-      creatorAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=250&q=80',
-      status: 'upcoming'
-    },
-    {
-      id: 'step-5',
-      skillId: 'sys-arch',
-      stepNumber: 5,
-      title: 'Zero-Downtime Schema Migrations',
-      description: 'Execute Expand-Contract migration patterns safely on active production databases without locking queries.',
-      estimatedMinutes: 22,
-      type: 'checklist',
-      creatorName: 'Elena Rostova',
-      creatorHandle: '@elenarostova',
-      creatorAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=250&q=80',
-      status: 'upcoming'
-    },
-    {
-      id: 'step-6',
-      skillId: 'sys-arch',
-      stepNumber: 6,
-      title: 'Capstone: Resilient Architecture Peer Review',
-      description: 'Submit an architectural decision record (ADR) for peer feedback in your Micro-Squad.',
-      estimatedMinutes: 30,
-      type: 'resource',
-      creatorName: 'Elena Rostova',
-      creatorHandle: '@elenarostova',
-      creatorAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=250&q=80',
-      status: 'upcoming'
+/**
+ * Dynamic User Generator
+ */
+export function createDynamicUser(name: string = 'Engineer', email: string = 'user@huddle.dev'): UserProfile {
+  const handle = `@${name.toLowerCase().replace(/\s+/g, '')}`;
+  return {
+    id: `u-${Date.now()}`,
+    name,
+    handle,
+    email,
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
+    bio: 'Turning doomscroll impulse into 1 deliberate daily engineering action.',
+    streak: 1,
+    maxStreak: 1,
+    reputation: 50,
+    squadId: 'squad-1',
+    macroSquadId: 'macro-squad-1',
+    onboardingCompleted: true,
+    joinedDate: 'Today',
+    primaryGoal: 'Master System Architecture',
+    careerMilestone: 'Staff Software Engineer',
+    privacy: {
+      showStreak: true,
+      showSquad: true,
+      showReputation: true,
+      publicProfile: true,
+      hideRawRoadmaps: true
     }
-  ]
-};
+  };
+}
+
+/**
+ * Dynamic Skill Health Generator
+ */
+export function createDynamicSkillsHealth(skills: string[] = ['System Architecture']): SkillHealth[] {
+  const categories: Record<string, string> = {
+    'System Architecture': 'Engineering',
+    'Next.js App Router': 'Frontend',
+    'TypeScript Type Mechanics': 'Languages',
+    'Product UI & Micro-interactions': 'Design',
+    'AI Engineering & Agents': 'AI & ML'
+  };
+
+  return skills.map((title, idx) => {
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    return {
+      skillId: slug,
+      skillTitle: title,
+      category: categories[title] || 'Engineering',
+      healthPercent: Math.max(70, 95 - idx * 8),
+      decayRate: '-2% / week',
+      lastPracticed: idx === 0 ? 'Today' : `${idx + 1} days ago`,
+      status: idx === 0 ? 'optimal' : 'maintaining'
+    };
+  });
+}
+
+/**
+ * Dynamic Sprint Generator based on chosen skill
+ */
+export function createDynamicSprint(
+  skillTitle: string = 'System Architecture',
+  milestone: string = 'Staff Software Engineer',
+  durationDays: number = 4
+): SprintChecklist {
+  const sprintBlueprints: Record<string, Array<{
+    title: string;
+    desc: string;
+    type: 'learn' | 'build' | 'real_world_proof';
+    creator: string;
+    handle: string;
+    avatar: string;
+    mins: number;
+    artifact?: string;
+  }>> = {
+    'System Architecture': [
+      {
+        title: 'Distributed Caching & Stampede Defense',
+        desc: 'Study probabilistic early expiration (XFetch algorithm) and Redis mutex locking patterns.',
+        type: 'learn',
+        creator: 'Elena Rostova',
+        handle: '@elena_distrib',
+        avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+        mins: 15,
+        artifact: 'Cache Stampede Mitigation Benchmark'
+      },
+      {
+        title: 'Atomic Lua Scripts in Redis Clusters',
+        desc: 'Implement single-threaded atomic mutex locking scripts to protect critical path cache keys.',
+        type: 'build',
+        creator: 'Elena Rostova',
+        handle: '@elena_distrib',
+        avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+        mins: 18,
+        artifact: 'Redis Lua Stampede Shield Mutex Blueprint'
+      },
+      {
+        title: 'Write-Through vs Write-Behind Tradeoffs',
+        desc: 'Analyze durability vs latency benchmarks with PostgreSQL replica failovers.',
+        type: 'learn',
+        creator: 'Marcus Vance',
+        handle: '@marcus_vance',
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+        mins: 20
+      },
+      {
+        title: 'Real-World Proof: Open-Source Cache ADR',
+        desc: 'Draft and submit an Architecture Decision Record (ADR) pull request documenting cache stampede mitigation.',
+        type: 'real_world_proof',
+        creator: 'Elena Rostova',
+        handle: '@elena_distrib',
+        avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+        mins: 15,
+        artifact: 'Open-Source Distributed Cache ADR #104'
+      }
+    ],
+    'Next.js App Router': [
+      {
+        title: 'RSC Stream Rendering & Suspense Boundaries',
+        desc: 'Master parallel nested layouts and suspense fallbacks for sub-100ms TTFB.',
+        type: 'learn',
+        creator: 'Kenji Sato',
+        handle: '@kenjisato',
+        avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150&auto=format&fit=crop&q=80',
+        mins: 15,
+        artifact: 'Streaming Layout Fallback Blueprint'
+      },
+      {
+        title: 'Server Actions with Optimistic UI Mutation',
+        desc: 'Implement type-safe server mutations with immediate optimistic client rollbacks.',
+        type: 'build',
+        creator: 'Kenji Sato',
+        handle: '@kenjisato',
+        avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150&auto=format&fit=crop&q=80',
+        mins: 20,
+        artifact: 'Optimistic Server Action Pattern'
+      },
+      {
+        title: 'Partial Prerendering (PPR) Architecture',
+        desc: 'Evaluate static shell caching combined with dynamic hole streaming.',
+        type: 'learn',
+        creator: 'Kenji Sato',
+        handle: '@kenjisato',
+        avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150&auto=format&fit=crop&q=80',
+        mins: 15
+      },
+      {
+        title: 'Public Benchmark: TTFB Comparison',
+        desc: 'Publish a micro-benchmark comparing standard SSR vs streaming RSC.',
+        type: 'real_world_proof',
+        creator: 'Kenji Sato',
+        handle: '@kenjisato',
+        avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150&auto=format&fit=crop&q=80',
+        mins: 15,
+        artifact: 'Next.js PPR Performance Benchmark'
+      }
+    ]
+  };
+
+  const tasksTemplate = sprintBlueprints[skillTitle] || sprintBlueprints['System Architecture'];
+
+  return {
+    id: `sprint-${Date.now()}`,
+    skillTitle,
+    careerMilestone: milestone,
+    durationDays: Math.min(durationDays, tasksTemplate.length),
+    currentDay: 1,
+    reshuffleCount: 0,
+    mascotNarration: `Pip here! Ready to dive into ${skillTitle}? Let's conquer Day 1 with deliberate practice.`,
+    tasks: tasksTemplate.slice(0, durationDays).map((item, idx) => ({
+      id: `task-${Date.now()}-${idx + 1}`,
+      dayNumber: idx + 1,
+      title: item.title,
+      description: item.desc,
+      type: item.type,
+      creatorName: item.creator,
+      creatorHandle: item.handle,
+      creatorAvatar: item.avatar,
+      estimatedMinutes: item.mins,
+      completed: false,
+      producesArtifact: !!item.artifact,
+      artifactTitle: item.artifact,
+      artifactType: 'code'
+    }))
+  };
+}
+
+/**
+ * Dynamic Roadmap Generator
+ */
+export function createDynamicRoadmap(skillTitle: string = 'System Architecture'): SkillRoadmap {
+  return {
+    skillId: skillTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+    skillTitle,
+    skillIcon: '⚡',
+    currentStepIndex: 1,
+    totalSteps: 2,
+    milestones: [
+      { id: 'm-1', title: 'Caching Foundations', stepNumber: 1, reached: true },
+      { id: 'm-2', title: 'Atomic Distributed Mutex', stepNumber: 2, reached: false }
+    ],
+    steps: [
+      {
+        id: 'step-1',
+        skillId: skillTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        stepNumber: 1,
+        title: 'Core Fundamentals & Invalidation Patterns',
+        description: 'Understand the mathematical boundaries and algorithmic strategies.',
+        estimatedMinutes: 15,
+        type: 'article',
+        status: 'completed',
+        completedAt: 'Yesterday',
+        creatorName: 'Elena Rostova',
+        creatorHandle: '@elena_distrib',
+        creatorAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80'
+      },
+      {
+        id: 'step-2',
+        skillId: skillTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        stepNumber: 2,
+        title: 'Implementation & Mutex Blueprint',
+        description: 'Code working script and benchmark under concurrent test loads.',
+        estimatedMinutes: 18,
+        type: 'checklist',
+        status: 'current',
+        creatorName: 'Elena Rostova',
+        creatorHandle: '@elena_distrib',
+        creatorAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80'
+      }
+    ]
+  };
+}
+
+/**
+ * Fallback Initial State Objects
+ */
+export const initialUser: UserProfile = createDynamicUser('Alex Chen', 'alex@huddle.dev');
+
+export const initialSkillsHealth: SkillHealth[] = createDynamicSkillsHealth([
+  'System Architecture',
+  'Next.js App Router',
+  'TypeScript Type Mechanics',
+  'Product UI & Micro-interactions'
+]);
+
+export const initialSprint: SprintChecklist = createDynamicSprint('System Architecture');
+
+export const initialRoadmap: SkillRoadmap = createDynamicRoadmap('System Architecture');
 
 export const initialSquad: MicroSquad = {
-  id: 'sq-1',
-  name: 'Async Engineers',
+  id: 'squad-1',
+  name: 'Distributed Systems Core',
   skillFocus: 'System Architecture',
+  sharedGoal: 'Complete 12 focused practice tasks together this week with zero pressure',
+  currentProgress: 7,
+  targetProgress: 12,
+  inviteCode: 'HUDDLE-4X9B',
   members: [
     {
       id: 'u-1',
-      name: 'Alex Rivera',
-      handle: '@alexrivera',
+      name: 'Alex Chen',
+      handle: '@alexchen',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
       streak: 5,
       checkedInToday: true,
-      lastCheckIn: '10:15 AM Today',
-      recentEncouragement: 'Focused on Event-Driven Queues today!',
-      role: 'member'
+      recentEncouragement: 'Working on Redis Lua atomic locks today!',
+      role: 'lead'
     },
     {
       id: 'u-2',
-      name: 'Maya Lin',
-      handle: '@mayacodes',
-      avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=250&q=80',
-      streak: 12,
+      name: 'Sarah Jenkins',
+      handle: '@sarah_j',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=250&q=80',
+      streak: 4,
       checkedInToday: true,
-      lastCheckIn: '1 hour ago',
-      recentEncouragement: 'Solid progress on Redis sliding window implementation.',
-      role: 'lead'
+      recentEncouragement: 'Completed Postgres replication lag analysis.',
+      role: 'member'
     },
     {
       id: 'u-3',
       name: 'David Kim',
-      handle: '@davidk',
+      handle: '@davidk_dev',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80',
       streak: 6,
       checkedInToday: true,
-      lastCheckIn: '3 hours ago',
-      recentEncouragement: 'Just completed step 2 checklist!',
+      recentEncouragement: 'Benchmarked event queue backpressure handling.',
       role: 'member'
     },
     {
       id: 'u-4',
-      name: 'Samira Patel',
-      handle: '@samirap',
+      name: 'Maya Patel',
+      handle: '@mayadev',
       avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=250&q=80',
       streak: 3,
       checkedInToday: false,
-      lastCheckIn: 'Yesterday 4:30 PM',
+      recentEncouragement: 'Prepping for Day 3 task tonight.',
       role: 'member'
     }
   ],
-  sharedGoal: 'Complete 16 total step milestones together this week',
-  currentProgress: 11,
-  targetProgress: 16,
-  inviteCode: 'HUDDLE-ASYNC-882'
+  activityPings: [
+    {
+      id: 'ping-1',
+      memberId: 'u-1',
+      memberName: 'Alex Chen',
+      memberAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
+      actionText: 'completed Day 1: Cache Stampede & Invalidation Patterns',
+      timestamp: '15m ago',
+      type: 'task_completed'
+    },
+    {
+      id: 'ping-2',
+      memberId: 'u-3',
+      memberName: 'David Kim',
+      memberAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80',
+      actionText: 'checked in for daily focus practice (6-day streak)',
+      timestamp: '1h ago',
+      type: 'checkin'
+    }
+  ]
+};
+
+export const initialMacroSquad: MacroSquad = {
+  id: 'macro-1',
+  name: 'Global Backend & Systems Circle',
+  description: 'A global macro circle of 38 engineers mastering distributed backend systems.',
+  trackCategory: 'System Architecture',
+  membersCount: 38,
+  members: [
+    {
+      id: 'm-1',
+      name: 'Liam Ross',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=250&q=80',
+      title: 'Principal Engineer',
+      skillsFocus: ['System Architecture', 'Kafka']
+    }
+  ],
+  milestoneUpdates: [
+    {
+      id: 'up-1',
+      authorName: 'Liam Ross',
+      authorAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=250&q=80',
+      milestoneTitle: 'Architected Multi-Region Read Replicas with <10ms sync lag',
+      skillTag: 'System Architecture',
+      timestamp: '2 hours ago',
+      congratsCount: 8,
+      userCongratulated: false
+    },
+    {
+      id: 'up-2',
+      authorName: 'Sofia Ramos',
+      authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
+      milestoneTitle: 'Merged first Open-Source ADR on Kafka Consumer Group balancing',
+      skillTag: 'Distributed Messaging',
+      timestamp: '5 hours ago',
+      congratsCount: 14,
+      userCongratulated: true
+    }
+  ]
 };
 
 export const initialPosts: CommunityPost[] = [
   {
-    id: 'post-1',
+    id: 'p-1',
     skillId: 'sys-arch',
     skillTitle: 'System Architecture',
-    authorName: 'David Kim',
-    authorHandle: '@davidk',
-    authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80',
-    authorReputation: 210,
-    title: 'How are you handling connection pooling with Serverless Postgres in Next.js App Router?',
-    content: 'We noticed connection exhaustion during traffic bursts when running database queries inside Server Components without a dedicated proxy like PgBouncer or Supabase Transaction Pooler. What pool max sizes are you configuring in production?',
-    category: 'question',
-    upvotes: 18,
-    userUpvoted: false,
-    repliesCount: 3,
-    isSolved: true,
-    createdAt: '2 hours ago',
+    authorName: 'Sarah Jenkins',
+    authorHandle: '@sarah_j',
+    authorAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=250&q=80',
+    authorReputation: 420,
+    title: 'Why we replaced Redis Distributed Locks with Atomic Lua Scripts',
+    content: 'Standard lock acquisition with TTLs creates subtle race windows during GC pauses. Executing logic directly inside Redis via Lua guarantees atomicity without network ping-pong.',
+    category: 'discussion',
+    upvotes: 28,
+    userUpvoted: true,
+    repliesCount: 4,
+    createdAt: '3 hours ago',
     replies: [
       {
-        id: 'rep-1',
-        authorName: 'Elena Rostova',
-        authorHandle: '@elenarostova',
-        authorAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=250&q=80',
-        content: 'For serverless environments, avoid direct TCP connections per request. Use HTTP API proxies or transaction poolers with a strict max allocation of 10 to 15 connections per cluster node, coupled with explicit client timeouts.',
+        id: 'r-1',
+        authorName: 'David Kim',
+        authorHandle: '@davidk_dev',
+        authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80',
+        content: 'Great breakdown. We observed a 40% reduction in p99 latency when we moved counter increments to Lua.',
         createdAt: '1 hour ago',
-        upvotes: 14,
+        upvotes: 6,
         isHelpful: true
-      },
-      {
-        id: 'rep-2',
-        authorName: 'Alex Rivera',
-        authorHandle: '@alexrivera',
-        authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
-        content: 'We configured Prisma/Drizzle with connection string parameters `connection_limit=10&pool_timeout=15` and it stabilized our error rate during warm instance scaling.',
-        createdAt: '45 mins ago',
-        upvotes: 5,
-        isHelpful: false
       }
     ]
-  },
-  {
-    id: 'post-2',
-    skillId: 'next-rsc',
-    skillTitle: 'Next.js App Router & RSC',
-    authorName: 'Marcus Vance',
-    authorHandle: '@marcusvance',
-    authorAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=250&q=80',
-    authorReputation: 890,
-    title: 'Clean architecture pattern for domain-driven folder structures in App Router',
-    content: 'Instead of nesting everything inside app/(routes), separate pure business logic into features/ or modules/ directories. Keep app/ strictly for route definitions, layout assembly, and page metadata declarations.',
-    category: 'tip',
-    upvotes: 42,
-    userUpvoted: true,
-    repliesCount: 5,
-    createdAt: '5 hours ago'
-  },
-  {
-    id: 'post-3',
-    skillId: 'ts-type-mechanics',
-    skillTitle: 'TypeScript Type Mechanics',
-    authorName: 'Maya Lin',
-    authorHandle: '@mayacodes',
-    authorAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=250&q=80',
-    authorReputation: 450,
-    title: 'Reviewing a template literal type helper for strongly typed event emitters',
-    content: 'Looking for input on this utility type `EventPayload<TDomain, TAction>` that parses snake_case strings into structured payload interfaces without losing strict type narrowing.',
-    category: 'code-review',
-    upvotes: 24,
-    userUpvoted: false,
-    repliesCount: 4,
-    createdAt: '1 day ago'
   }
 ];
 
 export const initialCreators: CreatorProfile[] = [
   {
-    id: 'cr-1',
+    id: 'c-1',
     name: 'Elena Rostova',
-    handle: '@elenarostova',
-    title: 'Principal Systems Architect',
+    handle: '@elena_distrib',
     avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=250&q=80',
-    bio: 'Architecting distributed platforms for high-load systems. Writing concise guides on fault-tolerance, caching, and database scaling.',
+    title: 'Principal Distributed Systems Architect',
+    bio: 'Authoring practical blueprints on distributed caching, raft consensus, and high-throughput microservices.',
     followersCount: 14200,
     isFollowing: true,
-    skillsTaught: ['System Architecture', 'Distributed Systems', 'Database Scaling'],
-    pinnedResources: [
-      { id: 'r-1', title: 'The System Architecture Playbook: Microservices & Event Loops', type: 'article', duration: '12 min read' },
-      { id: 'r-2', title: 'Redis Cache Stampede Mitigation Template', type: 'template', duration: 'Code Snippet', downloadsCount: 1430 },
-      { id: 'r-3', title: 'Designing High-Availability Message Queues', type: 'video', duration: '18 min video' }
-    ],
+    sponsorPartner: 'Khan Academy Partner',
+    skillsTaught: ['System Architecture', 'Distributed Caching', 'Database Scaling'],
     playlists: [
-      { id: 'pl-1', title: 'Distributed Systems Essentials', itemsCount: 8 },
-      { id: 'pl-2', title: 'Zero-Downtime DB Migrations', itemsCount: 5 }
+      { id: 'pl-1', title: 'Distributed Systems Mastery', itemsCount: 4 }
+    ],
+    pinnedResources: [
+      {
+        id: 'res-1',
+        title: 'Redis Lua Mutex Blueprint (.ts)',
+        type: 'template',
+        duration: '18m practice',
+        url: 'https://github.com/elena/redis-lua-blueprints'
+      }
     ]
   },
   {
-    id: 'cr-2',
+    id: 'c-2',
     name: 'Marcus Vance',
-    handle: '@marcusvance',
-    title: 'Next.js & Frontend Craftsman',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=250&q=80',
-    bio: 'Building production Next.js apps with clean layout boundaries, crisp typography, and zero layout shift.',
+    handle: '@marcus_vance',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80',
+    title: 'Staff Infrastructure Engineer',
+    bio: 'Deep dives into PACELC theorem, CRDTs, and zero-downtime database migrations.',
     followersCount: 9800,
-    isFollowing: true,
-    skillsTaught: ['Next.js App Router', 'React Performance', 'Tailwind Systems'],
-    pinnedResources: [
-      { id: 'r-4', title: 'Server Actions vs Route Handlers Decision Matrix', type: 'article', duration: '8 min read' },
-      { id: 'r-5', title: 'Framer Motion Layout Animations Starter', type: 'template', duration: 'Component Kit', downloadsCount: 2890 }
-    ],
-    playlists: [
-      { id: 'pl-3', title: 'React Server Components Masterclass', itemsCount: 6 }
-    ]
-  },
-  {
-    id: 'cr-3',
-    name: 'Sarah Chen',
-    handle: '@sarahchen',
-    title: 'Staff Product Designer',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
-    bio: 'Crafting calm, human-centric software interfaces with restrained aesthetic discipline.',
-    followersCount: 18500,
     isFollowing: false,
-    skillsTaught: ['Product UI & Micro-interactions', 'Design Systems', 'UX Writing'],
-    pinnedResources: [
-      { id: 'r-6', title: 'Micro-interaction Timing & Easing Curves', type: 'article', duration: '6 min read' }
-    ],
+    sponsorPartner: 'Udemy Engineering Sponsor',
+    skillsTaught: ['Database Engineering', 'Storage Engines'],
     playlists: [
-      { id: 'pl-4', title: 'Typography & Spacing Disciplines', itemsCount: 4 }
+      { id: 'pl-2', title: 'Database Internals', itemsCount: 3 }
+    ],
+    pinnedResources: [
+      {
+        id: 'res-2',
+        title: 'Distributed Consensus Decision Tree (.pdf)',
+        type: 'article',
+        duration: '22m read',
+        url: 'https://marcusvance.dev/downloads/consensus-tree.pdf'
+      }
     ]
+  }
+];
+
+export const initialCreatorPosts: CreatorPost[] = [
+  {
+    id: 'post-1',
+    creatorId: 'c-1',
+    creatorName: 'Elena Rostova',
+    creatorHandle: '@elena_distrib',
+    creatorAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+    creatorTitle: 'Principal Architect @ CloudScale',
+    sponsorBadge: 'Khan Academy Partner',
+    skillTag: 'System Architecture',
+    title: '3 Ways Redis Lua Scripts Prevent Race Conditions',
+    description: 'Why standard transactions fail during high write concurrency, and how 6 lines of atomic Lua solve cache stampedes forever.',
+    contentSnippet: '-- Redis Lua script for atomic get-and-refresh mutex\nlocal key = KEYS[1]\nlocal ttl = ARGV[1]\nlocal val = redis.call("GET", key)\nif not val then\n  redis.call("SET", key, "LOCKED", "EX", ttl)\n  return 1\nend\nreturn 0',
+    duration: '18 mins read + build',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    resourceLinks: [
+      { title: 'Download Production Redis Lua Mutex Blueprint (.ts)', url: 'https://github.com/elena/redis-lua-blueprints' }
+    ],
+    likesCount: 142,
+    createdAt: 'Today'
   }
 ];
 
 export const initialNotifications: NotificationItem[] = [
   {
-    id: 'n-1',
+    id: 'notif-1',
     type: 'squad_checkin',
-    title: 'Maya Lin checked in',
-    description: 'Maya completed step task in Async Engineers squad.',
-    timestamp: '1 hour ago',
+    title: 'Micro-Squad Goal Progress',
+    description: 'Your squad reached 7/12 completed steps this week!',
+    timestamp: '2 hours ago',
     read: false
-  },
-  {
-    id: 'n-2',
-    type: 'next_step',
-    title: 'Your next step is ready',
-    description: 'Event-Driven Architecture with Message Queues (18 mins).',
-    timestamp: '3 hours ago',
-    read: false
-  },
-  {
-    id: 'n-3',
-    type: 'creator_post',
-    title: 'Elena Rostova published a guide',
-    description: 'Redis Cache Stampede Mitigation Template is now available.',
-    timestamp: 'Yesterday',
-    read: true
-  },
-  {
-    id: 'n-4',
-    type: 'milestone',
-    title: 'Caching Foundations Reached',
-    description: 'You unlocked the Caching Foundations milestone badge.',
-    timestamp: '2 days ago',
-    read: true
   }
 ];
 
 export const initialMascotMessages: MascotMessage[] = [
   {
-    id: 'm-dash',
+    id: 'msg-1',
     context: 'dashboard',
-    text: 'You are on a 5-day streak. Your next step is Event-Driven Architecture with Message Queues.',
-    suggestionText: 'Want to complete this 18-minute session now?',
-    actionLabel: 'Take the next step',
+    text: "Hey! Pip here. Ready for today's deliberate practice? No doomscroll guilt, just steady craft.",
+    actionLabel: "Let's review Day 1 task",
     actionType: 'view_step'
-  },
-  {
-    id: 'm-pace',
-    context: 'journey',
-    text: 'You are moving faster than expected this week. Would you like to adjust tomorrow session duration?',
-    suggestionText: 'Reduce tomorrow session from 25m to 15m.',
-    actionLabel: 'Shorten session',
-    actionType: 'shorten_session'
-  },
-  {
-    id: 'm-squad',
-    context: 'squad',
-    text: 'Your squad has been active today. 3 out of 4 members checked in.',
-    suggestionText: 'Samira has not checked in yet today. Send a quick warm encouragement nudge?',
-    actionLabel: 'Send gentle nudge',
-    actionType: 'squad_nudge'
   }
 ];
+
+export const initialPortfolioItems: PortfolioItem[] = [
+  {
+    id: 'port-1',
+    title: 'Probabilistic Cache Early Expiration Benchmark',
+    category: 'System Architecture',
+    date: 'Yesterday',
+    description: 'Benchmark comparing vanilla TTL vs XFetch probabilistic early recomputation algorithm under 10k RPS load.',
+    artifactType: 'code',
+    previewSnippet: `function xfetch(key, ttl, beta = 1.0, delta = 50) {\n  const [val, deltaCalc, expiry] = redis.get(key);\n  if (!val || (Date.now() - (delta * beta * Math.log(Math.random()))) >= expiry) {\n    const freshVal = recomputeExpensiveValue();\n    redis.set(key, freshVal, ttl);\n    return freshVal;\n  }\n  return val;\n}`,
+    isPublished: true,
+    sourceTaskId: 'task-1',
+    tags: ['caching', 'redis', 'high-throughput']
+  }
+];
+
+export const initialRealWorldProofs: RealWorldProofItem[] = [
+  {
+    id: 'proof-1',
+    title: 'Merged PR: Redis Cache Invalidation Hook',
+    description: 'Contributed lock-free probabilistic cache warming to open-source distributed cache framework.',
+    category: 'open_source',
+    date: 'Aug 28, 2026',
+    completed: true,
+    externalLink: 'https://github.com/example/cache-engine/pull/142',
+    proofBadge: 'GitHub PR Merged'
+  }
+];
+
+export const initialCareerTimeline: CareerTimelineEntry[] = [
+  {
+    id: 'tl-1',
+    date: 'August 2026',
+    type: 'sprint_cleared',
+    title: 'Cleared 4-Day Distributed Caching Sprint',
+    description: 'Mastered cache stampede mitigation, XFetch algorithms, and atomic Lua script execution.',
+    badge: 'Milestone Achieved'
+  }
+];
+
+export const sampleBingeQuiz: Record<string, {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}> = {
+  'sys-arch': {
+    question: 'How do atomic Lua scripts in Redis protect against cache stampedes?',
+    options: [
+      'By allocating more network memory',
+      'By running atomically in a single thread without race condition interleaving',
+      'By removing query timeouts',
+      'By compressing binary logs'
+    ],
+    correctIndex: 1,
+    explanation: 'Redis executes Lua scripts atomically, guaranteeing no other write operation can slip between read and update steps.'
+  }
+};
