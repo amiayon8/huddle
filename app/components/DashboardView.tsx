@@ -239,7 +239,6 @@ export const DashboardView: React.FC = () => {
         showQuickActions={true}
       />
 
-      {/* Micro-Squad Live Activity Strip */}
       <div className="p-5 sm:p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] shadow-sm space-y-3.5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
           <div>

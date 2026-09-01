@@ -123,7 +123,7 @@ export const AuthModal: React.FC = () => {
             <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800 space-y-1 text-xs">
               <div className="flex items-center gap-1.5 font-semibold text-zinc-900 dark:text-zinc-100">
                 <ShieldCheck className="w-4 h-4 text-indigo-500" />
-                Live Supabase Authentication
+                Authentication
               </div>
               <p className="text-zinc-500 leading-relaxed">
                 Sign up with your email to sync your 2–5 day sprints, private portfolio artifacts, and micro-squad accountability.
