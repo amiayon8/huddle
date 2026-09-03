@@ -18,7 +18,8 @@ import {
   PortfolioItem,
   RealWorldProofItem,
   CareerTimelineEntry,
-  CommunityPost
+  CommunityPost,
+  UserSurveyData
 } from '../types/huddle';
 import { 
   initialUser, 
@@ -54,7 +55,8 @@ import {
   fetchSquad,
   addSquadActivityPingToDb,
   fetchCreatorPosts,
-  publishCreatorPostToDb
+  publishCreatorPostToDb,
+  resetDemoAccountInDb
 } from '../lib/supabase';
 
 interface HuddleContextType {
@@ -76,10 +78,12 @@ interface HuddleContextType {
   // Auth state & actions
   isAuthenticated: boolean;
   authLoading: boolean;
+  isDemo: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signup: (email: string, password: string, fullName: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   loginDemo: () => Promise<void>;
+  resetDemoAccount: (shouldLogout?: boolean) => Promise<{ success: boolean; error?: string }>;
 
   activeTab: ActiveTab;
   theme: 'dark' | 'light';
@@ -95,8 +99,12 @@ interface HuddleContextType {
   settingsOpen: boolean;
   mascotOpen: boolean;
   authModalOpen: boolean;
+  resetDemoModalOpen: boolean;
   authMode: 'welcome' | 'login' | 'signup' | 'forgot';
   onboardingActive: boolean;
+  surveyPromptModalOpen: boolean;
+  surveyActionAttempted: string | null;
+  hasSkippedToPreview: boolean;
   selectedStepModal: JourneyStep | null;
   selectedCreatorModal: CreatorProfile | null;
   creatorUploadModalOpen: boolean;
@@ -107,10 +115,14 @@ interface HuddleContextType {
   toggleTheme: () => void;
   setSearchOpen: (open: boolean) => void;
   setSettingsOpen: (open: boolean) => void;
+  setResetDemoModalOpen: (open: boolean) => void;
   setMascotOpen: (open: boolean) => void;
   openAuthModal: (mode?: 'welcome' | 'login' | 'signup' | 'forgot') => void;
   closeAuthModal: () => void;
   setOnboardingActive: (active: boolean) => void;
+  setSurveyPromptModalOpen: (open: boolean) => void;
+  setHasSkippedToPreview: (skipped: boolean) => void;
+  ensureSurveyDone: (actionName?: string) => boolean;
   setSelectedStepModal: (step: JourneyStep | null) => void;
   setSelectedCreatorModal: (creator: CreatorProfile | null) => void;
   setCreatorUploadModalOpen: (open: boolean) => void;
@@ -138,7 +150,7 @@ interface HuddleContextType {
   completeRealWorldProof: (proofId: string) => void;
   markNotificationRead: (id: string) => void;
   updateUserProfile: (updates: Partial<UserProfile>) => void;
-  finishOnboarding: (selectedSkillTitles: string[]) => void;
+  finishOnboarding: (selectedSkillTitles: string[], targetMilestone?: string, surveyPayload?: UserSurveyData) => void;
 }
 
 const HuddleContext = createContext<HuddleContextType | undefined>(undefined);
@@ -177,9 +189,21 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'welcome' | 'login' | 'signup' | 'forgot'>('welcome');
   const [onboardingActive, setOnboardingActive] = useState(false);
+  const [surveyPromptModalOpen, setSurveyPromptModalOpen] = useState(false);
+  const [surveyActionAttempted, setSurveyActionAttempted] = useState<string | null>(null);
+  const [hasSkippedToPreview, setHasSkippedToPreview] = useState(false);
   const [selectedStepModal, setSelectedStepModal] = useState<JourneyStep | null>(null);
   const [selectedCreatorModal, setSelectedCreatorModal] = useState<CreatorProfile | null>(null);
   const [creatorUploadModalOpen, setCreatorUploadModalOpen] = useState(false);
+  const [isDemoState, setIsDemoState] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('huddle_is_demo') === 'true';
+    }
+    return false;
+  });
+  const [resetDemoModalOpen, setResetDemoModalOpen] = useState(false);
+
+  const isDemo = isDemoState || user.id === 'user-1' || user.email === 'alex@huddle.dev';
 
   // Load from Supabase on mount & subscribe to Realtime updates
   useEffect(() => {
@@ -188,6 +212,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           setIsAuthenticated(true);
+          setIsDemoState(false);
           const activeUserId = session.user.id;
           const [
             dbProfile,
@@ -212,7 +237,14 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           if (dbSquad) setSquad(dbSquad);
           if (dbCreatorPosts && dbCreatorPosts.length > 0) setCreatorPosts(dbCreatorPosts);
         } else {
-          setIsAuthenticated(false);
+          const isDemoStored = typeof window !== 'undefined' && localStorage.getItem('huddle_is_demo') === 'true';
+          if (isDemoStored) {
+            setIsDemoState(true);
+            await loginDemo();
+          } else {
+            setIsAuthenticated(false);
+            setIsDemoState(false);
+          }
         }
       } catch (err) {
         console.error('Supabase initial data fetch error:', err);
@@ -383,6 +415,10 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const { user: authUser, error } = await signInUser(email, password);
     if (error) return { success: false, error };
     if (authUser) {
+      setIsDemoState(false);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('huddle_is_demo');
+      }
       setIsAuthenticated(true);
       const profile = await fetchUserProfile(authUser.id);
       if (profile) setUser(profile);
@@ -395,6 +431,10 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const { user: authUser, error } = await signUpUser(email, password, fullName);
     if (error) return { success: false, error };
     if (authUser) {
+      setIsDemoState(false);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('huddle_is_demo');
+      }
       setIsAuthenticated(true);
       const profile = await fetchUserProfile(authUser.id);
       if (profile) setUser(profile);
@@ -404,12 +444,20 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const logout = async () => {
+    setIsDemoState(false);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('huddle_is_demo');
+    }
     await signOutUser();
     setIsAuthenticated(false);
   };
 
   const loginDemo = async () => {
     setIsAuthenticated(true);
+    setIsDemoState(true);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('huddle_is_demo', 'true');
+    }
     const activeUserId = 'user-1';
     const [
       dbProfile,
@@ -433,6 +481,71 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (dbProofs && dbProofs.length > 0) setRealWorldProofs(dbProofs);
     if (dbSquad) setSquad(dbSquad);
     if (dbCreatorPosts && dbCreatorPosts.length > 0) setCreatorPosts(dbCreatorPosts);
+  };
+
+  const resetDemoAccount = async (shouldLogout: boolean = false): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const res = await resetDemoAccountInDb();
+      if (!res.success) {
+        return res;
+      }
+
+      if (shouldLogout) {
+        await logout();
+        return { success: true };
+      }
+
+      // Reset in-memory state cleanly to initial baseline
+      setUser(initialUser);
+      setSkillsHealth(initialSkillsHealth);
+      setRoadmap(initialRoadmap);
+      setSprint(initialSprint);
+      setPortfolioItems(initialPortfolioItems);
+      setRealWorldProofs(initialRealWorldProofs);
+      setSquad(initialSquad);
+      setSecondsFocusedToday(1080);
+      setIsTimerRunning(true);
+      setOnboardingActive(false);
+      setActiveTab('dashboard');
+
+      // Re-fetch from Supabase to guarantee complete parity with restored database
+      const activeUserId = 'user-1';
+      const [
+        dbProfile,
+        dbSprint,
+        dbPortfolio,
+        dbProofs,
+        dbSquad
+      ] = await Promise.all([
+        fetchUserProfile(activeUserId),
+        fetchCurrentSprint(activeUserId),
+        fetchPortfolioItems(activeUserId),
+        fetchRealWorldProofs(activeUserId),
+        fetchSquad('squad-1')
+      ]);
+
+      if (dbProfile) setUser(dbProfile);
+      if (dbSprint) setSprint(dbSprint);
+      if (dbPortfolio) setPortfolioItems(dbPortfolio);
+      if (dbProofs) setRealWorldProofs(dbProofs);
+      if (dbSquad) setSquad(dbSquad);
+
+      try {
+        import('canvas-confetti').then((confettiModule) => {
+          const confetti = confettiModule.default;
+          confetti({
+            particleCount: 50,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+        });
+      } catch (e) {}
+
+      return { success: true };
+    } catch (err: any) {
+      console.error('Error in resetDemoAccount:', err);
+      return { success: false, error: err.message || 'Failed to reset demo account' };
+    }
   };
 
   const toggleFocusTimer = () => {
@@ -460,8 +573,18 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setAuthModalOpen(false);
   };
 
+  const ensureSurveyDone = (actionName?: string): boolean => {
+    if (!user.onboardingCompleted) {
+      setSurveyActionAttempted(actionName || 'perform this action');
+      setSurveyPromptModalOpen(true);
+      return false;
+    }
+    return true;
+  };
+
   // Complete a task in the 2-5 day Sprint Checklist
   const completeSprintTask = (taskId: string) => {
+    if (!ensureSurveyDone('complete sprint tasks')) return;
     const targetTask = sprint.tasks.find(t => t.id === taskId);
     if (!targetTask) return;
 
@@ -577,6 +700,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // Zero-penalty Sprint Reshuffle
   const reshuffleSprint = (customPrompt?: string) => {
+    if (!ensureSurveyDone('reshuffle your sprint')) return;
     setSprint(prev => ({
       ...prev,
       currentDay: 1,
@@ -601,6 +725,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const completeStep = (stepId: string) => {
+    if (!ensureSurveyDone('complete roadmap steps')) return;
     setRoadmap(prev => {
       const updatedSteps = prev.steps.map(s => 
         s.id === stepId 
@@ -612,6 +737,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const checkInSquad = (encouragement?: string) => {
+    if (!ensureSurveyDone('check in with your squad')) return;
     setSquad(prev => ({
       ...prev,
       members: prev.members.map(m => 
@@ -640,6 +766,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const sendSquadNudge = (memberId: string) => {
+    if (!ensureSurveyDone('send squad nudges')) return;
     const member = squad.members.find(m => m.id === memberId);
     if (!member) return;
 
@@ -655,6 +782,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const congratulateMacroMilestone = (updateId: string) => {
+    if (!ensureSurveyDone('celebrate milestones')) return;
     setMacroSquad(prev => ({
       ...prev,
       milestoneUpdates: prev.milestoneUpdates.map(u => 
@@ -670,6 +798,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const createCommunityPost = (title: string, content: string, skillId: string, category: CommunityPost['category']) => {
+    if (!ensureSurveyDone('create community posts')) return;
     const newPost: CommunityPost = {
       id: `post-${Date.now()}`,
       skillId,
@@ -691,6 +820,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const toggleUpvotePost = (postId: string) => {
+    if (!ensureSurveyDone('upvote discussions')) return;
     setPosts(prev => prev.map(p => {
       if (p.id === postId) {
         return {
@@ -704,6 +834,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const addReplyToPost = (postId: string, content: string) => {
+    if (!ensureSurveyDone('reply to discussions')) return;
     const newReply = {
       id: `rep-${Date.now()}`,
       authorName: user.name,
@@ -728,6 +859,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const toggleFollowCreator = (creatorId: string) => {
+    if (!ensureSurveyDone('follow creators')) return;
     setCreators(prev => prev.map(c => {
       if (c.id === creatorId) {
         return { ...c, isFollowing: !c.isFollowing, followersCount: c.isFollowing ? c.followersCount - 1 : c.followersCount + 1 };
@@ -737,6 +869,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const toggleLikeCreatorPost = (postId: string) => {
+    if (!ensureSurveyDone('like creator tutorials')) return;
     setCreatorPosts(prev => prev.map(p => {
       if (p.id === postId) {
         return {
@@ -750,6 +883,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const toggleBookmarkCreatorPost = (postId: string) => {
+    if (!ensureSurveyDone('bookmark creator tutorials')) return;
     setCreatorPosts(prev => prev.map(p => {
       if (p.id === postId) {
         return { ...p, bookmarked: !p.bookmarked };
@@ -759,6 +893,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const publishCreatorPost = (title: string, description: string, skillTag: string, contentSnippet: string, resourceLink: string) => {
+    if (!ensureSurveyDone('upload creator tutorials')) return;
     const newPost: CreatorPost = {
       id: `post-${Date.now()}`,
       creatorId: user.id,
@@ -783,6 +918,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const togglePublishPortfolio = (portfolioId: string) => {
+    if (!ensureSurveyDone('publish portfolio artifacts')) return;
     setPortfolioItems(prev => prev.map(p => {
       if (p.id === portfolioId) {
         const nextPublished = !p.isPublished;
@@ -794,6 +930,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const completeRealWorldProof = (proofId: string) => {
+    if (!ensureSurveyDone('submit real-world proofs')) return;
     setRealWorldProofs(prev => prev.map(p => {
       if (p.id === proofId) {
         completeRealWorldProofInDb(proofId);
@@ -815,17 +952,46 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     });
   };
 
-  const finishOnboarding = (selectedSkillTitles: string[]) => {
+  const finishOnboarding = (
+    selectedSkillTitles: string[],
+    targetMilestone?: string,
+    surveyPayload?: UserSurveyData
+  ) => {
     const mainSkill = selectedSkillTitles[0] || 'System Architecture';
+    const milestone = targetMilestone || user.careerMilestone || 'Staff Software Engineer';
+    const completeSurvey: UserSurveyData = surveyPayload || {
+      subjects: ['Computer Science/ICT'],
+      hobbies: ['Gaming'],
+      age: '22',
+      ageInput: '22',
+      learningStage: 'Early Career / Rising Engineer',
+      targetProfession: milestone,
+      startingSkills: selectedSkillTitles,
+      completedAt: new Date().toISOString()
+    };
+
     setUser(prev => {
-      const next = { ...prev, onboardingCompleted: true, primaryGoal: `Master ${mainSkill}` };
-      updateProfileInDb(user.id, { onboardingCompleted: true, primaryGoal: next.primaryGoal });
+      const next = { 
+        ...prev, 
+        onboardingCompleted: true, 
+        primaryGoal: `Master ${mainSkill}`,
+        careerMilestone: milestone,
+        surveyData: completeSurvey
+      };
+      updateProfileInDb(user.id, { 
+        onboardingCompleted: true, 
+        primaryGoal: next.primaryGoal,
+        careerMilestone: next.careerMilestone,
+        surveyData: completeSurvey
+      });
       return next;
     });
     setSprint(prev => ({
       ...prev,
       skillTitle: mainSkill
     }));
+    setHasSkippedToPreview(false);
+    setSurveyPromptModalOpen(false);
     setOnboardingActive(false);
   };
 
@@ -835,10 +1001,12 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         user,
         isAuthenticated,
         authLoading,
+        isDemo,
         login,
         signup,
         logout,
         loginDemo,
+        resetDemoAccount,
         skillsHealth,
         roadmap,
         squad,
@@ -865,8 +1033,12 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         settingsOpen,
         mascotOpen,
         authModalOpen,
+        resetDemoModalOpen,
         authMode,
         onboardingActive,
+        surveyPromptModalOpen,
+        surveyActionAttempted,
+        hasSkippedToPreview,
         selectedStepModal,
         selectedCreatorModal,
         creatorUploadModalOpen,
@@ -876,10 +1048,14 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         toggleTheme,
         setSearchOpen,
         setSettingsOpen,
+        setResetDemoModalOpen,
         setMascotOpen,
         openAuthModal,
         closeAuthModal,
         setOnboardingActive,
+        setSurveyPromptModalOpen,
+        setHasSkippedToPreview,
+        ensureSurveyDone,
         setSelectedStepModal,
         setSelectedCreatorModal,
         setCreatorUploadModalOpen,

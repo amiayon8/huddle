@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useHuddle } from '../context/HuddleContext';
 import { JourneyStep } from '../types/huddle';
+import { DuolingoMascot } from './DuolingoMascot';
 
 export const JourneyView: React.FC = () => {
   const { roadmap, setSelectedStepModal, completeStep } = useHuddle();
@@ -65,6 +66,14 @@ export const JourneyView: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Pip Mascot Roadmap Guidance */}
+      <DuolingoMascot
+        emotion="planning"
+        size="md"
+        speechText={`Pip here! Every node in this **${roadmap.skillTitle}** journey is vetted by Staff Engineers. You've cleared **${completedCount}/${roadmap.totalSteps}** steps! Keep momentum going.`}
+        showQuickActions={true}
+      />
 
       <div className="p-5 rounded-2xl border border-indigo-100 dark:border-indigo-900/40 bg-indigo-50/40 dark:bg-indigo-950/20 flex items-start gap-3">
         <div className="p-2 rounded-xl bg-indigo-600 text-white shrink-0">

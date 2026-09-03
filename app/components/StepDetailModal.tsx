@@ -18,7 +18,7 @@ import {
 import { useHuddle } from '../context/HuddleContext';
 
 export const StepDetailModal: React.FC = () => {
-  const { selectedStepModal, setSelectedStepModal, completeStep } = useHuddle();
+  const { selectedStepModal, setSelectedStepModal, completeStep, ensureSurveyDone } = useHuddle();
   const [completedChecklist, setCompletedChecklist] = useState<string[]>([]);
   const [stepCompleted, setStepCompleted] = useState(false);
 
@@ -33,6 +33,7 @@ export const StepDetailModal: React.FC = () => {
   };
 
   const handleFinishStep = () => {
+    if (!ensureSurveyDone('complete roadmap steps')) return;
     setStepCompleted(true);
     completeStep(step.id);
     setTimeout(() => {
@@ -77,6 +78,21 @@ export const StepDetailModal: React.FC = () => {
             <div className="flex items-center gap-1.5">
               <img src={step.creatorAvatar} alt={step.creatorName} className="w-4 h-4 rounded-full object-cover" />
               <span>Curated by {step.creatorName}</span>
+            </div>
+          </div>
+
+          {/* Pip Companion Study Tip */}
+          <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex items-start gap-3.5 shadow-2xs">
+            <div className="w-12 h-12 p-1 rounded-xl bg-white dark:bg-[#111218] border border-indigo-200 dark:border-indigo-800/60 shrink-0 flex items-center justify-center">
+              <img src="/mascot_deep_thinking.svg" alt="Pip Study Companion" className="w-full h-full object-contain" />
+            </div>
+            <div className="text-xs text-zinc-700 dark:text-zinc-300">
+              <span className="font-semibold text-indigo-600 dark:text-indigo-400 block text-[11px] uppercase tracking-wider">
+                Pip's Study Tip
+              </span>
+              <p className="mt-0.5 leading-relaxed">
+                Take 5 minutes to draft key architectural tradeoffs before typing code. You can always ask me in chat to verify your math formulas or benchmark logic!
+              </p>
             </div>
           </div>
 

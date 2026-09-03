@@ -12,6 +12,7 @@ import {
   FileCode
 } from 'lucide-react';
 import { useHuddle } from '../context/HuddleContext';
+import { DuolingoMascot } from './DuolingoMascot';
 
 export const CreatorView: React.FC = () => {
   const {
@@ -62,6 +63,14 @@ export const CreatorView: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Pip Mascot Curator Banner */}
+      <DuolingoMascot
+        emotion="deep_thinking"
+        size="md"
+        speechText="Pip Curates: 15-minute engineering builds from Elena Rostova, Kenji Sato, and Marcus Vance. High-signal craft without algorithmic rabbit holes."
+        showQuickActions={true}
+      />
 
       {/* Featured Creators */}
       <div className="space-y-3">

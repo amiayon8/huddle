@@ -15,6 +15,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useHuddle } from '../context/HuddleContext';
+import { DuolingoMascot } from './DuolingoMascot';
 
 export const SquadView: React.FC = () => {
   const {
@@ -85,6 +86,14 @@ export const SquadView: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Pip Mascot Squad Intelligence */}
+      <DuolingoMascot
+        emotion="encouragement"
+        size="md"
+        speechText={`Pip's Squad Insights: Your squad has accomplished **${squad.currentProgress}/${squad.targetProgress}** collective check-ins this week! Safe, pressure-free peer momentum.`}
+        showQuickActions={true}
+      />
 
       {/* Micro-Squad View */}
       {activeSquadTab === 'micro' && (
@@ -213,11 +222,16 @@ export const SquadView: React.FC = () => {
             {squad.activeProject && (
               <div className="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] shadow-sm space-y-3.5">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <img src="/mascot_planning.svg" alt="Pip" className="w-6 h-6 object-contain" />
-                    <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
-                      Mascot Group Project
-                    </h3>
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 p-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/40 flex items-center justify-center shrink-0">
+                      <img src="/mascot_planning.svg" alt="Pip" className="w-full h-full object-contain" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                        Mascot Group Project
+                      </h3>
+                      <p className="text-[10.5px] text-zinc-500">Collaborative team practice</p>
+                    </div>
                   </div>
                   <span className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold">
                     Due {squad.activeProject.deadline}

@@ -37,6 +37,23 @@ export default function ForgotPasswordPage() {
           </div>
         </div>
 
+        {/* Pip Mascot Note */}
+        <div className="p-3.5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex items-center gap-3.5">
+          <div className="relative shrink-0 w-12 h-12">
+            <img 
+              src="/mascot_thinking.svg" 
+              alt="Pip Mascot" 
+              className="w-full h-full object-contain drop-shadow-xs transition-transform hover:scale-110" 
+            />
+          </div>
+          <div className="text-xs text-zinc-700 dark:text-zinc-300">
+            <span className="font-semibold text-indigo-600 dark:text-indigo-400 block text-[11px] uppercase tracking-wider">
+              Pip Companion
+            </span>
+            <span>Forgot your credentials? Enter your email and Pip will help you recover access.</span>
+          </div>
+        </div>
+
         {sent ? (
           <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 text-xs text-emerald-800 dark:text-emerald-300 space-y-2">
             <div className="flex items-center gap-2 font-semibold">

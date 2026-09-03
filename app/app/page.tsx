@@ -21,10 +21,13 @@ import { StepDetailModal } from '../components/StepDetailModal';
 import { CreatorDetailModal } from '../components/CreatorDetailModal';
 import { CreatorUploadModal } from '../components/CreatorUploadModal';
 import { BingeQuizModal } from '../components/BingeQuizModal';
+import { ResetDemoModal } from '../components/ResetDemoModal';
+import { FloatingMascotBadge } from '../components/FloatingMascotBadge';
+import { SurveyPromptModal } from '../components/SurveyPromptModal';
 
 export default function AppPage() {
   const router = useRouter();
-  const { activeTab, user, onboardingActive, isAuthenticated, authLoading } = useHuddle();
+  const { activeTab, user, onboardingActive, setOnboardingActive, hasSkippedToPreview, isAuthenticated, authLoading } = useHuddle();
 
   // Route protection: If not logged in, redirect from /app to /auth/login
   useEffect(() => {
@@ -45,8 +48,8 @@ export default function AppPage() {
     return null;
   }
 
-  // If user has not completed questionnaire or is changing focus
-  if (!user.onboardingCompleted || onboardingActive) {
+  // If user has not completed questionnaire and has not skipped to preview, or questionnaire triggered
+  if ((!user.onboardingCompleted && !hasSkippedToPreview) || onboardingActive) {
     return (
       <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-100 font-sans transition-colors">
         <LandingQuestionnaire />
@@ -55,6 +58,8 @@ export default function AppPage() {
         <SettingsModal />
         <MascotDrawer />
         <BingeQuizModal />
+        <ResetDemoModal />
+        <SurveyPromptModal />
       </div>
     );
   }
@@ -85,11 +90,32 @@ export default function AppPage() {
     <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-100 flex flex-col font-sans transition-colors">
       <Navbar />
 
+      {/* Preview Mode Alert Banner if Survey Incomplete */}
+      {!user.onboardingCompleted && (
+        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 sm:px-6">
+          <div className="max-w-7xl w-full mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2 text-amber-900 dark:text-amber-200">
+              <img src="/mascot_planning.svg" alt="Pip" className="w-5 h-5 object-contain shrink-0" />
+              <span>
+                <strong>Intake Survey Incomplete (Preview Mode):</strong> Actions are locked until you complete the 5-step intake survey.
+              </span>
+            </div>
+            <button
+              onClick={() => setOnboardingActive(true)}
+              className="px-3 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-xs transition-colors shrink-0 cursor-pointer"
+            >
+              Complete Survey Now (1 min) →
+            </button>
+          </div>
+        </div>
+      )}
+
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-20 md:pb-12">
         {renderActiveView()}
       </main>
 
       <MobileNav />
+      <FloatingMascotBadge />
 
       <AuthModal />
       <MascotDrawer />
@@ -99,6 +125,8 @@ export default function AppPage() {
       <CreatorDetailModal />
       <CreatorUploadModal />
       <BingeQuizModal />
+      <ResetDemoModal />
+      <SurveyPromptModal />
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { useHuddle } from '../context/HuddleContext';
 import { signInUser, signUpUser } from '../lib/supabase';
 
 export const AuthModal: React.FC = () => {
-  const { authModalOpen, closeAuthModal, authMode, setOnboardingActive, updateUserProfile } = useHuddle();
+  const { authModalOpen, closeAuthModal, authMode, setOnboardingActive, updateUserProfile, loginDemo } = useHuddle();
   const [mode, setMode] = useState<'welcome' | 'login' | 'signup' | 'forgot'>(authMode || 'welcome');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -69,12 +69,19 @@ export const AuthModal: React.FC = () => {
     }
   };
 
-  const handleDemoLogin = () => {
+  const handleDemoLogin = async () => {
     setLoading(true);
-    setTimeout(() => {
-      closeAuthModal();
+    try {
+      await loginDemo();
+      setSuccessMessage('Logged in as Demo Engineer!');
+      setTimeout(() => {
+        closeAuthModal();
+        setLoading(false);
+      }, 400);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to login demo account.');
       setLoading(false);
-    }, 400);
+    }
   };
 
   return (
@@ -88,13 +95,13 @@ export const AuthModal: React.FC = () => {
           <X className="w-4 h-4" />
         </button>
 
-        <div className="flex items-center gap-2.5 mb-5">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-xs">
-            H
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-900/40 p-1 flex items-center justify-center shrink-0">
+            <img src="/mascot_encouragement.svg" alt="Pip" className="w-full h-full object-contain" />
           </div>
           <div>
             <h2 className="text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-              Huddle
+              Huddle • Pip Companion
             </h2>
             <p className="text-xs text-zinc-500">
               Deliberate practice with zero doomscrolling
@@ -147,9 +154,10 @@ export const AuthModal: React.FC = () => {
 
             <button
               onClick={handleDemoLogin}
-              className="w-full py-2 text-center text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+              className="w-full py-2 flex items-center justify-center gap-2 text-center text-xs text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
             >
-              Continue as Demo Engineer
+              <img src="/mascot_idle.svg" alt="Pip" className="w-4 h-4 object-contain" />
+              <span>Continue as Demo Engineer</span>
             </button>
           </div>
         )}

@@ -1,17 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Compass, 
-  Users, 
-  BookOpen, 
-  MessageSquare, 
-  User as UserIcon, 
-  Flame, 
-  Search, 
-  Bell, 
-  Moon, 
-  Sun, 
+import {
+  Compass,
+  Users,
+  BookOpen,
+  MessageSquare,
+  User as UserIcon,
+  Flame,
+  Search,
+  Bell,
+  Moon,
+  Sun,
   Sparkles,
   Settings,
   LogOut,
@@ -25,16 +25,18 @@ import { useHuddle } from '../context/HuddleContext';
 import { ActiveTab } from '../types/huddle';
 
 export const Navbar: React.FC = () => {
-  const { 
-    user, 
+  const {
+    user,
     isAuthenticated,
+    isDemo,
     logout,
-    activeTab, 
-    setActiveTab, 
-    theme, 
+    activeTab,
+    setActiveTab,
+    theme,
     toggleTheme,
     setSearchOpen,
     setSettingsOpen,
+    setResetDemoModalOpen,
     mascotOpen,
     setMascotOpen,
     notifications,
@@ -69,10 +71,10 @@ export const Navbar: React.FC = () => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-[#090a0f]/80 backdrop-blur-md transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
-        
+
         {/* Brand & Primary Navigation */}
         <div className="flex items-center gap-7">
-          <button 
+          <button
             onClick={() => setActiveTab('dashboard')}
             className="flex items-center gap-2.5 group focus:outline-none"
           >
@@ -93,11 +95,10 @@ export const Navbar: React.FC = () => {
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    isActive
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${isActive
                       ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-xs'
                       : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
-                  }`}
+                    }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
                   <span>{item.label}</span>
@@ -109,16 +110,15 @@ export const Navbar: React.FC = () => {
 
         {/* Right Action Controls */}
         <div className="flex items-center gap-2">
-          
+
           {/* Functional Precision Focus Timer Widget */}
           {isAuthenticated && (
-            <div 
+            <div
               onClick={toggleFocusTimer}
-              className={`hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-xs font-medium cursor-pointer transition-all ${
-                isAppFocused && isTimerRunning 
-                  ? 'bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-300/80 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-300' 
+              className={`hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-xs font-medium cursor-pointer transition-all ${isAppFocused && isTimerRunning
+                  ? 'bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-300/80 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-300'
                   : 'bg-zinc-50 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 text-zinc-500'
-              }`}
+                }`}
               title={isTimerRunning ? 'Active Focus Timer (Click to pause)' : 'Timer Paused (Click to resume)'}
             >
               <Clock className="w-3 h-3 opacity-70" />
@@ -138,18 +138,34 @@ export const Navbar: React.FC = () => {
             </kbd>
           </button>
 
+          {/* Survey Required Pill if Not Completed */}
+          {!user.onboardingCompleted && (
+            <button
+              onClick={() => setOnboardingActive(true)}
+              className="px-2.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs transition-colors flex items-center gap-1.5 animate-pulse cursor-pointer shrink-0"
+              title="Intake survey required to unlock sprint actions"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Survey Required</span>
+            </button>
+          )}
+
           {/* Mascot Pip Assistant Trigger */}
           <button
             onClick={() => setMascotOpen(!mascotOpen)}
-            className={`relative p-1.5 rounded-lg border transition-all flex items-center gap-1.5 ${
-              mascotOpen 
-                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400' 
-                : 'border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
-            }`}
-            title="Ask Pip AI Mascot"
+            className={`relative px-2.5 py-1.5 rounded-xl border transition-all flex items-center gap-2 group cursor-pointer ${mascotOpen
+                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 ring-2 ring-indigo-500/20 shadow-xs'
+                : 'border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30'
+              }`}
+            title="Ask Pip AI"
           >
-            <img src="/mascot_idle.svg" alt="Pip Mascot" className="w-4.5 h-4.5 object-contain" />
-            <span className="hidden xl:inline text-xs font-medium">Pip</span>
+            <div className="w-5 h-5 relative shrink-0 transition-transform group-hover:scale-110">
+              <img src="/mascot_idle.svg" alt="Pip Mascot" className="w-full h-full object-contain" />
+              <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            </div>
+            <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 hidden sm:inline">
+              Ask Pip
+            </span>
           </button>
 
           {/* Notification Button */}
@@ -177,14 +193,13 @@ export const Navbar: React.FC = () => {
                   </div>
                   <div className="mt-2 space-y-1.5 max-h-72 overflow-y-auto">
                     {notifications.map(n => (
-                      <div 
+                      <div
                         key={n.id}
                         onClick={() => markNotificationRead(n.id)}
-                        className={`p-2.5 rounded-xl cursor-pointer text-xs transition-colors ${
-                          n.read 
-                            ? 'bg-transparent text-zinc-500 dark:text-zinc-400' 
+                        className={`p-2.5 rounded-xl cursor-pointer text-xs transition-colors ${n.read
+                            ? 'bg-transparent text-zinc-500 dark:text-zinc-400'
                             : 'bg-indigo-50/50 dark:bg-indigo-950/30 text-zinc-900 dark:text-zinc-100 border border-indigo-100/80 dark:border-indigo-900/40'
-                        }`}
+                          }`}
                       >
                         <div className="font-medium text-zinc-900 dark:text-zinc-100">
                           {n.title}
@@ -219,10 +234,10 @@ export const Navbar: React.FC = () => {
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                 className="flex items-center gap-1.5 p-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors focus:outline-none"
               >
-                <img 
-                  src={user.avatar} 
-                  alt={user.name} 
-                  className="w-6 h-6 rounded-md object-cover ring-1 ring-zinc-300 dark:ring-zinc-700" 
+                <img
+                  src={user.avatar}
+                  alt={user.name}
+                  className="w-6 h-6 rounded-md object-cover ring-1 ring-zinc-300 dark:ring-zinc-700"
                 />
                 <ChevronDown className="w-3 h-3 text-zinc-400" />
               </button>
@@ -230,10 +245,17 @@ export const Navbar: React.FC = () => {
               {profileDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-52 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] shadow-xl p-1.5 z-50 animate-in fade-in duration-150">
                   <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800">
-                    <div className="font-semibold text-xs text-zinc-900 dark:text-zinc-100">
-                      {user.name}
+                    <div className="flex items-center justify-between gap-1.5">
+                      <div className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 truncate">
+                        {user.name}
+                      </div>
+                      {isDemo && (
+                        <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 shrink-0">
+                          Demo
+                        </span>
+                      )}
                     </div>
-                    <div className="text-[10px] text-zinc-500">
+                    <div className="text-[10px] text-zinc-500 truncate">
                       {user.handle}
                     </div>
                   </div>
@@ -253,10 +275,19 @@ export const Navbar: React.FC = () => {
                         setOnboardingActive(true);
                         setProfileDropdownOpen(false);
                       }}
-                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-left transition-colors"
+                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-left transition-colors"
                     >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      Change Learning Path
+                      <span className="flex items-center gap-2">
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>{user.onboardingCompleted ? 'Retake Intake Survey' : 'Complete Intake Survey'}</span>
+                      </span>
+                      <span className={`text-[9.5px] font-bold px-1.5 py-0.2 rounded ${
+                        user.onboardingCompleted 
+                          ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400' 
+                          : 'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
+                      }`}>
+                        {user.onboardingCompleted ? 'Done' : 'Required'}
+                      </span>
                     </button>
                     <button
                       onClick={() => {
@@ -268,6 +299,18 @@ export const Navbar: React.FC = () => {
                       <Settings className="w-3.5 h-3.5" />
                       Settings
                     </button>
+                    {isDemo && (
+                      <button
+                        onClick={() => {
+                          setProfileDropdownOpen(false);
+                          setResetDemoModalOpen(true);
+                        }}
+                        className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 text-left transition-colors"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        <span>Full Reset</span>
+                      </button>
+                    )}
                     <button
                       onClick={async () => {
                         await logout();
@@ -276,7 +319,7 @@ export const Navbar: React.FC = () => {
                       }}
                       className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-left transition-colors"
                     >
-                      <LogOut className="w-3.5 h-3.5" />
+                      <LogOut className="w-3.5 h-3.5 shrink-0" />
                       Sign Out
                     </button>
                   </div>

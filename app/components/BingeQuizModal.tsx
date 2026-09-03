@@ -12,7 +12,7 @@ import { useHuddle } from '../context/HuddleContext';
 import { sampleBingeQuiz } from '../data/initialData';
 
 export const BingeQuizModal: React.FC = () => {
-  const { showBingeQuizModal, setShowBingeQuizModal } = useHuddle();
+  const { showBingeQuizModal, setShowBingeQuizModal, ensureSurveyDone } = useHuddle();
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
@@ -31,6 +31,7 @@ export const BingeQuizModal: React.FC = () => {
   };
 
   const handleSubmit = () => {
+    if (!ensureSurveyDone('verify quiz answers')) return;
     setSubmitted(true);
   };
 
@@ -48,12 +49,18 @@ export const BingeQuizModal: React.FC = () => {
         
         {/* Header */}
         <div className="p-4 sm:p-5 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <img 
-              src="/mascot_thinking.svg" 
-              alt="Pip Mascot" 
-              className="w-10 h-10 object-contain drop-shadow-xs"
-            />
+          <div className="flex items-center gap-3.5">
+            <div className="w-14 h-14 p-1 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/40 flex items-center justify-center shrink-0">
+              <img 
+                src={
+                  !submitted 
+                    ? '/mascot_thinking.svg' 
+                    : (isCorrect ? '/mascot_success.svg' : '/mascot_encouragement.svg')
+                } 
+                alt="Pip Mascot" 
+                className="w-full h-full object-contain drop-shadow-xs"
+              />
+            </div>
             <div>
               <div className="inline-flex items-center gap-1 px-2 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-[10px] font-semibold">
                 <Clock className="w-3 h-3" />
@@ -117,22 +124,24 @@ export const BingeQuizModal: React.FC = () => {
           </div>
 
           {submitted && (
-            <div className={`p-3.5 rounded-xl border text-xs space-y-1 animate-in fade-in duration-150 ${
+            <div className={`p-4 rounded-2xl border text-xs space-y-1.5 animate-in fade-in duration-150 flex items-start gap-3.5 ${
               isCorrect 
-                ? 'bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/40 text-emerald-900 dark:text-emerald-300'
-                : 'bg-indigo-50/60 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-900/40 text-indigo-900 dark:text-indigo-300'
+                ? 'bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/40 text-emerald-900 dark:text-emerald-300'
+                : 'bg-indigo-50/70 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-900/40 text-indigo-900 dark:text-indigo-300'
             }`}>
-              <div className="font-semibold flex items-center gap-1.5">
-                <img 
-                  src={isCorrect ? '/mascot_success.svg' : '/mascot_encouragement.svg'} 
-                  alt="Pip" 
-                  className="w-4 h-4 object-contain inline-block"
-                />
-                <span>{isCorrect ? 'Correct! Real mastery unlocked.' : 'Good try! Here is how it works:'}</span>
+              <img 
+                src={isCorrect ? '/mascot_success.svg' : '/mascot_encouragement.svg'} 
+                alt="Pip" 
+                className="w-10 h-10 object-contain shrink-0 drop-shadow-xs"
+              />
+              <div>
+                <div className="font-semibold text-xs">
+                  {isCorrect ? 'Correct! Real craft mastery unlocked.' : 'Good try! Here is how it works:'}
+                </div>
+                <p className="text-[11.5px] opacity-90 leading-relaxed mt-0.5">
+                  {quiz.explanation}
+                </p>
               </div>
-              <p className="text-[11px] opacity-90 leading-relaxed">
-                {quiz.explanation}
-              </p>
             </div>
           )}
         </div>

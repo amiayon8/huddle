@@ -33,6 +33,16 @@ export function createDynamicUser(name: string = 'Engineer', email: string = 'us
     squadId: 'squad-1',
     macroSquadId: 'macro-squad-1',
     onboardingCompleted: true,
+    surveyData: {
+      subjects: ['Computer Science/ICT', 'Mathematics'],
+      hobbies: ['Gaming', 'Reading'],
+      age: '24',
+      ageInput: '24',
+      learningStage: 'Early Career / Rising Engineer',
+      targetProfession: 'Staff Software Engineer',
+      startingSkills: ['System Architecture'],
+      completedAt: new Date().toISOString()
+    },
     joinedDate: 'Today',
     primaryGoal: 'Master System Architecture',
     careerMilestone: 'Staff Software Engineer',

@@ -20,9 +20,11 @@ import {
   ChevronRight,
   Edit3,
   X,
-  Camera
+  Camera,
+  Sparkles
 } from 'lucide-react';
 import { useHuddle } from '../context/HuddleContext';
+import { DuolingoMascot } from './DuolingoMascot';
 
 export const PublicProfileView: React.FC = () => {
   const { 
@@ -203,6 +205,54 @@ export const PublicProfileView: React.FC = () => {
             <span className="text-zinc-400">Reputation</span>
           </div>
         </div>
+
+        {/* Survey & AI Personalization Highlights Card */}
+        {user.surveyData && (
+          <div className="mt-4 p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 text-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+              <div className="flex items-center gap-2 font-bold text-indigo-700 dark:text-indigo-300">
+                <Sparkles className="w-4 h-4 text-indigo-500" />
+                <span>AI Intake & Personalization Profile (Stored in DB)</span>
+              </div>
+              <button
+                onClick={() => setOnboardingActive(true)}
+                className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline self-start sm:self-auto cursor-pointer"
+              >
+                Retake Intake Survey →
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-zinc-600 dark:text-zinc-400">
+              <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800">
+                <span className="block text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Stage & Age</span>
+                <span className="font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 block truncate">
+                  {user.surveyData.learningStage || 'Rising Engineer'} ({user.surveyData.age || '22'}y)
+                </span>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800">
+                <span className="block text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Subjects</span>
+                <span className="font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 block truncate">
+                  {user.surveyData.subjects?.join(', ') || 'Computer Science'}
+                </span>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800">
+                <span className="block text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Hobbies / Passions</span>
+                <span className="font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 block truncate">
+                  {user.surveyData.hobbies?.join(', ') || 'Gaming'}
+                </span>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800">
+                <span className="block text-[10px] text-zinc-400 uppercase tracking-wider font-semibold">Dream Target</span>
+                <span className="font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 block truncate">
+                  {user.surveyData.targetProfession || user.careerMilestone}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Edit Profile Modal */}
@@ -345,6 +395,14 @@ export const PublicProfileView: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Pip Mascot Career Proof Verification Banner */}
+      <DuolingoMascot
+        emotion="success"
+        size="md"
+        speechText={`Pip's Verified Review: You have **${portfolioItems.length}** assembled artifacts, **${realWorldProofs.filter(p => p.completed).length}** verified real-world proofs, and an active **${user.streak}-day** focus streak!`}
+        showQuickActions={true}
+      />
 
       {/* Tabs */}
       <div className="flex items-center space-x-1 border-b border-zinc-200 dark:border-zinc-800 pb-1 overflow-x-auto hide-scrollbar">

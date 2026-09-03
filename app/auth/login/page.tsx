@@ -69,6 +69,23 @@ export default function LoginPage() {
           </div>
         </div>
 
+        {/* Pip Mascot Welcome */}
+        <div className="p-3.5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex items-center gap-3.5">
+          <div className="relative shrink-0 w-12 h-12">
+            <img 
+              src="/mascot_encouragement.svg" 
+              alt="Pip Mascot" 
+              className="w-full h-full object-contain drop-shadow-xs transition-transform hover:scale-110" 
+            />
+          </div>
+          <div className="text-xs text-zinc-700 dark:text-zinc-300">
+            <span className="font-semibold text-indigo-600 dark:text-indigo-400 block text-[11px] uppercase tracking-wider">
+              Pip Companion
+            </span>
+            <span>Consistency beats intensity! Log in to resume your active 4-day sprint.</span>
+          </div>
+        </div>
+
         {/* Error Feedback */}
         {errorMsg && (
           <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40 text-xs text-rose-800 dark:text-rose-300 flex items-center gap-2">

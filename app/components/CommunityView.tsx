@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useHuddle } from '../context/HuddleContext';
 import { CommunityPost } from '../types/huddle';
+import { DuolingoMascot } from './DuolingoMascot';
 
 export const CommunityView: React.FC = () => {
   const { posts, createCommunityPost, toggleUpvotePost, addReplyToPost } = useHuddle();
@@ -89,9 +90,17 @@ export const CommunityView: React.FC = () => {
           className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition-colors self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
-          Start Discussion
+          <span>New Discussion</span>
         </button>
       </div>
+
+      {/* Pip Mascot Signal Banner */}
+      <DuolingoMascot
+        emotion="thinking"
+        size="md"
+        speechText="Pip's Signal Shield: Pure technical discussions, architecture reviews, and actionable tips. Zero toxic algorithm traps."
+        showQuickActions={true}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         

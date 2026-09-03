@@ -9,6 +9,21 @@ export type OnboardingStep =
   | 'squad' 
   | 'ready';
 
+export interface UserSurveyData {
+  subjects: string[];
+  subjectsOther?: string;
+  hobbies: string[];
+  hobbiesOther?: string;
+  age?: string;
+  ageInput?: string;
+  learningStage?: string;
+  targetProfession?: string;
+  professionOther?: string;
+  startingSkills: string[];
+  skillsOther?: string;
+  completedAt?: string;
+}
+
 export interface UserProfile {
   id: string;
   name: string;
@@ -22,6 +37,7 @@ export interface UserProfile {
   squadId: string | null;
   macroSquadId?: string | null;
   onboardingCompleted: boolean;
+  surveyData?: UserSurveyData;
   joinedDate: string;
   primaryGoal: string;
   careerMilestone: string;
@@ -261,6 +277,23 @@ export interface NotificationItem {
   description: string;
   timestamp: string;
   read: boolean;
+}
+
+export interface PipChatMessage {
+  id: string;
+  sender: 'pip' | 'user';
+  text: string;
+  mascotSvg?: string;
+  timestamp: string;
+}
+
+export interface PipChatSession {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  messages: PipChatMessage[];
+  skillFocus?: string;
 }
 
 export interface MascotMessage {

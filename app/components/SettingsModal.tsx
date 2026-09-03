@@ -1,12 +1,22 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Sun, Moon, Shield, Bell, User as UserIcon, Sparkles, Check, LogOut } from 'lucide-react';
+import { X, Sun, Moon, Shield, Bell, User as UserIcon, Sparkles, Check, LogOut, RotateCcw } from 'lucide-react';
 import { useHuddle } from '../context/HuddleContext';
-import { signOutUser } from '../lib/supabase';
 
 export const SettingsModal: React.FC = () => {
-  const { settingsOpen, setSettingsOpen, user, updateUserProfile, theme, setTheme, openAuthModal } = useHuddle();
+  const { 
+    settingsOpen, 
+    setSettingsOpen, 
+    user, 
+    updateUserProfile, 
+    theme, 
+    setTheme, 
+    openAuthModal,
+    isDemo,
+    logout,
+    setResetDemoModalOpen 
+  } = useHuddle();
   const [activeTab, setActiveTab] = useState<'account' | 'privacy' | 'appearance' | 'notifications' | 'mascot'>('account');
   const [name, setName] = useState(user.name);
   const [bio, setBio] = useState(user.bio);
@@ -24,7 +34,7 @@ export const SettingsModal: React.FC = () => {
   };
 
   const handleSignOut = async () => {
-    await signOutUser();
+    await logout();
     setSettingsOpen(false);
     openAuthModal('welcome');
   };
@@ -97,12 +107,29 @@ export const SettingsModal: React.FC = () => {
             Mascot
           </button>
 
-          <div className="pt-4 mt-2 border-t border-zinc-200 dark:border-zinc-800">
+          <div className="pt-4 mt-2 border-t border-zinc-200 dark:border-zinc-800 space-y-1">
+            {isDemo && (
+              <button
+                onClick={() => {
+                  setSettingsOpen(false);
+                  setResetDemoModalOpen(true);
+                }}
+                className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-colors text-left"
+              >
+                <div className="flex items-center gap-2">
+                  <RotateCcw className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <span>Full Reset</span>
+                </div>
+                <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 shrink-0">
+                  Demo
+                </span>
+              </button>
+            )}
             <button
               onClick={handleSignOut}
               className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
             >
-              <LogOut className="w-3.5 h-3.5" />
+              <LogOut className="w-3.5 h-3.5 shrink-0" />
               Sign Out
             </button>
           </div>
@@ -236,12 +263,44 @@ export const SettingsModal: React.FC = () => {
           )}
 
           {activeTab === 'mascot' && (
-            <div className="space-y-3 text-xs">
-              <p className="text-zinc-500 leading-relaxed">
-                Pip mascot provides supportive reflections and zero-penalty schedule adjustments.
-              </p>
-              <div className="p-3 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 font-semibold text-indigo-900 dark:text-indigo-300">
-                Persona: Encouraging Pair Engineer (Minimax M3 Powered)
+            <div className="space-y-4 text-xs">
+              <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex flex-col items-center text-center space-y-3">
+                <div className="w-20 h-20 p-2 rounded-2xl bg-white dark:bg-[#111218] border-2 border-indigo-500 shadow-md flex items-center justify-center transition-transform hover:scale-110 cursor-pointer">
+                  <img src="/mascot_idle.svg" alt="Pip AI" className="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm text-zinc-900 dark:text-zinc-100">
+                    Pip AI Engineering Companion
+                  </h4>
+                  <p className="text-zinc-500 text-xs mt-0.5">
+                    Modeled after Duolingo's mascot philosophy — active on every page to encourage 1 daily deliberate practice action.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                  <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[11px] font-medium text-zinc-700 dark:text-zinc-300">
+                    <img src="/mascot_idle.svg" alt="Idle" className="w-4 h-4 object-contain" />
+                    <span>Idle</span>
+                  </div>
+                  <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[11px] font-medium text-zinc-700 dark:text-zinc-300">
+                    <img src="/mascot_planning.svg" alt="Planning" className="w-4 h-4 object-contain" />
+                    <span>Planning</span>
+                  </div>
+                  <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[11px] font-medium text-zinc-700 dark:text-zinc-300">
+                    <img src="/mascot_thinking.svg" alt="Thinking" className="w-4 h-4 object-contain" />
+                    <span>Thinking</span>
+                  </div>
+                  <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[11px] font-medium text-zinc-700 dark:text-zinc-300">
+                    <img src="/mascot_success.svg" alt="Success" className="w-4 h-4 object-contain" />
+                    <span>Success</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 space-y-1">
+                <div className="font-semibold text-zinc-900 dark:text-zinc-100">Zero-Penalty Philosophy</div>
+                <p className="text-[11px] leading-relaxed">
+                  Pip never penalizes missed days or broken streaks. Reshuffling a 4-day sprint is always 100% free and supportive.
+                </p>
               </div>
             </div>
           )}

@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import confetti from 'canvas-confetti';
-import { 
-  Sparkles, 
-  RotateCcw, 
-  MessageSquare, 
+import {
+  Sparkles,
+  RotateCcw,
+  MessageSquare,
   ArrowRight,
   Flame,
   CheckCircle2
@@ -71,19 +71,18 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
 
   return (
     <div className={`flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 ${className}`}>
-      
+
       {/* Animated Mascot Character */}
-      <div 
+      <div
         onClick={handleMascotPoke}
         className="relative group cursor-pointer shrink-0 flex flex-col items-center select-none"
         title="Tap Pip for encouragement"
       >
-        <div className={`relative ${sizeClasses[size]} transition-transform duration-200 ${
-          isBouncing ? 'animate-bounce' : 'group-hover:scale-105 group-active:scale-95'
-        }`}>
-          <img 
-            src={currentSvg} 
-            alt="Pip Mascot" 
+        <div className={`relative ${sizeClasses[size]} transition-transform duration-200 ${isBouncing ? 'animate-bounce' : 'group-hover:scale-105 group-active:scale-95'
+          }`}>
+          <img
+            src={currentSvg}
+            alt="Pip Mascot"
             className="w-full h-full object-contain"
           />
         </div>
@@ -95,7 +94,7 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
       {/* Speech Balloon with Pointer Tail */}
       <div className="flex-1 w-full relative">
         <div className="relative p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2.5">
-          
+
           {/* Speech Bubble Arrow Tail for Desktop (Left) */}
           <div className="hidden sm:block absolute top-5 -left-2.5 w-0 h-0 border-t-[7px] border-t-transparent border-r-[10px] border-r-zinc-200 dark:border-r-zinc-800 border-b-[7px] border-b-transparent" />
           <div className="hidden sm:block absolute top-5 -left-2 w-0 h-0 border-t-[7px] border-t-transparent border-r-[10px] border-r-white dark:border-r-[#111218] border-b-[7px] border-b-transparent" />
@@ -112,14 +111,6 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
                 {user.streak}d streak
               </span>
             </div>
-
-            <button
-              onClick={() => setMascotOpen(true)}
-              className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
-            >
-              <span>Ask Pip</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
           </div>
 
           {/* Markdown & LaTeX Content */}
@@ -135,7 +126,7 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-medium shadow-xs transition-colors"
               >
                 <MessageSquare className="w-3 h-3" />
-                <span>Chat with AI Mascot</span>
+                <span>Chat with Me!</span>
               </button>
 
               <button

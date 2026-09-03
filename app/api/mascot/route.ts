@@ -2,16 +2,36 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, userProfile, sprintContext, actionType } = await req.json();
+    const { messages, userProfile, sprintContext, actionType, surveyData } = await req.json();
 
     const apiKey = process.env.OPENROUTER_API_KEY;
     const model = process.env.OPENROUTER_MODEL || 'minimax/minimax-m3:free';
 
-    const systemPrompt = `You are Pip, the calm, friendly, and supportive AI Mascot for "Huddle" — a deliberate practice app that turns skill learning into 1 actionable daily step to beat doomscroll guilt.
+    const effectiveSurvey = surveyData || userProfile?.surveyData;
+
+    const surveyPersonalization = effectiveSurvey ? `
+=== STRUCTURED USER INTAKE SURVEY & PERSONALIZATION CONTEXT ===
+- Favourite Subjects: ${effectiveSurvey.subjects?.join(', ') || 'Computer Science/ICT'}${effectiveSurvey.subjectsOther ? ` (Other: ${effectiveSurvey.subjectsOther})` : ''}
+- Flow Hobbies & Passions: ${effectiveSurvey.hobbies?.join(', ') || 'Gaming'}${effectiveSurvey.hobbiesOther ? ` (Other: ${effectiveSurvey.hobbiesOther})` : ''}
+- Age & Learning Stage: ${effectiveSurvey.age || '22'} years old (${effectiveSurvey.learningStage || 'Early Career / Rising Engineer'})
+- Target Dream Profession: ${effectiveSurvey.targetProfession || userProfile?.careerMilestone || 'Staff Systems Architect'}${effectiveSurvey.professionOther ? ` (Other: ${effectiveSurvey.professionOther})` : ''}
+- Selected Initial Skills: ${effectiveSurvey.startingSkills?.join(', ') || sprintContext?.skillTitle || 'System Architecture'}${effectiveSurvey.skillsOther ? ` (Other: ${effectiveSurvey.skillsOther})` : ''}
+
+CRITICAL PERSONALIZATION DIRECTIVES FOR PIP:
+1. Analogy & Mental Models: Actively draw metaphors from the user's hobbies (${effectiveSurvey.hobbies?.join(', ') || 'Gaming'}) and favorite subjects (${effectiveSurvey.subjects?.join(', ') || 'Science'}) when explaining complex technical concepts, distributed patterns, or sprint steps.
+2. Direct Career Milestone Connection: Continually bridge today's 15-20 min deliberate practice step to their dream profession: "${effectiveSurvey.targetProfession || userProfile?.careerMilestone}". Remind them how this specific task builds undeniable proof for that exact role.
+3. Rhythm & Stage Pacing: The user is at the "${effectiveSurvey.learningStage || 'Early Career / Rising Engineer'}" stage. Tailor the tone, depth, and pacing to match their reality. Keep tasks bite-sized (15-25 mins) and free from overwhelm.` : `
+=== USER CONTEXT ===
+- Milestone Goal: ${userProfile?.careerMilestone || 'Staff Systems Architect'}
+- Current Focus: ${sprintContext?.skillTitle || 'System Architecture'}`;
+
+    const systemPrompt = `You are Pip, the calm, friendly, and supportive AI mascot and deliberate practice tutor for "Huddle".
 User Name: ${userProfile?.name || 'Alex'}
 Current Skill Focus: ${sprintContext?.skillTitle || 'System Architecture'}
 Career Milestone Target: ${userProfile?.careerMilestone || 'Staff Systems Architect'}
 Current Sprint: ${sprintContext?.durationDays || 4}-Day Sprint (Day ${sprintContext?.currentDay || 2})
+
+${surveyPersonalization}
 
 Your Tone & Rules:
 1. Casual, warm, non-corporate, and encouraging. Never sound like a corporate boss or an intrusive stats robot.

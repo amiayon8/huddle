@@ -130,6 +130,7 @@ export async function fetchUserProfile(userId: string = 'user-1'): Promise<UserP
       primaryGoal: data.primary_goal,
       careerMilestone: data.career_milestone,
       onboardingCompleted: data.onboarding_completed,
+      surveyData: data.survey_data || undefined,
       joinedDate: 'August 2026',
       privacy: data.privacy || {
         showStreak: true,
@@ -158,6 +159,7 @@ export async function updateUserProfile(userId: string, updates: Partial<UserPro
     if (updates.onboardingCompleted !== undefined) dbUpdates.onboarding_completed = updates.onboardingCompleted;
     if (updates.primaryGoal !== undefined) dbUpdates.primary_goal = updates.primaryGoal;
     if (updates.careerMilestone !== undefined) dbUpdates.career_milestone = updates.careerMilestone;
+    if (updates.surveyData !== undefined) dbUpdates.survey_data = updates.surveyData;
     if (updates.privacy !== undefined) dbUpdates.privacy = updates.privacy;
 
     await supabase.from('profiles').update(dbUpdates).eq('id', userId);
@@ -537,5 +539,121 @@ export async function publishCreatorPostToDb(post: CreatorPost) {
     });
   } catch (err) {
     console.error('Error publishing creator post:', err);
+  }
+}
+
+/**
+ * Full reset of the demo account (user-1) back to initial baseline
+ */
+export async function resetDemoAccountInDb(): Promise<{ success: boolean; error?: string }> {
+  try {
+    // 1. Reset user profile
+    await supabase.from('profiles').update({
+      name: 'Alex Chen',
+      handle: '@alexchen.dev',
+      email: 'alex@huddle.dev',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+      bio: 'Staff Software Engineer exploring distributed systems, caching hierarchies, and resilient microservices.',
+      streak: 8,
+      max_streak: 12,
+      reputation: 240,
+      squad_id: 'squad-1',
+      macro_squad_id: 'macro-squad-1',
+      primary_goal: 'Build resilient production software',
+      career_milestone: 'Staff Backend & Distributed Systems Architect',
+      onboarding_completed: false,
+      survey_data: {
+        subjects: ['Computer Science/ICT', 'Mathematics'],
+        hobbies: ['Gaming', 'Reading'],
+        age: '24',
+        ageInput: '24',
+        learningStage: 'Early Career / Rising Engineer',
+        targetProfession: 'Staff Backend & Distributed Systems Architect',
+        startingSkills: ['System Architecture & Scalability', 'Next.js App Router & Server Components'],
+        completedAt: new Date().toISOString()
+      },
+      privacy: {
+        showStreak: true,
+        showSquad: true,
+        showReputation: true,
+        publicProfile: true,
+        hideRawRoadmaps: false
+      }
+    }).eq('id', 'user-1');
+
+    // 2. Reset sprint
+    await supabase.from('sprints').update({
+      skill_title: 'System Architecture',
+      career_milestone: 'Staff Backend & Distributed Systems Architect',
+      duration_days: 4,
+      current_day: 1,
+      reshuffle_count: 0,
+      last_reshuffled_at: null,
+      mascot_narration: 'Ready for today? Complete your deliberate practice task to keep your streak alive!'
+    }).eq('user_id', 'user-1');
+
+    // 3. Reset sprint tasks
+    await supabase.from('sprint_tasks').update({
+      completed: false,
+      completed_at: null
+    }).eq('sprint_id', 'sprint-1');
+
+    // 4. Reset portfolio items - delete dynamically generated ones
+    const { data: userPortItems } = await supabase
+      .from('portfolio_items')
+      .select('id')
+      .eq('user_id', 'user-1');
+
+    const toDeletePortIds = (userPortItems || [])
+      .filter((item: any) => item.id !== 'port-1' && item.id !== 'port-2')
+      .map((item: any) => item.id);
+
+    if (toDeletePortIds.length > 0) {
+      await supabase.from('portfolio_items').delete().in('id', toDeletePortIds);
+    }
+
+    // Ensure baseline portfolio items exist & are published
+    await supabase.from('portfolio_items').upsert([
+      {
+        id: 'port-1',
+        user_id: 'user-1',
+        title: 'Probabilistic Cache Early Expiration Benchmark',
+        category: 'System Architecture',
+        date: 'Yesterday',
+        description: 'Benchmark comparing vanilla TTL vs XFetch probabilistic early recomputation algorithm under 10k RPS load.',
+        artifact_type: 'code',
+        preview_snippet: 'function xfetch(key, ttl, beta = 1.0, delta = 50) {\n  const [val, deltaCalc, expiry] = redis.get(key);\n  if (!val || (Date.now() - (delta * beta * Math.log(Math.random()))) >= expiry) {\n    const freshVal = recomputeExpensiveValue();\n    redis.set(key, freshVal, ttl);\n    return freshVal;\n  }\n  return val;\n}',
+        is_published: true,
+        source_task_id: 'task-1',
+        tags: ['caching', 'redis', 'high-throughput']
+      },
+      {
+        id: 'port-2',
+        user_id: 'user-1',
+        title: 'Postgres Read-Replica Connection Pooler ADR',
+        category: 'Database Engineering',
+        date: 'Last week',
+        description: 'Architecture Decision Record for pgBouncer transaction pooling in serverless edge environments.',
+        artifact_type: 'summary',
+        preview_snippet: 'Status: Accepted\nContext: Edge functions spawning 500+ ephemeral DB connections causing Postgres MAX_CONNECTIONS exhaustion.\nDecision: Deploy PgBouncer in transaction mode with max_client_conn=5000 and default_pool_size=40.',
+        is_published: true,
+        source_task_id: 'task-prev',
+        tags: ['postgres', 'architecture', 'scalability']
+      }
+    ]);
+
+    // 5. Reset real world proofs
+    await supabase.from('real_world_proofs').update({ completed: true }).eq('id', 'proof-1');
+    await supabase.from('real_world_proofs').update({ completed: true }).eq('id', 'proof-2');
+    await supabase.from('real_world_proofs').update({ completed: false }).eq('id', 'proof-3');
+
+    // 6. Reset squad progress & pings
+    await supabase.from('squads').update({ current_progress: 7 }).eq('id', 'squad-1');
+    await supabase.from('squad_activity_pings').delete().eq('squad_id', 'squad-1').neq('id', 'ping-1');
+
+    return { success: true };
+  } catch (err: any) {
+    console.error('Error resetting demo account in DB:', err);
+    return { success: false, error: err.message || 'Failed to reset demo account' };
   }
 }
