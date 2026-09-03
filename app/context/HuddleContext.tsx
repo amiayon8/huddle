@@ -21,22 +21,6 @@ import {
   CommunityPost,
   UserSurveyData
 } from '../types/huddle';
-import { 
-  initialUser, 
-  initialSkillsHealth, 
-  initialRoadmap, 
-  initialSquad, 
-  initialMacroSquad, 
-  initialPosts, 
-  initialCreators, 
-  initialCreatorPosts, 
-  initialNotifications, 
-  initialMascotMessages,
-  initialSprint,
-  initialPortfolioItems,
-  initialRealWorldProofs,
-  initialCareerTimeline
-} from '../data/initialData';
 import {
   supabase,
   signUpUser,
@@ -56,7 +40,30 @@ import {
   addSquadActivityPingToDb,
   fetchCreatorPosts,
   publishCreatorPostToDb,
-  resetDemoAccountInDb
+  fetchSkillsHealth,
+  fetchCareerTimeline,
+  fetchSkillRoadmap,
+  fetchMacroSquad,
+  fetchCommunityPosts,
+  fetchCreators,
+  fetchNotifications,
+  fetchMascotMessages,
+  updateRoadmapStepCompletionInDb,
+  addCommunityPostToDb,
+  toggleCommunityPostUpvoteInDb,
+  addReplyToCommunityPostInDb,
+  toggleFollowCreatorInDb,
+  toggleLikeCreatorPostInDb,
+  toggleMacroMilestoneCongratsInDb,
+  markNotificationReadInDb,
+  addNotificationToDb,
+  addCareerTimelineEntryToDb,
+  updateSkillHealthInDb,
+  updateSquadMemberCheckInInDb,
+  updateSprintSkillInDb,
+  resetPasswordUser,
+  resetDemoAccountInDb,
+  generateTasksForSkill
 } from '../lib/supabase';
 
 interface HuddleContextType {
@@ -156,22 +163,80 @@ interface HuddleContextType {
 const HuddleContext = createContext<HuddleContextType | undefined>(undefined);
 
 export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserProfile>(initialUser);
+  const [user, setUser] = useState<UserProfile>({
+    id: 'user-1',
+    name: 'Alex Chen',
+    handle: '@alexchen.dev',
+    email: 'alex@huddle.dev',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    bio: 'Staff Software Engineer exploring distributed systems, caching hierarchies, and resilient microservices.',
+    streak: 8,
+    maxStreak: 12,
+    reputation: 240,
+    squadId: 'squad-1',
+    macroSquadId: 'macro-squad-1',
+    onboardingCompleted: true,
+    joinedDate: 'August 2026',
+    primaryGoal: 'Build resilient production software',
+    careerMilestone: 'Staff Backend & Distributed Systems Architect',
+    privacy: {
+      showStreak: true,
+      showSquad: true,
+      showReputation: true,
+      publicProfile: true,
+      hideRawRoadmaps: false
+    }
+  });
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [authLoading, setAuthLoading] = useState<boolean>(true);
-  const [skillsHealth, setSkillsHealth] = useState<SkillHealth[]>(initialSkillsHealth);
-  const [roadmap, setRoadmap] = useState<SkillRoadmap>(initialRoadmap);
-  const [squad, setSquad] = useState<MicroSquad>(initialSquad);
-  const [macroSquad, setMacroSquad] = useState<MacroSquad>(initialMacroSquad);
-  const [posts, setPosts] = useState<CommunityPost[]>(initialPosts);
-  const [creators, setCreators] = useState<CreatorProfile[]>(initialCreators);
-  const [creatorPosts, setCreatorPosts] = useState<CreatorPost[]>(initialCreatorPosts);
-  const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications);
-  const [mascotMessages, setMascotMessages] = useState<MascotMessage[]>(initialMascotMessages);
-  const [sprint, setSprint] = useState<SprintChecklist>(initialSprint);
-  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>(initialPortfolioItems);
-  const [realWorldProofs, setRealWorldProofs] = useState<RealWorldProofItem[]>(initialRealWorldProofs);
-  const [careerTimeline, setCareerTimeline] = useState<CareerTimelineEntry[]>(initialCareerTimeline);
+  const [skillsHealth, setSkillsHealth] = useState<SkillHealth[]>([]);
+  const [roadmap, setRoadmap] = useState<SkillRoadmap>({
+    skillId: 'system-architecture',
+    skillTitle: 'System Architecture',
+    skillIcon: '⚡',
+    currentStepIndex: 1,
+    totalSteps: 2,
+    milestones: [],
+    steps: []
+  });
+  const [squad, setSquad] = useState<MicroSquad>({
+    id: 'squad-1',
+    name: 'Distributed Systems Core',
+    skillFocus: 'System Architecture',
+    sharedGoal: 'Complete 12 focused practice tasks together this week with zero pressure',
+    currentProgress: 7,
+    targetProgress: 12,
+    inviteCode: 'HUDDLE-4X9B',
+    members: [],
+    activityPings: []
+  });
+  const [macroSquad, setMacroSquad] = useState<MacroSquad>({
+    id: 'macro-1',
+    name: 'Global Backend & Systems Circle',
+    description: 'A global macro circle of 38 engineers mastering distributed backend systems.',
+    trackCategory: 'System Architecture',
+    membersCount: 38,
+    members: [],
+    milestoneUpdates: []
+  });
+  const [posts, setPosts] = useState<CommunityPost[]>([]);
+  const [creators, setCreators] = useState<CreatorProfile[]>([]);
+  const [creatorPosts, setCreatorPosts] = useState<CreatorPost[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [mascotMessages, setMascotMessages] = useState<MascotMessage[]>([]);
+  const [sprint, setSprint] = useState<SprintChecklist>({
+    id: 'sprint-1',
+    skillTitle: 'System Architecture',
+    careerMilestone: 'Staff Backend & Distributed Systems Architect',
+    durationDays: 4,
+    currentDay: 1,
+    tasks: generateTasksForSkill('sprint-1', 'System Architecture'),
+    mascotNarration: 'Ready for today? Complete your deliberate practice task to keep your streak alive!',
+    reshuffleCount: 0
+  });
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
+  const [realWorldProofs, setRealWorldProofs] = useState<RealWorldProofItem[]>([]);
+  const [careerTimeline, setCareerTimeline] = useState<CareerTimelineEntry[]>([]);
   
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [theme, setThemeState] = useState<'dark' | 'light'>('dark');
@@ -205,6 +270,59 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const isDemo = isDemoState || user.id === 'user-1' || user.email === 'alex@huddle.dev';
 
+  const loadAllSupabaseData = async (activeUserId: string = 'user-1') => {
+    try {
+      const [
+        dbProfile,
+        dbSprint,
+        dbPortfolio,
+        dbProofs,
+        dbSquad,
+        dbCreatorPosts,
+        dbSkillsHealth,
+        dbCareerTimeline,
+        dbRoadmap,
+        dbMacroSquad,
+        dbCommunityPosts,
+        dbCreators,
+        dbNotifications,
+        dbMascotMessages
+      ] = await Promise.all([
+        fetchUserProfile(activeUserId),
+        fetchCurrentSprint(activeUserId),
+        fetchPortfolioItems(activeUserId),
+        fetchRealWorldProofs(activeUserId),
+        fetchSquad('squad-1'),
+        fetchCreatorPosts(),
+        fetchSkillsHealth(activeUserId),
+        fetchCareerTimeline(activeUserId),
+        fetchSkillRoadmap('System Architecture'),
+        fetchMacroSquad('macro-1'),
+        fetchCommunityPosts(),
+        fetchCreators(),
+        fetchNotifications(activeUserId),
+        fetchMascotMessages(activeUserId)
+      ]);
+
+      if (dbProfile) setUser(dbProfile);
+      if (dbSprint) setSprint(dbSprint);
+      if (dbPortfolio) setPortfolioItems(dbPortfolio);
+      if (dbProofs) setRealWorldProofs(dbProofs);
+      if (dbSquad) setSquad(dbSquad);
+      if (dbCreatorPosts) setCreatorPosts(dbCreatorPosts);
+      if (dbSkillsHealth && dbSkillsHealth.length > 0) setSkillsHealth(dbSkillsHealth);
+      if (dbCareerTimeline && dbCareerTimeline.length > 0) setCareerTimeline(dbCareerTimeline);
+      if (dbRoadmap) setRoadmap(dbRoadmap);
+      if (dbMacroSquad) setMacroSquad(dbMacroSquad);
+      if (dbCommunityPosts && dbCommunityPosts.length > 0) setPosts(dbCommunityPosts);
+      if (dbCreators && dbCreators.length > 0) setCreators(dbCreators);
+      if (dbNotifications && dbNotifications.length > 0) setNotifications(dbNotifications);
+      if (dbMascotMessages && dbMascotMessages.length > 0) setMascotMessages(dbMascotMessages);
+    } catch (err) {
+      console.error('Error loading Supabase data:', err);
+    }
+  };
+
   // Load from Supabase on mount & subscribe to Realtime updates
   useEffect(() => {
     async function loadSupabaseData() {
@@ -213,37 +331,16 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         if (session?.user) {
           setIsAuthenticated(true);
           setIsDemoState(false);
-          const activeUserId = session.user.id;
-          const [
-            dbProfile,
-            dbSprint,
-            dbPortfolio,
-            dbProofs,
-            dbSquad,
-            dbCreatorPosts
-          ] = await Promise.all([
-            fetchUserProfile(activeUserId),
-            fetchCurrentSprint(activeUserId),
-            fetchPortfolioItems(activeUserId),
-            fetchRealWorldProofs(activeUserId),
-            fetchSquad('squad-1'),
-            fetchCreatorPosts()
-          ]);
-
-          if (dbProfile) setUser(dbProfile);
-          if (dbSprint) setSprint(dbSprint);
-          if (dbPortfolio && dbPortfolio.length > 0) setPortfolioItems(dbPortfolio);
-          if (dbProofs && dbProofs.length > 0) setRealWorldProofs(dbProofs);
-          if (dbSquad) setSquad(dbSquad);
-          if (dbCreatorPosts && dbCreatorPosts.length > 0) setCreatorPosts(dbCreatorPosts);
+          await loadAllSupabaseData(session.user.id);
         } else {
           const isDemoStored = typeof window !== 'undefined' && localStorage.getItem('huddle_is_demo') === 'true';
           if (isDemoStored) {
             setIsDemoState(true);
-            await loginDemo();
+            await loadAllSupabaseData('user-1');
           } else {
             setIsAuthenticated(false);
             setIsDemoState(false);
+            await loadAllSupabaseData('user-1');
           }
         }
       } catch (err) {
@@ -396,13 +493,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     if (isTimerRunning && isAppFocused) {
       interval = setInterval(() => {
-        setSecondsFocusedToday(prev => {
-          const next = prev + 1;
-          if (next > 0 && next % 1500 === 0) {
-            setShowBingeQuizModal(true);
-          }
-          return next;
-        });
+        setSecondsFocusedToday(prev => prev + 1);
       }, 1000);
     }
     return () => {
@@ -458,29 +549,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (typeof window !== 'undefined') {
       localStorage.setItem('huddle_is_demo', 'true');
     }
-    const activeUserId = 'user-1';
-    const [
-      dbProfile,
-      dbSprint,
-      dbPortfolio,
-      dbProofs,
-      dbSquad,
-      dbCreatorPosts
-    ] = await Promise.all([
-      fetchUserProfile(activeUserId),
-      fetchCurrentSprint(activeUserId),
-      fetchPortfolioItems(activeUserId),
-      fetchRealWorldProofs(activeUserId),
-      fetchSquad('squad-1'),
-      fetchCreatorPosts()
-    ]);
-
-    if (dbProfile) setUser(dbProfile);
-    if (dbSprint) setSprint(dbSprint);
-    if (dbPortfolio && dbPortfolio.length > 0) setPortfolioItems(dbPortfolio);
-    if (dbProofs && dbProofs.length > 0) setRealWorldProofs(dbProofs);
-    if (dbSquad) setSquad(dbSquad);
-    if (dbCreatorPosts && dbCreatorPosts.length > 0) setCreatorPosts(dbCreatorPosts);
+    await loadAllSupabaseData('user-1');
   };
 
   const resetDemoAccount = async (shouldLogout: boolean = false): Promise<{ success: boolean; error?: string }> => {
@@ -495,40 +564,12 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return { success: true };
       }
 
-      // Reset in-memory state cleanly to initial baseline
-      setUser(initialUser);
-      setSkillsHealth(initialSkillsHealth);
-      setRoadmap(initialRoadmap);
-      setSprint(initialSprint);
-      setPortfolioItems(initialPortfolioItems);
-      setRealWorldProofs(initialRealWorldProofs);
-      setSquad(initialSquad);
       setSecondsFocusedToday(1080);
       setIsTimerRunning(true);
       setOnboardingActive(false);
       setActiveTab('dashboard');
 
-      // Re-fetch from Supabase to guarantee complete parity with restored database
-      const activeUserId = 'user-1';
-      const [
-        dbProfile,
-        dbSprint,
-        dbPortfolio,
-        dbProofs,
-        dbSquad
-      ] = await Promise.all([
-        fetchUserProfile(activeUserId),
-        fetchCurrentSprint(activeUserId),
-        fetchPortfolioItems(activeUserId),
-        fetchRealWorldProofs(activeUserId),
-        fetchSquad('squad-1')
-      ]);
-
-      if (dbProfile) setUser(dbProfile);
-      if (dbSprint) setSprint(dbSprint);
-      if (dbPortfolio) setPortfolioItems(dbPortfolio);
-      if (dbProofs) setRealWorldProofs(dbProofs);
-      if (dbSquad) setSquad(dbSquad);
+      await loadAllSupabaseData('user-1');
 
       try {
         import('canvas-confetti').then((confettiModule) => {
@@ -642,6 +683,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           badge: 'Portfolio Ready'
         };
         setCareerTimeline(prev => [newTimelineEntry, ...prev]);
+        addCareerTimelineEntryToDb(newTimelineEntry, user.id);
       }
 
       const newSquadPing = {
@@ -665,9 +707,11 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setSkillsHealth(prev => 
         prev.map(sh => {
           if (sh.skillTitle.toLowerCase().includes(sprint.skillTitle.toLowerCase())) {
+            const nextHealth = Math.min(100, sh.healthPercent + 5);
+            updateSkillHealthInDb(user.id, sprint.skillTitle, nextHealth);
             return {
               ...sh,
-              healthPercent: Math.min(100, sh.healthPercent + 5),
+              healthPercent: nextHealth,
               lastPracticed: 'Today',
               status: 'optimal'
             };
@@ -695,6 +739,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         read: false
       };
       setNotifications(prev => [notif, ...prev]);
+      addNotificationToDb(notif, user.id);
     }
   };
 
@@ -722,6 +767,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       read: false
     };
     setNotifications(prev => [notif, ...prev]);
+    addNotificationToDb(notif, user.id);
   };
 
   const completeStep = (stepId: string) => {
@@ -734,6 +780,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       );
       return { ...prev, steps: updatedSteps };
     });
+    updateRoadmapStepCompletionInDb('rm-1', stepId, true);
   };
 
   const checkInSquad = (encouragement?: string) => {
@@ -763,6 +810,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }));
 
     addSquadActivityPingToDb(squad.id, user.id, user.name, user.avatar, newSquadPing.actionText, 'checkin');
+    updateSquadMemberCheckInInDb(squad.id, user.id, encouragement);
   };
 
   const sendSquadNudge = (memberId: string) => {
@@ -779,10 +827,14 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       read: false
     };
     setNotifications(prev => [notif, ...prev]);
+    addNotificationToDb(notif, user.id);
   };
 
   const congratulateMacroMilestone = (updateId: string) => {
     if (!ensureSurveyDone('celebrate milestones')) return;
+    const targetUpdate = macroSquad.milestoneUpdates.find(u => u.id === updateId);
+    const nextCongratulated = !targetUpdate?.userCongratulated;
+
     setMacroSquad(prev => ({
       ...prev,
       milestoneUpdates: prev.milestoneUpdates.map(u => 
@@ -795,6 +847,8 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           : u
       )
     }));
+
+    toggleMacroMilestoneCongratsInDb(updateId, nextCongratulated);
   };
 
   const createCommunityPost = (title: string, content: string, skillId: string, category: CommunityPost['category']) => {
@@ -817,10 +871,14 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       replies: []
     };
     setPosts(prev => [newPost, ...prev]);
+    addCommunityPostToDb(newPost);
   };
 
   const toggleUpvotePost = (postId: string) => {
     if (!ensureSurveyDone('upvote discussions')) return;
+    const target = posts.find(p => p.id === postId);
+    const nextUpvoted = !target?.userUpvoted;
+
     setPosts(prev => prev.map(p => {
       if (p.id === postId) {
         return {
@@ -831,6 +889,8 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
       return p;
     }));
+
+    toggleCommunityPostUpvoteInDb(postId, nextUpvoted);
   };
 
   const addReplyToPost = (postId: string, content: string) => {
@@ -856,20 +916,30 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
       return p;
     }));
+
+    addReplyToCommunityPostInDb(postId, newReply);
   };
 
   const toggleFollowCreator = (creatorId: string) => {
     if (!ensureSurveyDone('follow creators')) return;
+    const target = creators.find(c => c.id === creatorId);
+    const nextFollowing = !target?.isFollowing;
+
     setCreators(prev => prev.map(c => {
       if (c.id === creatorId) {
         return { ...c, isFollowing: !c.isFollowing, followersCount: c.isFollowing ? c.followersCount - 1 : c.followersCount + 1 };
       }
       return c;
     }));
+
+    toggleFollowCreatorInDb(creatorId, nextFollowing);
   };
 
   const toggleLikeCreatorPost = (postId: string) => {
     if (!ensureSurveyDone('like creator tutorials')) return;
+    const target = creatorPosts.find(p => p.id === postId);
+    const nextLiked = !target?.userLiked;
+
     setCreatorPosts(prev => prev.map(p => {
       if (p.id === postId) {
         return {
@@ -880,6 +950,8 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
       return p;
     }));
+
+    toggleLikeCreatorPostInDb(postId, nextLiked);
   };
 
   const toggleBookmarkCreatorPost = (postId: string) => {
@@ -942,6 +1014,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const markNotificationRead = (id: string) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    markNotificationReadInDb(id);
   };
 
   const updateUserProfile = (updates: Partial<UserProfile>) => {
@@ -986,10 +1059,20 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       });
       return next;
     });
-    setSprint(prev => ({
-      ...prev,
-      skillTitle: mainSkill
-    }));
+    updateSprintSkillInDb(user.id, mainSkill, milestone).then((tasks) => {
+      if (tasks && tasks.length > 0) {
+        setSprint((prev) => ({
+          ...prev,
+          skillTitle: mainSkill,
+          tasks
+        }));
+      } else {
+        setSprint((prev) => ({
+          ...prev,
+          skillTitle: mainSkill
+        }));
+      }
+    });
     setHasSkippedToPreview(false);
     setSurveyPromptModalOpen(false);
     setOnboardingActive(false);

@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Sparkles, X, ArrowRight, Lock, ShieldAlert } from 'lucide-react';
-import { useHuddle } from '../context/HuddleContext';
+import React from "react";
+import { X, ArrowRight, Lock, ShieldAlert } from "lucide-react";
+import { useHuddle } from "../context/HuddleContext";
 
 export const SurveyPromptModal: React.FC = () => {
-  const { 
-    surveyPromptModalOpen, 
-    setSurveyPromptModalOpen, 
-    surveyActionAttempted, 
-    setOnboardingActive 
+  const {
+    surveyPromptModalOpen,
+    setSurveyPromptModalOpen,
+    surveyActionAttempted,
+    setOnboardingActive,
   } = useHuddle();
 
   if (!surveyPromptModalOpen) return null;
@@ -26,7 +26,6 @@ export const SurveyPromptModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
       <div className="relative w-full max-w-md bg-white dark:bg-[#111218] border border-amber-300 dark:border-amber-900/60 rounded-2xl shadow-2xl p-6 sm:p-7 transition-colors animate-in zoom-in-95 duration-200">
-        
         {/* Close button */}
         <button
           onClick={handleDismiss}
@@ -36,13 +35,13 @@ export const SurveyPromptModal: React.FC = () => {
           <X className="w-4 h-4" />
         </button>
 
-        {/* Header with Pip Mascot */}
+        {/* Header with Pip */}
         <div className="flex items-center gap-3.5 mb-4">
           <div className="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 p-1 flex items-center justify-center shrink-0 shadow-xs">
-            <img 
-              src="/mascot_planning.svg" 
-              alt="Pip Mascot" 
-              className="w-full h-full object-contain drop-shadow-xs" 
+            <img
+              src="/mascot_planning.svg"
+              alt="Pip"
+              className="w-full h-full object-contain drop-shadow-xs"
             />
           </div>
           <div>
@@ -65,10 +64,14 @@ export const SurveyPromptModal: React.FC = () => {
         <div className="p-3.5 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-900/40 text-xs text-amber-900 dark:text-amber-300 space-y-1 mb-4 leading-relaxed">
           <p className="font-semibold flex items-center gap-1.5">
             <ShieldAlert className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-            <span>Cannot {surveyActionAttempted || 'perform this action'} yet</span>
+            <span>
+              Cannot {surveyActionAttempted || "perform this action"} yet
+            </span>
           </p>
           <p className="text-[11.5px] opacity-90">
-            Huddle personalizes your 4-day sprint, squad check-ins, and Pip AI concept breakdowns based on your 5-step intake survey. You can browse in preview mode, but actions are locked until completed.
+            Huddle personalizes your 4-day sprint, squad check-ins, and Pip AI
+            concept breakdowns based on your 5-step intake survey. You can
+            browse in preview mode, but actions are locked until completed.
           </p>
         </div>
 
@@ -89,7 +92,6 @@ export const SurveyPromptModal: React.FC = () => {
             Continue Browsing (Preview Mode)
           </button>
         </div>
-
       </div>
     </div>
   );

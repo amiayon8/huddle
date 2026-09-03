@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { X, ArrowRight, Check, ShieldCheck, Mail, Lock, User as UserIcon, AlertCircle } from 'lucide-react';
 import { useHuddle } from '../context/HuddleContext';
-import { signInUser, signUpUser } from '../lib/supabase';
+import { signInUser, signUpUser, resetPasswordUser } from '../lib/supabase';
 
 export const AuthModal: React.FC = () => {
   const { authModalOpen, closeAuthModal, authMode, setOnboardingActive, updateUserProfile, loginDemo } = useHuddle();
@@ -57,7 +57,13 @@ export const AuthModal: React.FC = () => {
           }, 600);
         }
       } else if (mode === 'forgot') {
-        setSuccessMessage(`Password reset link sent to ${email}`);
+        const res = await resetPasswordUser(email);
+        if (!res.success) {
+          setErrorMessage(res.error || 'Failed to dispatch password reset email.');
+          setLoading(false);
+          return;
+        }
+        setSuccessMessage(`Password reset instructions sent to ${email}`);
         setTimeout(() => {
           setMode('login');
           setLoading(false);

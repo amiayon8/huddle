@@ -1,16 +1,13 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import confetti from 'canvas-confetti';
+import React, { useState, useEffect, useRef } from "react";
+import confetti from "canvas-confetti";
 import {
-  Sparkles,
   X,
   ArrowRight,
-  Zap,
   RotateCcw,
   CheckCircle2,
   Send,
-  Target,
   Bot,
   Plus,
   History,
@@ -19,11 +16,12 @@ import {
   Clock,
   ArrowLeft,
   ChevronRight,
-  Calendar
-} from 'lucide-react';
-import { useHuddle } from '../context/HuddleContext';
-import { MarkdownRenderer } from './MarkdownRenderer';
-import { PipChatMessage, PipChatSession } from '../types/huddle';
+  Calendar,
+} from "lucide-react";
+import { useHuddle } from "../context/HuddleContext";
+import { MarkdownRenderer } from "./MarkdownRenderer";
+import { PipChatMessage, PipChatSession } from "../types/huddle";
+import { addMascotMessageToDb } from "../lib/supabase";
 
 export const MascotDrawer: React.FC = () => {
   const {
@@ -32,61 +30,74 @@ export const MascotDrawer: React.FC = () => {
     sprint,
     reshuffleSprint,
     user,
-    ensureSurveyDone
+    ensureSurveyDone,
   } = useHuddle();
 
-  const [chatInput, setChatInput] = useState('');
-  const [currentMascotEmotion, setCurrentMascotEmotion] = useState<string>('idle');
+  const [chatInput, setChatInput] = useState("");
+  const [currentMascotEmotion, setCurrentMascotEmotion] =
+    useState<string>("idle");
   const [isThinking, setIsThinking] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [sessions, setSessions] = useState<PipChatSession[]>([]);
-  const [currentSessionId, setCurrentSessionId] = useState<string>('');
+  const [currentSessionId, setCurrentSessionId] = useState<string>("");
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const mascotMap: Record<string, string> = {
-    idle: '/mascot_idle.svg',
-    encouragement: '/mascot_encouragement.svg',
-    thinking: '/mascot_thinking.svg',
-    deep_thinking: '/mascot_deep_thinking.svg',
-    planning: '/mascot_planning.svg',
-    success: '/mascot_success.svg',
-    error: '/mascot_error.svg'
+    idle: "/mascot_idle.svg",
+    encouragement: "/mascot_encouragement.svg",
+    thinking: "/mascot_thinking.svg",
+    deep_thinking: "/mascot_deep_thinking.svg",
+    planning: "/mascot_planning.svg",
+    success: "/mascot_success.svg",
+    error: "/mascot_error.svg",
   };
 
-  const getStorageKey = () => `huddle_pip_sessions_${user.id || 'user-1'}`;
+  const getStorageKey = () => `huddle_pip_sessions_${user.id || "user-1"}`;
 
   // Helper to generate personalized default messages tailored to user survey & sprint
   const createDefaultMessages = (): PipChatMessage[] => {
-    const firstName = user.name ? user.name.split(' ')[0] : 'Engineer';
-    const milestone = user.surveyData?.targetProfession || user.careerMilestone || 'Staff Software Engineer';
-    const skill = sprint?.skillTitle || 'System Architecture';
-    const hobbies = user.surveyData?.hobbies?.length ? user.surveyData.hobbies.join(', ') : 'technology';
-    const subjects = user.surveyData?.subjects?.length ? user.surveyData.subjects.join(', ') : 'computing';
-    const completedTasks = sprint?.tasks ? sprint.tasks.filter(t => t.completed).length : 0;
+    const firstName = user.name ? user.name.split(" ")[0] : "Engineer";
+    const milestone =
+      user.surveyData?.targetProfession ||
+      user.careerMilestone ||
+      "Staff Software Engineer";
+    const skill = sprint?.skillTitle || "System Architecture";
+    const hobbies = user.surveyData?.hobbies?.length
+      ? user.surveyData.hobbies.join(", ")
+      : "technology";
+    const subjects = user.surveyData?.subjects?.length
+      ? user.surveyData.subjects.join(", ")
+      : "computing";
+    const completedTasks = sprint?.tasks
+      ? sprint.tasks.filter((t) => t.completed).length
+      : 0;
     const totalTasks = sprint?.tasks ? sprint.tasks.length : 4;
-    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const currentTime = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
     return [
       {
         id: `msg-${Date.now()}-1`,
-        sender: 'pip',
-        text: `Hey **${firstName}**! Pip here.\n\nI see you're building towards **${milestone}** with an active focus on **${skill}**.\n\nYour flow states in **${hobbies}** and natural curiosity in **${subjects}** are baked directly into our daily sessions.`,
-        mascotSvg: '/mascot_idle.svg',
-        timestamp: currentTime
+        sender: "pip",
+        text: `I'm Pip, your engineering mentor for this sprint on **${skill}**.\n\nWe focus on short, deliberate technical practice. You're building towards **${milestone}** with analogies drawn from **${hobbies}** and **${subjects}** when helpful.`,
+        mascotSvg: "/mascot_idle.svg",
+        timestamp: currentTime,
       },
       {
         id: `msg-${Date.now()}-2`,
-        sender: 'pip',
-        text: `You're currently on **Day ${sprint.currentDay}** of your **${sprint.durationDays || 4}-day sprint** (${completedTasks}/${totalTasks} tasks completed).\n\nAsk me any concept questions with or request a 0-penalty sprint reshuffle if you need adjustments!`,
-        mascotSvg: '/mascot_encouragement.svg',
-        timestamp: currentTime
-      }
+        sender: "pip",
+        text: `Day ${sprint.currentDay} of ${sprint.durationDays || 4}. ${completedTasks} of ${totalTasks} tasks complete.\n\nAsk me technical questions about today's practice, review code, or request a schedule adjustment.`,
+        mascotSvg: "/mascot_encouragement.svg",
+        timestamp: currentTime,
+      },
     ];
   };
 
   // Load chat sessions from localStorage on mount or when user changes
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
     const storageKey = getStorageKey();
 
     try {
@@ -100,7 +111,7 @@ export const MascotDrawer: React.FC = () => {
         }
       }
     } catch (e) {
-      console.error('Failed to parse Pip chat sessions from localStorage:', e);
+      console.error("Failed to parse Pip chat sessions from localStorage:", e);
     }
 
     // Initialize with first default session
@@ -110,7 +121,7 @@ export const MascotDrawer: React.FC = () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       messages: createDefaultMessages(),
-      skillFocus: sprint.skillTitle
+      skillFocus: sprint.skillTitle,
     };
 
     setSessions([initialSession]);
@@ -118,30 +129,31 @@ export const MascotDrawer: React.FC = () => {
     try {
       localStorage.setItem(storageKey, JSON.stringify([initialSession]));
     } catch (e) {
-      console.error('Failed to write initial Pip session to localStorage:', e);
+      console.error("Failed to write initial Pip session to localStorage:", e);
     }
   }, [user.id]);
 
   // Persist sessions to localStorage whenever they change
   const saveSessions = (updated: PipChatSession[]) => {
     setSessions(updated);
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       try {
         localStorage.setItem(getStorageKey(), JSON.stringify(updated));
       } catch (e) {
-        console.error('Failed to save Pip sessions:', e);
+        console.error("Failed to save Pip sessions:", e);
       }
     }
   };
 
   // Find active session
-  const activeSession = sessions.find(s => s.id === currentSessionId) || sessions[0];
+  const activeSession =
+    sessions.find((s) => s.id === currentSessionId) || sessions[0];
   const messages = activeSession ? activeSession.messages : [];
 
   // Scroll to bottom on new message
   useEffect(() => {
     if (chatEndRef.current && !showHistory) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages.length, isThinking, showHistory]);
 
@@ -153,14 +165,14 @@ export const MascotDrawer: React.FC = () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       messages: createDefaultMessages(),
-      skillFocus: sprint.skillTitle
+      skillFocus: sprint.skillTitle,
     };
 
     const updated = [newSession, ...sessions];
     saveSessions(updated);
     setCurrentSessionId(newSession.id);
     setShowHistory(false);
-    setCurrentMascotEmotion('idle');
+    setCurrentMascotEmotion("idle");
   };
 
   // Switch to a previous chat session
@@ -172,7 +184,7 @@ export const MascotDrawer: React.FC = () => {
   // Delete a chat session
   const handleDeleteSession = (sessionId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const remaining = sessions.filter(s => s.id !== sessionId);
+    const remaining = sessions.filter((s) => s.id !== sessionId);
 
     if (remaining.length === 0) {
       const freshSession: PipChatSession = {
@@ -181,7 +193,7 @@ export const MascotDrawer: React.FC = () => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         messages: createDefaultMessages(),
-        skillFocus: sprint.skillTitle
+        skillFocus: sprint.skillTitle,
       };
       saveSessions([freshSession]);
       setCurrentSessionId(freshSession.id);
@@ -196,118 +208,153 @@ export const MascotDrawer: React.FC = () => {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatInput.trim() || isThinking) return;
-    if (!ensureSurveyDone('chat with Pip mascot')) return;
+    if (!ensureSurveyDone("chat with Pip")) return;
 
     const userText = chatInput.trim();
-    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const currentTime = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
     const newUserMsg: PipChatMessage = {
       id: `msg-${Date.now()}-user`,
-      sender: 'user',
+      sender: "user",
       text: userText,
-      timestamp: currentTime
+      timestamp: currentTime,
     };
 
     const updatedMessages = [...messages, newUserMsg];
 
     // Auto-update session title if it is still generic
-    let sessionTitle = activeSession?.title || 'Engineering Discussion';
-    if (sessionTitle.startsWith('Sprint Focus') || sessionTitle.startsWith('Discussion #')) {
-      sessionTitle = userText.length > 36 ? `${userText.slice(0, 36)}...` : userText;
+    let sessionTitle = activeSession?.title || "Engineering Discussion";
+    if (
+      sessionTitle.startsWith("Sprint Focus") ||
+      sessionTitle.startsWith("Discussion #")
+    ) {
+      sessionTitle =
+        userText.length > 36 ? `${userText.slice(0, 36)}...` : userText;
     }
 
     const updatedSession: PipChatSession = {
       ...(activeSession || {
         id: `sess-${Date.now()}`,
         createdAt: new Date().toISOString(),
-        skillFocus: sprint.skillTitle
+        skillFocus: sprint.skillTitle,
       }),
       title: sessionTitle,
       updatedAt: new Date().toISOString(),
-      messages: updatedMessages
+      messages: updatedMessages,
     };
 
-    const nextSessions = sessions.map(s => s.id === updatedSession.id ? updatedSession : s);
+    const nextSessions = sessions.map((s) =>
+      s.id === updatedSession.id ? updatedSession : s,
+    );
     saveSessions(nextSessions);
 
-    setChatInput('');
+    setChatInput("");
     setIsThinking(true);
-    setCurrentMascotEmotion('deep_thinking');
+    setCurrentMascotEmotion("deep_thinking");
 
     try {
-      const res = await fetch('/api/mascot', {
-        method: 'POST',
+      const res = await fetch("/api/mascot", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           // Send entire structured conversation history for full contextual memory
-          messages: updatedMessages.map(m => ({ sender: m.sender, text: m.text })),
+          messages: updatedMessages.map((m) => ({
+            sender: m.sender,
+            text: m.text,
+          })),
           userProfile: user,
           surveyData: user.surveyData,
-          sprintContext: sprint
-        })
+          sprintContext: sprint,
+        }),
       });
 
       if (res.ok) {
         const data = await res.json();
-        const emotionSvg = data.mascotSvg || '/mascot_encouragement.svg';
+        const emotionSvg = data.mascotSvg || "/mascot_encouragement.svg";
 
-        if (emotionSvg.includes('success')) {
+        if (emotionSvg.includes("success")) {
           confetti({
             particleCount: 30,
             spread: 50,
-            origin: { y: 0.7 }
+            origin: { y: 0.7 },
           });
         }
 
         const newPipMsg: PipChatMessage = {
           id: `msg-${Date.now()}-pip`,
-          sender: 'pip',
+          sender: "pip",
           text: data.reply,
           mascotSvg: emotionSvg,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          timestamp: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
         };
+
+        addMascotMessageToDb(
+          { id: newPipMsg.id, context: "chat", text: newPipMsg.text },
+          user.id,
+        );
 
         const finalMessages = [...updatedMessages, newPipMsg];
         const finalSession: PipChatSession = {
           ...updatedSession,
           updatedAt: new Date().toISOString(),
-          messages: finalMessages
+          messages: finalMessages,
         };
 
-        saveSessions(sessions.map(s => s.id === finalSession.id ? finalSession : s));
-
-        setCurrentMascotEmotion(
-          emotionSvg.includes('planning') ? 'planning' :
-            emotionSvg.includes('success') ? 'success' :
-              emotionSvg.includes('deep') ? 'deep_thinking' : 'encouragement'
+        saveSessions(
+          sessions.map((s) => (s.id === finalSession.id ? finalSession : s)),
         );
 
-        if (userText.toLowerCase().includes('reshuffle') || userText.toLowerCase().includes('busy') || userText.toLowerCase().includes('missed')) {
+        setCurrentMascotEmotion(
+          emotionSvg.includes("planning")
+            ? "planning"
+            : emotionSvg.includes("success")
+              ? "success"
+              : emotionSvg.includes("deep")
+                ? "deep_thinking"
+                : "encouragement",
+        );
+
+        if (
+          userText.toLowerCase().includes("reshuffle") ||
+          userText.toLowerCase().includes("busy") ||
+          userText.toLowerCase().includes("missed")
+        ) {
           reshuffleSprint(userText);
         }
       } else {
-        throw new Error('API request failed');
+        throw new Error("API request failed");
       }
     } catch (err) {
       console.error(err);
       const fallbackMsg: PipChatMessage = {
         id: `msg-${Date.now()}-fallback`,
-        sender: 'pip',
+        sender: "pip",
         text: `I've got your back! Consistency beats intensity. Let's focus on **Day ${sprint.currentDay}** of your **${sprint.skillTitle}** sprint.`,
-        mascotSvg: '/mascot_encouragement.svg',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        mascotSvg: "/mascot_encouragement.svg",
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
       };
 
       const finalMessages = [...updatedMessages, fallbackMsg];
       const finalSession: PipChatSession = {
         ...updatedSession,
         updatedAt: new Date().toISOString(),
-        messages: finalMessages
+        messages: finalMessages,
       };
-      saveSessions(sessions.map(s => s.id === finalSession.id ? finalSession : s));
-      setCurrentMascotEmotion('encouragement');
+      saveSessions(
+        sessions.map((s) => (s.id === finalSession.id ? finalSession : s)),
+      );
+      setCurrentMascotEmotion("encouragement");
     } finally {
       setIsThinking(false);
     }
@@ -318,15 +365,18 @@ export const MascotDrawer: React.FC = () => {
     confetti({
       particleCount: 25,
       spread: 45,
-      origin: { y: 0.8 }
+      origin: { y: 0.8 },
     });
 
     const reshuffleMsg: PipChatMessage = {
       id: `msg-${Date.now()}-reshuffle`,
-      sender: 'pip',
-      text: 'Sprint reshuffled smoothly with **zero penalties**! Pick up Day 1 whenever you are ready.',
-      mascotSvg: '/mascot_planning.svg',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      sender: "pip",
+      text: "Sprint reshuffled smoothly with **zero penalties**! Pick up Day 1 whenever you are ready.",
+      mascotSvg: "/mascot_planning.svg",
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     };
 
     const finalMessages = [...messages, reshuffleMsg];
@@ -334,36 +384,39 @@ export const MascotDrawer: React.FC = () => {
       const finalSession: PipChatSession = {
         ...activeSession,
         updatedAt: new Date().toISOString(),
-        messages: finalMessages
+        messages: finalMessages,
       };
-      saveSessions(sessions.map(s => s.id === finalSession.id ? finalSession : s));
+      saveSessions(
+        sessions.map((s) => (s.id === finalSession.id ? finalSession : s)),
+      );
     }
-    setCurrentMascotEmotion('planning');
+    setCurrentMascotEmotion("planning");
   };
 
   if (!mascotOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
-
       {/* Backdrop click to close */}
       <div className="flex-1" onClick={() => setMascotOpen(false)} />
 
       {/* Drawer Container */}
       <div className="w-full sm:w-[500px] bg-white dark:bg-[#0c0d12] border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-200">
-
         {/* Header */}
         <div className="p-4 sm:p-5 border-b border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between">
           <div className="flex items-center gap-3.5">
             <div className="relative shrink-0">
               <div className="w-13 h-13 sm:w-15 sm:h-15 p-1.5 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-800/50 flex items-center justify-center shadow-xs">
                 <img
-                  src={mascotMap[currentMascotEmotion] || '/mascot_idle.svg'}
-                  alt="Pip Mascot"
+                  src={mascotMap[currentMascotEmotion] || "/mascot_idle.svg"}
+                  alt="Pip"
                   className="w-full h-full object-contain drop-shadow-sm transition-transform duration-200 hover:scale-105 cursor-pointer"
                 />
               </div>
-              <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-[#0c0d12]" title="Pip is active" />
+              <span
+                className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-[#0c0d12]"
+                title="Pip is active"
+              />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -374,8 +427,13 @@ export const MascotDrawer: React.FC = () => {
                   Online
                 </span>
               </div>
-              <p className="text-[11px] text-zinc-500 truncate max-w-[170px] sm:max-w-[210px]" title={activeSession?.title}>
-                {showHistory ? 'Conversation History' : (activeSession?.title || 'Sprint companion & concept tutor')}
+              <p
+                className="text-[11px] text-zinc-500 truncate max-w-[170px] sm:max-w-[210px]"
+                title={activeSession?.title}
+              >
+                {showHistory
+                  ? "Conversation History"
+                  : activeSession?.title || "Sprint companion & concept tutor"}
               </p>
             </div>
           </div>
@@ -394,10 +452,11 @@ export const MascotDrawer: React.FC = () => {
             {/* History Toggle Button */}
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold shadow-2xs transition-all cursor-pointer ${showHistory
-                  ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400'
-                  : 'border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:border-indigo-400'
-                }`}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold shadow-2xs transition-all cursor-pointer ${
+                showHistory
+                  ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400"
+                  : "border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:border-indigo-400"
+              }`}
               title="View past conversations"
             >
               <History className="w-3.5 h-3.5" />
@@ -441,27 +500,31 @@ export const MascotDrawer: React.FC = () => {
             </div>
 
             <p className="text-[11.5px] text-zinc-500 pb-2">
-              Select any past discussion to reopen it with complete contextual memory and prior dialogue history.
+              Select any past discussion to reopen it with complete contextual
+              memory and prior dialogue history.
             </p>
 
             <div className="space-y-2.5">
-              {sessions.map(sess => {
+              {sessions.map((sess) => {
                 const isActive = sess.id === currentSessionId;
-                const dateFormatted = new Date(sess.updatedAt).toLocaleDateString([], {
-                  month: 'short',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
+                const dateFormatted = new Date(
+                  sess.updatedAt,
+                ).toLocaleDateString([], {
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
                 });
 
                 return (
                   <div
                     key={sess.id}
                     onClick={() => handleSelectSession(sess.id)}
-                    className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer group flex items-center justify-between ${isActive
-                        ? 'border-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/30 ring-1 ring-indigo-500/20'
-                        : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] hover:border-zinc-300 dark:hover:border-zinc-700'
-                      }`}
+                    className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer group flex items-center justify-between ${
+                      isActive
+                        ? "border-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/30 ring-1 ring-indigo-500/20"
+                        : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] hover:border-zinc-300 dark:hover:border-zinc-700"
+                    }`}
                   >
                     <div className="space-y-1 min-w-0 pr-3">
                       <div className="flex items-center gap-2">
@@ -510,12 +573,15 @@ export const MascotDrawer: React.FC = () => {
           /* Active Chat Stream */
           <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 text-xs sm:text-[13px]">
             {messages.map((m, idx) => (
-              <div key={m.id || idx} className={`flex items-start gap-3 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                {m.sender === 'pip' && (
+              <div
+                key={m.id || idx}
+                className={`flex items-start gap-3 ${m.sender === "user" ? "justify-end" : "justify-start"}`}
+              >
+                {m.sender === "pip" && (
                   <div className="shrink-0 flex flex-col items-center pt-0.5 select-none">
                     <div className="w-12 h-12 sm:w-14 sm:h-14 p-1 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex items-center justify-center transition-transform hover:scale-105 shadow-2xs">
                       <img
-                        src={m.mascotSvg || '/mascot_idle.svg'}
+                        src={m.mascotSvg || "/mascot_idle.svg"}
                         alt="Pip"
                         className="w-full h-full object-contain drop-shadow-xs"
                       />
@@ -524,18 +590,23 @@ export const MascotDrawer: React.FC = () => {
                 )}
 
                 <div className="space-y-1 max-w-[82%]">
-                  <div className={`p-3.5 rounded-2xl leading-relaxed ${m.sender === 'user'
-                    ? 'bg-indigo-600 text-white rounded-br-xs'
-                    : 'bg-zinc-100 dark:bg-zinc-800/70 text-zinc-900 dark:text-zinc-100 rounded-bl-xs border border-zinc-200/60 dark:border-zinc-700/60'
-                    }`}>
-                    {m.sender === 'user' ? (
+                  <div
+                    className={`p-3.5 rounded-2xl leading-relaxed ${
+                      m.sender === "user"
+                        ? "bg-indigo-600 text-white rounded-br-xs"
+                        : "bg-zinc-100 dark:bg-zinc-800/70 text-zinc-900 dark:text-zinc-100 rounded-bl-xs border border-zinc-200/60 dark:border-zinc-700/60"
+                    }`}
+                  >
+                    {m.sender === "user" ? (
                       <span>{m.text}</span>
                     ) : (
                       <MarkdownRenderer content={m.text} />
                     )}
                   </div>
                   {m.timestamp && (
-                    <div className={`text-[10px] text-zinc-400 px-1 ${m.sender === 'user' ? 'text-right' : 'text-left'}`}>
+                    <div
+                      className={`text-[10px] text-zinc-400 px-1 ${m.sender === "user" ? "text-right" : "text-left"}`}
+                    >
                       {m.timestamp}
                     </div>
                   )}
@@ -546,10 +617,14 @@ export const MascotDrawer: React.FC = () => {
             {isThinking && (
               <div className="flex items-center gap-3 text-zinc-500 text-xs py-2 pl-1 animate-in fade-in duration-150">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 p-1 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex items-center justify-center shrink-0">
-                  <img src="/mascot_deep_thinking.svg" alt="Thinking" className="w-full h-full object-contain animate-bounce" />
+                  <img
+                    src="/mascot_deep_thinking.svg"
+                    alt="Thinking"
+                    className="w-full h-full object-contain animate-bounce"
+                  />
                 </div>
-                <div className="p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 text-xs animate-pulse border border-zinc-200/60 dark:border-zinc-700/60">
-                  Pip is thinking & computing response with your personalization profile...
+                <div className="p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 text-xs border border-zinc-200/60 dark:border-zinc-700/60">
+                  Thinking...
                 </div>
               </div>
             )}
@@ -558,61 +633,112 @@ export const MascotDrawer: React.FC = () => {
           </div>
         )}
 
-        {/* Action Controls & Input (Hidden in history list view) */}
+        {/* Action Controls & Input */}
         {!showHistory && (
-          <div className="p-3.5 sm:p-4 border-t border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/40 space-y-2.5">
+          <div className="p-3 sm:p-4 border-t border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/40 space-y-2.5">
+            {/* Dynamic Survey-Based Quick Prompt Chips */}
+            {(() => {
+              const survey = user?.surveyData;
+              const primaryHobby = survey?.hobbies?.[0] || "Gaming";
+              const primarySubject =
+                survey?.subjects?.[0] || "Computer Science";
+              const targetProfession =
+                survey?.targetProfession ||
+                user?.careerMilestone ||
+                "Staff Architect";
+              const primarySkill =
+                survey?.startingSkills?.[0] ||
+                sprint?.skillTitle ||
+                "System Design";
+              const learningStage = survey?.learningStage || "Rising Engineer";
 
-            {/* Quick Prompt Chips */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 hide-scrollbar">
-              <button
-                onClick={handleQuickReshuffle}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-indigo-500 transition-colors shrink-0 shadow-2xs"
-              >
-                <RotateCcw className="w-3 h-3 text-indigo-500" />
-                Reshuffle Sprint
-              </button>
+              return (
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 hide-scrollbar">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setChatInput(
+                        `Explain ${sprint?.skillTitle || "today step"} using a ${primaryHobby} analogy`,
+                      )
+                    }
+                    className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors shrink-0 cursor-pointer"
+                  >
+                    <span>{primaryHobby} analogy</span>
+                  </button>
 
-              <button
-                onClick={() => setChatInput('Explain algorithm complexity using LaTeX formulas')}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-indigo-500 transition-colors shrink-0 shadow-2xs"
-              >
-                <Zap className="w-3 h-3 text-indigo-500" />
-                LaTeX Formula Demo
-              </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setChatInput(
+                        `How does today's step build proof for a ${targetProfession} role?`,
+                      )
+                    }
+                    className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors shrink-0 cursor-pointer"
+                  >
+                    <span>{targetProfession} context</span>
+                  </button>
 
-              <button
-                onClick={() => setChatInput('How does today step connect to my career milestone?')}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-indigo-500 transition-colors shrink-0 shadow-2xs"
-              >
-                <Target className="w-3 h-3 text-indigo-500" />
-                Career Goal
-              </button>
-            </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setChatInput(
+                        `Connect today's task to fundamental ${primarySubject} principles`,
+                      )
+                    }
+                    className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors shrink-0 cursor-pointer"
+                  >
+                    <span>{primarySubject} theory</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setChatInput(
+                        `Give me a 20-min practice drill for ${primarySkill} at my ${learningStage} level`,
+                      )
+                    }
+                    className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors shrink-0 cursor-pointer"
+                  >
+                    <span>20 min drill</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleQuickReshuffle}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors shrink-0 cursor-pointer"
+                    title="Reschedule practice without penalty"
+                  >
+                    <RotateCcw className="w-3 h-3 text-zinc-400" />
+                    <span>Reschedule</span>
+                  </button>
+                </div>
+              );
+            })()}
 
             {/* Form */}
-            <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+            <form
+              onSubmit={handleSendMessage}
+              className="flex items-center gap-2"
+            >
               <input
                 type="text"
-                placeholder="Ask Pip anything (LaTeX & Markdown enabled)..."
+                placeholder="Ask Pip a question..."
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 disabled={isThinking}
-                className="flex-1 px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 placeholder:text-zinc-400"
+                className="flex-1 px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 placeholder:text-zinc-400"
               />
               <button
                 type="submit"
                 disabled={!chatInput.trim() || isThinking}
-                className="p-2.5 rounded-xl bg-indigo-600 disabled:opacity-50 hover:bg-indigo-500 text-white transition-colors shadow-xs cursor-pointer"
+                className="p-2 rounded-xl bg-indigo-600 disabled:opacity-50 hover:bg-indigo-700 text-white transition-colors shadow-xs cursor-pointer"
               >
                 <Send className="w-3.5 h-3.5" />
               </button>
             </form>
-
           </div>
         )}
-
       </div>
-
     </div>
   );
 };

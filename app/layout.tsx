@@ -9,6 +9,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Huddle — Skill Development Platform",
   description: "A calm, focused space for deliberate skill practice with intimate 4-member micro-squads and curated roadmap steps.",
+  icons: {
+    icon: "/logo.svg",
+  },
 };
 
 export default function RootLayout({

@@ -10,8 +10,7 @@ import {
   Lock, 
   ShieldCheck, 
   CheckCircle2,
-  Clock,
-  Sparkles
+  Clock
 } from 'lucide-react';
 import { useHuddle } from '../context/HuddleContext';
 
@@ -181,7 +180,7 @@ export const ProgressView: React.FC = () => {
 
       <div className="p-6 rounded-3xl border border-indigo-100 dark:border-indigo-900/40 bg-indigo-50/40 dark:bg-indigo-950/20 space-y-3">
         <div className="flex items-center gap-2 text-xs font-semibold text-indigo-900 dark:text-indigo-300">
-          <Sparkles className="w-4 h-4 text-indigo-500" />
+          <Calendar className="w-4 h-4 text-indigo-500" />
           Monthly Recap
         </div>
         <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">

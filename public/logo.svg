@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <rect width="400" height="400" rx="40" fill="#2e3740" />
+  
+  <g transform="translate(100, 80)">
+    <!-- Connectivity Paths (Network/Pipelines) -->
+    <path d="M 40 40 L 40 160" fill="none" stroke="#e3efef" stroke-width="14" stroke-linecap="round" />
+    <path d="M 160 40 L 160 160" fill="none" stroke="#e3efef" stroke-width="14" stroke-linecap="round" />
+    <path d="M 40 100 L 160 100" fill="none" stroke="#e3efef" stroke-width="14" stroke-linecap="round" />
+    
+    <!-- 4-Member Squad / Stepping-Stone Nodes -->
+    <circle cx="40" cy="40" r="24" fill="#79c6c0" />
+    <circle cx="40" cy="160" r="24" fill="#79c8c0" />
+    <circle cx="160" cy="40" r="24" fill="#79c8c0" />
+    <circle cx="160" cy="160" r="24" fill="#79c6c0" />
+    
+    <!-- Inner Core (Deliberate Practice Focus) -->
+    <circle cx="40" cy="40" r="8" fill="#2e3740" />
+    <circle cx="40" cy="160" r="8" fill="#2e3740" />
+    <circle cx="160" cy="40" r="8" fill="#2e3740" />
+    <circle cx="160" cy="160" r="8" fill="#2e3740" />
+  </g>
+  
+  <!-- Logotype -->
+  <text x="200" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="46" font-weight="800" fill="#e3efef" text-anchor="middle" letter-spacing="4">HUDDLE</text>
+</svg>

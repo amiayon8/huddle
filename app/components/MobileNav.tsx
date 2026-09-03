@@ -9,12 +9,11 @@ export const MobileNav: React.FC = () => {
   const { activeTab, setActiveTab } = useHuddle();
 
   const items: { id: ActiveTab; label: string; icon: React.FC<{ className?: string }> }[] = [
-    { id: 'dashboard', label: 'Home', icon: Layers },
-    { id: 'journey', label: 'Journey', icon: Compass },
-    { id: 'squad', label: 'Squads', icon: Users },
+    { id: 'dashboard', label: 'Learn', icon: Compass },
+    { id: 'squad', label: 'Squad', icon: Users },
     { id: 'creators', label: 'Explore', icon: BookOpen },
-    { id: 'community', label: 'Community', icon: MessageSquare },
-    { id: 'profile', label: 'Profile', icon: Briefcase }
+    { id: 'community', label: 'Discussions', icon: MessageSquare },
+    { id: 'profile', label: 'Profile', icon: UserIcon }
   ];
 
   return (

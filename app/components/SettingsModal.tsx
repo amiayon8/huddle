@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Sun, Moon, Shield, Bell, User as UserIcon, Sparkles, Check, LogOut, RotateCcw } from 'lucide-react';
+import { X, Sun, Moon, Shield, Bell, User as UserIcon, Bot, Check, LogOut, RotateCcw } from 'lucide-react';
 import { useHuddle } from '../context/HuddleContext';
 
 export const SettingsModal: React.FC = () => {
@@ -103,7 +103,7 @@ export const SettingsModal: React.FC = () => {
               activeTab === 'mascot' ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-xs' : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/60'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Bot className="w-3.5 h-3.5" />
             Mascot
           </button>
 

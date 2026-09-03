@@ -1,13 +1,15 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import confetti from 'canvas-confetti';
-import { Sparkles, MessageSquare, X, ChevronUp } from 'lucide-react';
-import { useHuddle } from '../context/HuddleContext';
+import React, { useState, useEffect } from "react";
+import confetti from "canvas-confetti";
+import { MessageSquare, X, ChevronUp } from "lucide-react";
+import { useHuddle } from "../context/HuddleContext";
 
 export const FloatingMascotBadge: React.FC = () => {
   const { setMascotOpen, user, sprint, activeTab } = useHuddle();
-  const [speechBubble, setSpeechBubble] = useState<string>('Click me for sprint coaching & LaTeX concept tutor!');
+  const [speechBubble, setSpeechBubble] = useState<string>(
+    "Click me for personalized sprint coaching & survey-tailored tutoring!",
+  );
   const [showSpeech, setShowSpeech] = useState(true);
   const [isBouncing, setIsBouncing] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -15,36 +17,56 @@ export const FloatingMascotBadge: React.FC = () => {
   // Contextual tips based on current active tab
   useEffect(() => {
     switch (activeTab) {
-      case 'dashboard':
-        setSpeechBubble(`Day ${sprint.currentDay}: Keep your ${user.streak}-day streak alive with 1 deliberate action!`);
+      case "dashboard":
+        setSpeechBubble(
+          `Day ${sprint.currentDay}: Keep your ${user.streak}-day streak alive with 1 deliberate action!`,
+        );
         break;
-      case 'journey':
-        setSpeechBubble(`Mapping ${sprint.skillTitle} towards ${user.careerMilestone}! Tap nodes to study.`);
+      case "journey":
+        setSpeechBubble(
+          `Mapping ${sprint.skillTitle} towards ${user.careerMilestone}! Tap nodes to study.`,
+        );
         break;
-      case 'squad':
-        setSpeechBubble('Your micro-squad has zero toxic leaderboards. High-signal accountability!');
+      case "squad":
+        setSpeechBubble(
+          "Your micro-squad has zero toxic leaderboards. High-signal accountability!",
+        );
         break;
-      case 'creators':
-        setSpeechBubble('15-min creator blueprints from verified Staff Engineers. No doomscrolling.');
+      case "creators":
+        setSpeechBubble(
+          "15-min creator blueprints from verified Staff Engineers. No doomscrolling.",
+        );
         break;
-      case 'community':
-        setSpeechBubble('Have an architecture question? Ask the community or draft it with me!');
+      case "community":
+        setSpeechBubble(
+          "Have an architecture question? Ask the community or draft it with me!",
+        );
         break;
-      case 'profile':
-        setSpeechBubble('Your private portfolio auto-assembles with each finished sprint task!');
+      case "profile":
+        setSpeechBubble(
+          "Your private portfolio auto-assembles with each finished sprint task!",
+        );
         break;
       default:
-        setSpeechBubble('Need a concept breakdown or 0-penalty reshuffle? Chat with Pip!');
+        setSpeechBubble(
+          "Need a concept breakdown or 0-penalty reshuffle? Chat with Pip!",
+        );
     }
     setShowSpeech(true);
-  }, [activeTab, sprint.currentDay, sprint.skillTitle, user.streak, user.careerMilestone]);
+  }, [
+    activeTab,
+    sprint.currentDay,
+    sprint.skillTitle,
+    user.streak,
+    user.careerMilestone,
+  ]);
 
   const handleMascotClick = () => {
     setIsBouncing(true);
     confetti({
       particleCount: 20,
       spread: 40,
-      origin: { x: 0.9, y: 0.85 }
+      origin: { x: 0.9, y: 0.85 },
     });
     setTimeout(() => {
       setIsBouncing(false);
@@ -57,24 +79,31 @@ export const FloatingMascotBadge: React.FC = () => {
       <button
         onClick={() => setIsMinimized(false)}
         className="fixed bottom-18 md:bottom-6 right-4 z-40 p-2.5 rounded-full bg-white dark:bg-[#111218] border-2 border-indigo-500 shadow-xl flex items-center gap-1.5 hover:scale-105 transition-all group cursor-pointer"
-        title="Show Pip Mascot"
+        title="Show Pip"
       >
-        <img src="/mascot_idle.svg" alt="Pip" className="w-7 h-7 object-contain" />
-        <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 pr-1">Pip</span>
+        <img
+          src="/mascot_idle.svg"
+          alt="Pip"
+          className="w-7 h-7 object-contain"
+        />
+        <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 pr-1">
+          Pip
+        </span>
       </button>
     );
   }
 
   return (
-    <aside aria-label="Pip AI Assistant" className="fixed bottom-16 md:bottom-6 right-4 z-40 flex items-end gap-2.5 pointer-events-none select-none animate-in slide-in-from-bottom-4 duration-300">
-      
+    <aside
+      aria-label="Pip AI Assistant"
+      className="fixed bottom-16 md:bottom-6 right-4 z-40 flex items-end gap-2.5 pointer-events-none select-none animate-in slide-in-from-bottom-4 duration-300"
+    >
       {/* Speech Bubble */}
       {showSpeech && (
         <div className="pointer-events-auto relative max-w-[210px] sm:max-w-[240px] p-2.5 sm:p-3 rounded-2xl bg-white dark:bg-[#111218] border border-indigo-200 dark:border-indigo-900/60 shadow-xl text-zinc-800 dark:text-zinc-200 text-xs font-medium leading-snug animate-in fade-in zoom-in-95 duration-200">
           <div className="flex items-start justify-between gap-1 mb-1">
-            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-              <Sparkles className="w-2.5 h-2.5" />
-              Pip AI
+            <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+              Pip
             </span>
             <div className="flex items-center gap-0.5">
               <button
@@ -86,9 +115,7 @@ export const FloatingMascotBadge: React.FC = () => {
               </button>
             </div>
           </div>
-          <p className="text-[11.5px] line-clamp-3">
-            {speechBubble}
-          </p>
+          <p className="text-[11.5px] line-clamp-3">{speechBubble}</p>
           <div className="mt-1.5 pt-1.5 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
             <button
               onClick={() => setMascotOpen(true)}
@@ -111,18 +138,20 @@ export const FloatingMascotBadge: React.FC = () => {
       )}
 
       {/* Floating Mascot Character */}
-      <div 
+      <div
         onClick={handleMascotClick}
         className="pointer-events-auto relative group cursor-pointer shrink-0 transition-transform duration-200 hover:scale-110 active:scale-95"
-        title="Tap Pip for coaching & LaTeX chat"
+        title="Tap Pip for personalized coaching & survey-tailored chat"
       >
-        <div className={`w-14 h-14 sm:w-16 sm:h-16 p-1 rounded-2xl bg-white/90 dark:bg-[#111218]/90 backdrop-blur-sm border-2 border-indigo-500 shadow-2xl flex items-center justify-center ${
-          isBouncing ? 'animate-bounce' : 'group-hover:-translate-y-1'
-        }`}>
-          <img 
-            src="/mascot_idle.svg" 
-            alt="Pip Mascot" 
-            className="w-full h-full object-contain drop-shadow-sm" 
+        <div
+          className={`w-14 h-14 sm:w-16 sm:h-16 p-1 rounded-2xl bg-white/90 dark:bg-[#111218]/90 backdrop-blur-sm border-2 border-indigo-500 shadow-2xl flex items-center justify-center ${
+            isBouncing ? "animate-bounce" : "group-hover:-translate-y-1"
+          }`}
+        >
+          <img
+            src="/mascot_idle.svg"
+            alt="Pip"
+            className="w-full h-full object-contain drop-shadow-sm"
           />
         </div>
         <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
@@ -130,7 +159,6 @@ export const FloatingMascotBadge: React.FC = () => {
           <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-indigo-500" />
         </span>
       </div>
-
     </aside>
   );
 };

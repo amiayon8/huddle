@@ -8,7 +8,6 @@ import {
   X, 
   CheckCircle2, 
   AlertCircle, 
-  Sparkles, 
   Loader2 
 } from 'lucide-react';
 import { useHuddle } from '../context/HuddleContext';
@@ -112,7 +111,7 @@ export const ResetDemoModal: React.FC = () => {
         {/* Success Alert */}
         {successMessage && (
           <div className="mb-4 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2 animate-in fade-in duration-150">
-            <Sparkles className="w-4 h-4 text-emerald-500 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
             <span>{successMessage}</span>
           </div>
         )}

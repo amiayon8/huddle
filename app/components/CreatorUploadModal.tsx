@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import {
   X,
   Upload,
-  Sparkles,
   Link as LinkIcon
 } from 'lucide-react';
 import { useHuddle } from '../context/HuddleContext';

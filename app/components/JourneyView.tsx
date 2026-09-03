@@ -1,44 +1,51 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { 
-  Check, 
-  Play, 
-  Lock, 
-  Clock, 
-  BookOpen, 
-  Sparkles, 
-  Award, 
-  ChevronRight, 
-  CheckCircle2, 
+import React from "react";
+import {
+  Check,
+  Play,
+  Lock,
+  Clock,
+  BookOpen,
+  Award,
+  ChevronRight,
+  CheckCircle2,
   ArrowRight,
   FileText,
   Video,
-  ListChecks
-} from 'lucide-react';
-import { useHuddle } from '../context/HuddleContext';
-import { JourneyStep } from '../types/huddle';
-import { DuolingoMascot } from './DuolingoMascot';
+  ListChecks,
+} from "lucide-react";
+import { useHuddle } from "../context/HuddleContext";
+import { JourneyStep } from "../types/huddle";
+import { DuolingoMascot } from "./DuolingoMascot";
 
 export const JourneyView: React.FC = () => {
   const { roadmap, setSelectedStepModal, completeStep } = useHuddle();
 
-  const currentStep = roadmap.steps.find(s => s.status === 'current') || roadmap.steps[2];
-  const completedCount = roadmap.steps.filter(s => s.status === 'completed').length;
-  const progressPercent = Math.round((completedCount / roadmap.totalSteps) * 100);
+  const currentStep =
+    roadmap.steps.find((s) => s.status === "current") || roadmap.steps[2];
+  const completedCount = roadmap.steps.filter(
+    (s) => s.status === "completed",
+  ).length;
+  const progressPercent = Math.round(
+    (completedCount / roadmap.totalSteps) * 100,
+  );
 
-  const getStepIcon = (type: JourneyStep['type']) => {
+  const getStepIcon = (type: JourneyStep["type"]) => {
     switch (type) {
-      case 'article': return FileText;
-      case 'video': return Video;
-      case 'checklist': return ListChecks;
-      default: return BookOpen;
+      case "article":
+        return FileText;
+      case "video":
+        return Video;
+      case "checklist":
+        return ListChecks;
+      default:
+        return BookOpen;
     }
   };
 
   return (
     <div className="space-y-8 pb-12">
-      
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-zinc-200 dark:border-zinc-800/80 pb-6">
         <div>
           <div className="inline-flex items-center gap-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 mb-1">
@@ -49,17 +56,20 @@ export const JourneyView: React.FC = () => {
             {roadmap.skillTitle}
           </h1>
           <p className="text-sm text-zinc-500 mt-1">
-            {completedCount} of {roadmap.totalSteps} steps completed • {progressPercent}% total progress
+            {completedCount} of {roadmap.totalSteps} steps completed •{" "}
+            {progressPercent}% total progress
           </p>
         </div>
 
         <div className="w-full md:w-64 space-y-2">
           <div className="flex justify-between text-xs font-medium">
             <span className="text-zinc-500">Roadmap Completion</span>
-            <span className="font-bold text-zinc-900 dark:text-zinc-100">{progressPercent}%</span>
+            <span className="font-bold text-zinc-900 dark:text-zinc-100">
+              {progressPercent}%
+            </span>
           </div>
           <div className="w-full h-2.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-            <div 
+            <div
               className="h-full bg-indigo-600 rounded-full transition-all duration-500"
               style={{ width: `${progressPercent}%` }}
             />
@@ -67,7 +77,7 @@ export const JourneyView: React.FC = () => {
         </div>
       </div>
 
-      {/* Pip Mascot Roadmap Guidance */}
+      {/* Pip Roadmap Guidance */}
       <DuolingoMascot
         emotion="planning"
         size="md"
@@ -77,14 +87,15 @@ export const JourneyView: React.FC = () => {
 
       <div className="p-5 rounded-2xl border border-indigo-100 dark:border-indigo-900/40 bg-indigo-50/40 dark:bg-indigo-950/20 flex items-start gap-3">
         <div className="p-2 rounded-xl bg-indigo-600 text-white shrink-0">
-          <Sparkles className="w-4 h-4" />
+          <Award className="w-4 h-4" />
         </div>
         <div>
           <div className="text-xs font-semibold text-indigo-900 dark:text-indigo-300">
-            Pip Mascot Guidance
+            Pip Guidance
           </div>
           <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 leading-relaxed">
-            You completed 2 steps this week. You are on track to reach the Event-Driven Patterns milestone.
+            You completed 2 steps this week. You are on track to reach the
+            Event-Driven Patterns milestone.
           </p>
         </div>
       </div>
@@ -94,23 +105,29 @@ export const JourneyView: React.FC = () => {
           Roadmap Milestones
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-          {roadmap.milestones.map(ms => (
-            <div 
+          {roadmap.milestones.map((ms) => (
+            <div
               key={ms.id}
               className={`p-3.5 rounded-2xl border flex items-center gap-3 transition-colors ${
-                ms.reached 
-                  ? 'border-emerald-200 dark:border-emerald-900/40 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-900 dark:text-emerald-300' 
-                  : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/40 text-zinc-600 dark:text-zinc-400'
+                ms.reached
+                  ? "border-emerald-200 dark:border-emerald-900/40 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-900 dark:text-emerald-300"
+                  : "border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/40 text-zinc-600 dark:text-zinc-400"
               }`}
             >
-              <div className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 ${
-                ms.reached ? 'bg-emerald-600 text-white' : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-500'
-              }`}>
-                {ms.reached ? <Check className="w-4 h-4" /> : <Award className="w-4 h-4" />}
+              <div
+                className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 ${
+                  ms.reached
+                    ? "bg-emerald-600 text-white"
+                    : "bg-zinc-200 dark:bg-zinc-700 text-zinc-500"
+                }`}
+              >
+                {ms.reached ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <Award className="w-4 h-4" />
+                )}
               </div>
-              <div className="text-xs font-semibold">
-                {ms.title}
-              </div>
+              <div className="text-xs font-semibold">{ms.title}</div>
             </div>
           ))}
         </div>
@@ -124,19 +141,20 @@ export const JourneyView: React.FC = () => {
         <div className="relative pl-6 sm:pl-8 space-y-8 before:absolute before:left-3 sm:before:left-4 before:top-4 before:bottom-4 before:w-0.5 before:bg-zinc-200 dark:before:bg-zinc-800">
           {roadmap.steps.map((step, idx) => {
             const Icon = getStepIcon(step.type);
-            const isCompleted = step.status === 'completed';
-            const isCurrent = step.status === 'current';
+            const isCompleted = step.status === "completed";
+            const isCurrent = step.status === "current";
 
             return (
               <div key={step.id} className="relative group">
-                
-                <div className={`absolute -left-6 sm:-left-8 top-1.5 w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 transition-all ${
-                  isCompleted 
-                    ? 'bg-emerald-600 border-emerald-600 text-white' 
-                    : isCurrent 
-                    ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-600/40 animate-pulse' 
-                    : 'bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700 text-zinc-400'
-                }`}>
+                <div
+                  className={`absolute -left-6 sm:-left-8 top-1.5 w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center border-2 transition-all ${
+                    isCompleted
+                      ? "bg-emerald-600 border-emerald-600 text-white"
+                      : isCurrent
+                        ? "bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-600/40 animate-pulse"
+                        : "bg-white dark:bg-zinc-900 border-zinc-300 dark:border-zinc-700 text-zinc-400"
+                  }`}
+                >
                   {isCompleted ? (
                     <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[3]" />
                   ) : isCurrent ? (
@@ -146,14 +164,14 @@ export const JourneyView: React.FC = () => {
                   )}
                 </div>
 
-                <div 
+                <div
                   onClick={() => setSelectedStepModal(step)}
                   className={`p-5 sm:p-6 rounded-3xl border cursor-pointer transition-all ${
-                    isCurrent 
-                      ? 'border-indigo-600 bg-indigo-50/20 dark:bg-indigo-950/20 shadow-md ring-1 ring-indigo-500/30' 
-                      : isCompleted 
-                      ? 'border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700' 
-                      : 'border-zinc-200 dark:border-zinc-800/50 bg-zinc-50/50 dark:bg-zinc-900/40 opacity-70 hover:opacity-100'
+                    isCurrent
+                      ? "border-indigo-600 bg-indigo-50/20 dark:bg-indigo-950/20 shadow-md ring-1 ring-indigo-500/30"
+                      : isCompleted
+                        ? "border-zinc-200 dark:border-zinc-800/80 bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700"
+                        : "border-zinc-200 dark:border-zinc-800/50 bg-zinc-50/50 dark:bg-zinc-900/40 opacity-70 hover:opacity-100"
                   }`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -162,7 +180,9 @@ export const JourneyView: React.FC = () => {
                         <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
                           Step {step.stepNumber}
                         </span>
-                        <span className="text-zinc-300 dark:text-zinc-700">•</span>
+                        <span className="text-zinc-300 dark:text-zinc-700">
+                          •
+                        </span>
                         <span className="text-xs text-zinc-500 flex items-center gap-1">
                           <Icon className="w-3 h-3" />
                           <span className="capitalize">{step.type}</span>
@@ -194,26 +214,35 @@ export const JourneyView: React.FC = () => {
                           }
                         }}
                         className={`px-4 py-2 rounded-xl text-xs font-semibold transition-colors ${
-                          isCurrent 
-                            ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm' 
-                            : isCompleted 
-                            ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300' 
-                            : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-500'
+                          isCurrent
+                            ? "bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm"
+                            : isCompleted
+                              ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
+                              : "bg-zinc-200 dark:bg-zinc-800 text-zinc-500"
                         }`}
                       >
-                        {isCurrent ? 'Start Task' : isCompleted ? 'Review' : 'Locked'}
+                        {isCurrent
+                          ? "Start Task"
+                          : isCompleted
+                            ? "Review"
+                            : "Locked"}
                       </button>
                     </div>
                   </div>
 
                   <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800/60 flex items-center justify-between text-xs text-zinc-500">
                     <div className="flex items-center gap-2">
-                      <img 
-                        src={step.creatorAvatar} 
-                        alt={step.creatorName} 
-                        className="w-5 h-5 rounded-full object-cover" 
+                      <img
+                        src={step.creatorAvatar}
+                        alt={step.creatorName}
+                        className="w-5 h-5 rounded-full object-cover"
                       />
-                      <span>Curated by <strong className="text-zinc-700 dark:text-zinc-300 font-semibold">{step.creatorName}</strong></span>
+                      <span>
+                        Curated by{" "}
+                        <strong className="text-zinc-700 dark:text-zinc-300 font-semibold">
+                          {step.creatorName}
+                        </strong>
+                      </span>
                     </div>
 
                     {step.completedAt && (
@@ -222,15 +251,12 @@ export const JourneyView: React.FC = () => {
                       </span>
                     )}
                   </div>
-
                 </div>
-
               </div>
             );
           })}
         </div>
       </div>
-
     </div>
   );
 };
