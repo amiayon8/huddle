@@ -155,11 +155,11 @@ export const DashboardView: React.FC = () => {
 
         {/* Path Nodes */}
         <div className="relative flex flex-col items-center space-y-8 py-2">
-          {sprint.tasks.map((task, index) => {
+          {tasks.map((task, index) => {
             const isCompleted = task.completed;
             const isCurrent =
               !isCompleted &&
-              (index === 0 || sprint.tasks[index - 1].completed);
+              (index === 0 || tasks[index - 1].completed);
             const isUpcoming = !isCompleted && !isCurrent;
             const isExpanded = expandedTaskId === task.id;
 
@@ -171,7 +171,7 @@ export const DashboardView: React.FC = () => {
                 key={task.id}
                 className={`relative flex flex-col items-center transition-all ${offsetClasses}`}
               >
-                {index < sprint.tasks.length - 1 && (
+                {index < tasks.length - 1 && (
                   <div className="absolute top-14 left-1/2 -translate-x-1/2 w-0.5 h-8 bg-zinc-200 dark:bg-zinc-800 -z-0" />
                 )}
 
