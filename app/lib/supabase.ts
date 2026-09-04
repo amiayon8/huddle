@@ -15,7 +15,9 @@ import {
   SkillRoadmap,
   CommunityPost,
   NotificationItem,
-  MascotMessage
+  MascotMessage,
+  PracticeSessionProgress,
+  AnonymousSquadReport
 } from '../types/huddle';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://puusreiewwibbegrznli.supabase.co';
@@ -234,22 +236,134 @@ export async function fetchCurrentSprint(userId: string = 'user-1'): Promise<Spr
   }
 }
 
-/**
- * Update sprint task completion
- */
-export async function updateSprintTaskCompletion(taskId: string, completed: boolean, completedAt?: string) {
+export async function updateSprintTaskCompletion(
+  taskId: string,
+  completed: boolean,
+  completedAt?: string,
+  sprintId?: string,
+  dayNumber?: number
+) {
   try {
-    await supabase
+    const { data } = await supabase
       .from('sprint_tasks')
       .update({
         completed: completed,
         completed_at: completedAt || (completed ? 'Just now' : null)
       })
-      .eq('id', taskId);
+      .eq('id', taskId)
+      .select('id');
+
+    if ((!data || data.length === 0) && sprintId && dayNumber !== undefined) {
+      await supabase
+        .from('sprint_tasks')
+        .update({
+          completed: completed,
+          completed_at: completedAt || (completed ? 'Just now' : null)
+        })
+        .eq('sprint_id', sprintId)
+        .eq('day_number', dayNumber);
+    }
   } catch (err) {
     console.error('Error updating sprint task:', err);
   }
 }
+
+export async function fetchPracticeSessionProgress(
+  userId: string,
+  taskId: string
+): Promise<PracticeSessionProgress | null> {
+  try {
+    const { data, error } = await supabase
+      .from('practice_session_progress')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('task_id', taskId)
+      .maybeSingle();
+
+    if (error || !data) return null;
+
+    return {
+      id: data.id,
+      userId: data.user_id,
+      taskId: data.task_id,
+      sprintId: data.sprint_id,
+      completed: data.completed || false,
+      completedAt: data.completed_at || undefined,
+      videoWatchedSeconds: data.video_watched_seconds || 0,
+      videoCompleted: data.video_completed || false,
+      reflectionNotes: data.reflection_notes || '',
+      userCode: data.user_code || undefined,
+      quizAnswers: data.quiz_answers || undefined,
+      quizScore: data.quiz_score || 0,
+      timeSpentSeconds: data.time_spent_seconds || 0
+    };
+  } catch (err) {
+    console.error('Error fetching practice progress:', err);
+    return null;
+  }
+}
+
+export async function fetchAllPracticeSessionProgress(
+  userId: string
+): Promise<PracticeSessionProgress[]> {
+  try {
+    const { data, error } = await supabase
+      .from('practice_session_progress')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (error || !data) return [];
+
+    return data.map((d: any) => ({
+      id: d.id,
+      userId: d.user_id,
+      taskId: d.task_id,
+      sprintId: d.sprint_id,
+      completed: d.completed || false,
+      completedAt: d.completed_at || undefined,
+      videoWatchedSeconds: d.video_watched_seconds || 0,
+      videoCompleted: d.video_completed || false,
+      reflectionNotes: d.reflection_notes || '',
+      userCode: d.user_code || undefined,
+      quizAnswers: d.quiz_answers || undefined,
+      quizScore: d.quiz_score || 0,
+      timeSpentSeconds: d.time_spent_seconds || 0
+    }));
+  } catch (err) {
+    console.error('Error fetching all practice progress:', err);
+    return [];
+  }
+}
+
+export async function savePracticeSessionProgress(
+  progress: PracticeSessionProgress
+): Promise<void> {
+  try {
+    const payload = {
+      id: progress.id,
+      user_id: progress.userId,
+      task_id: progress.taskId,
+      sprint_id: progress.sprintId,
+      completed: progress.completed,
+      completed_at: progress.completedAt || null,
+      video_watched_seconds: progress.videoWatchedSeconds,
+      video_completed: progress.videoCompleted,
+      reflection_notes: progress.reflectionNotes,
+      user_code: progress.userCode || null,
+      quiz_answers: progress.quizAnswers || null,
+      quiz_score: progress.quizScore || 0,
+      time_spent_seconds: progress.timeSpentSeconds,
+      updated_at: new Date().toISOString()
+    };
+
+    await supabase
+      .from('practice_session_progress')
+      .upsert(payload, { onConflict: 'user_id,task_id' });
+  } catch (err) {
+    console.error('Error saving practice session progress:', err);
+  }
+}
+
 
 /**
  * Reshuffle sprint in database
@@ -486,6 +600,79 @@ export async function addSquadActivityPingToDb(
     }
   } catch (err) {
     console.error('Error adding squad ping:', err);
+  }
+}
+
+export async function removeSquadMemberInDb(squadId: string, memberId: string) {
+  try {
+    await supabase
+      .from('squad_members')
+      .delete()
+      .eq('squad_id', squadId)
+      .eq('id', memberId);
+  } catch (err) {
+    console.error('Error removing squad member from DB:', err);
+  }
+}
+
+export async function updateSquadMemberRoleInDb(squadId: string, memberId: string, role: 'member' | 'lead') {
+  try {
+    await supabase
+      .from('squad_members')
+      .update({ role })
+      .eq('squad_id', squadId)
+      .eq('id', memberId);
+  } catch (err) {
+    console.error('Error updating squad member role in DB:', err);
+  }
+}
+
+export async function updateSquadSettingsInDb(
+  squadId: string, 
+  updates: { name?: string; skillFocus?: string; sharedGoal?: string; targetProgress?: number; inviteCode?: string }
+) {
+  try {
+    const payload: Record<string, any> = {};
+    if (updates.name !== undefined) payload.name = updates.name;
+    if (updates.skillFocus !== undefined) payload.skill_focus = updates.skillFocus;
+    if (updates.sharedGoal !== undefined) payload.shared_goal = updates.sharedGoal;
+    if (updates.targetProgress !== undefined) payload.target_progress = updates.targetProgress;
+    if (updates.inviteCode !== undefined) payload.invite_code = updates.inviteCode;
+
+    await supabase
+      .from('squads')
+      .update(payload)
+      .eq('id', squadId);
+  } catch (err) {
+    console.error('Error updating squad settings in DB:', err);
+  }
+}
+
+export async function submitSquadReportToDb(report: AnonymousSquadReport) {
+  try {
+    const reportId = report.id || `rep-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    const { error } = await supabase
+      .from('squad_reports')
+      .insert({
+        id: reportId,
+        squad_id: report.squadId,
+        reported_member_id: report.reportedMemberId,
+        reported_member_name: report.reportedMemberName,
+        reporter_hash: report.reporterHash || null,
+        reason_category: report.reasonCategory,
+        details: report.details || null,
+        status: report.status || 'pending',
+        created_at: new Date().toISOString()
+      });
+
+    if (error) {
+      console.error('Supabase error inserting squad report:', error);
+      return { success: false, error: error.message };
+    }
+    return { success: true, id: reportId };
+  } catch (err: any) {
+    console.error('Error submitting squad report to DB:', err);
+    return { success: false, error: err?.message || 'Failed to submit report' };
   }
 }
 
@@ -1030,9 +1217,6 @@ export async function updateSquadMemberCheckInInDb(squadId: string, userId: stri
   }
 }
 
-/**
- * Update sprint skill focus in database
- */
 export const generateTasksForSkill = (sprintId: string, skillTitle: string): SprintTask[] => {
   const lower = skillTitle.toLowerCase();
 

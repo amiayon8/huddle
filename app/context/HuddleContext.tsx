@@ -19,8 +19,21 @@ import {
   RealWorldProofItem,
   CareerTimelineEntry,
   CommunityPost,
-  UserSurveyData
+  UserSurveyData,
+  SquadCreatePayload,
+  SquadActivityPing,
+  MacroSquadUpdate,
+  PracticeSessionProgress,
+  AnonymousSquadReport,
+  ReportReasonCategory
 } from '../types/huddle';
+import {
+  defaultMicroSquad,
+  defaultMacroSquad,
+  defaultSquadMembers,
+  defaultSquadProject,
+  presetAvailableSquads
+} from '../lib/defaultSquadData';
 import {
   supabase,
   signUpUser,
@@ -38,6 +51,8 @@ import {
   completeRealWorldProofInDb,
   fetchSquad,
   addSquadActivityPingToDb,
+  fetchAllPracticeSessionProgress,
+  savePracticeSessionProgress,
   fetchCreatorPosts,
   publishCreatorPostToDb,
   fetchSkillsHealth,
@@ -63,7 +78,11 @@ import {
   updateSprintSkillInDb,
   resetPasswordUser,
   resetDemoAccountInDb,
-  generateTasksForSkill
+  generateTasksForSkill,
+  removeSquadMemberInDb,
+  updateSquadMemberRoleInDb,
+  updateSquadSettingsInDb,
+  submitSquadReportToDb
 } from '../lib/supabase';
 
 interface HuddleContextType {
@@ -115,6 +134,9 @@ interface HuddleContextType {
   selectedStepModal: JourneyStep | null;
   selectedCreatorModal: CreatorProfile | null;
   creatorUploadModalOpen: boolean;
+  selectedPracticeTask: SprintTask | null;
+  isPracticeSessionOpen: boolean;
+  isPracticeReviewMode: boolean;
   
   // State setters
   setActiveTab: (tab: ActiveTab) => void;
@@ -139,12 +161,44 @@ interface HuddleContextType {
   toggleFocusTimer: () => void;
   resetFocusTimer: () => void;
   
-  // Actions
-  completeSprintTask: (taskId: string) => void;
+  practiceProgressMap: Record<string, PracticeSessionProgress>;
+  savePracticeNote: (taskId: string, notes: string) => void;
+  savePracticeVideoWatched: (taskId: string, watchedSeconds: number, completed: boolean) => void;
+  savePracticeCodeSolution: (taskId: string, code: string) => void;
+  savePracticeQuizResult: (taskId: string, answers: Record<string, number>, score: number) => void;
+  completeSprintTask: (taskId: string, customSnippet?: string, reflection?: string) => void;
+  openPracticeSession: (task: SprintTask, reviewMode?: boolean) => void;
+  closePracticeSession: () => void;
+  completePracticeSession: (
+    taskId: string,
+    sessionSecondsElapsed: number,
+    customArtifactSnippet?: string,
+    reflectionNotes?: string,
+    quizScore?: number,
+    quizAnswers?: Record<string, number>,
+    userCode?: string,
+    videoCompleted?: boolean
+  ) => void;
   reshuffleSprint: (customPrompt?: string) => void;
   completeStep: (stepId: string) => void;
   checkInSquad: (encouragement?: string) => void;
   sendSquadNudge: (memberId: string) => void;
+  sendSquadCheer: (memberId: string) => void;
+  submitSquadProject: (title: string, notes: string, link?: string) => void;
+  joinSquadByCode: (code: string) => boolean;
+  createCustomSquad: (payload: SquadCreatePayload) => void;
+  removeSquadMember: (memberId: string) => Promise<void>;
+  updateSquadMemberRole: (memberId: string, newRole: 'member' | 'lead') => Promise<void>;
+  updateSquadSettings: (updates: { name?: string; sharedGoal?: string; skillFocus?: string; targetProgress?: number }) => Promise<void>;
+  regenerateSquadInviteCode: () => Promise<string>;
+  submitAnonymousSquadReport: (payload: {
+    squadId: string;
+    reportedMemberId: string;
+    reportedMemberName: string;
+    reasonCategory: ReportReasonCategory;
+    details?: string;
+  }) => Promise<{ success: boolean; error?: string }>;
+  shareProofToCommunity: (milestoneTitle: string, skillTag: string) => void;
   congratulateMacroMilestone: (updateId: string) => void;
   createCommunityPost: (title: string, content: string, skillId: string, category: CommunityPost['category']) => void;
   toggleUpvotePost: (postId: string) => void;
@@ -193,32 +247,14 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [roadmap, setRoadmap] = useState<SkillRoadmap>({
     skillId: 'system-architecture',
     skillTitle: 'System Architecture',
-    skillIcon: '⚡',
+    skillIcon: 'lightning',
     currentStepIndex: 1,
     totalSteps: 2,
     milestones: [],
     steps: []
   });
-  const [squad, setSquad] = useState<MicroSquad>({
-    id: 'squad-1',
-    name: 'Distributed Systems Core',
-    skillFocus: 'System Architecture',
-    sharedGoal: 'Complete 12 focused practice tasks together this week with zero pressure',
-    currentProgress: 7,
-    targetProgress: 12,
-    inviteCode: 'HUDDLE-4X9B',
-    members: [],
-    activityPings: []
-  });
-  const [macroSquad, setMacroSquad] = useState<MacroSquad>({
-    id: 'macro-1',
-    name: 'Global Backend & Systems Circle',
-    description: 'A global macro circle of 38 engineers mastering distributed backend systems.',
-    trackCategory: 'System Architecture',
-    membersCount: 38,
-    members: [],
-    milestoneUpdates: []
-  });
+  const [squad, setSquad] = useState<MicroSquad>(defaultMicroSquad);
+  const [macroSquad, setMacroSquad] = useState<MacroSquad>(defaultMacroSquad);
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [creators, setCreators] = useState<CreatorProfile[]>([]);
   const [creatorPosts, setCreatorPosts] = useState<CreatorPost[]>([]);
@@ -260,6 +296,10 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [selectedStepModal, setSelectedStepModal] = useState<JourneyStep | null>(null);
   const [selectedCreatorModal, setSelectedCreatorModal] = useState<CreatorProfile | null>(null);
   const [creatorUploadModalOpen, setCreatorUploadModalOpen] = useState(false);
+  const [selectedPracticeTask, setSelectedPracticeTask] = useState<SprintTask | null>(null);
+  const [isPracticeSessionOpen, setIsPracticeSessionOpen] = useState(false);
+  const [isPracticeReviewMode, setIsPracticeReviewMode] = useState(false);
+  const [practiceProgressMap, setPracticeProgressMap] = useState<Record<string, PracticeSessionProgress>>({});
   const [isDemoState, setIsDemoState] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('huddle_is_demo') === 'true';
@@ -286,7 +326,8 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         dbCommunityPosts,
         dbCreators,
         dbNotifications,
-        dbMascotMessages
+        dbMascotMessages,
+        dbPracticeProgress
       ] = await Promise.all([
         fetchUserProfile(activeUserId),
         fetchCurrentSprint(activeUserId),
@@ -301,23 +342,31 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         fetchCommunityPosts(),
         fetchCreators(),
         fetchNotifications(activeUserId),
-        fetchMascotMessages(activeUserId)
+        fetchMascotMessages(activeUserId),
+        fetchAllPracticeSessionProgress(activeUserId)
       ]);
 
       if (dbProfile) setUser(dbProfile);
       if (dbSprint) setSprint(dbSprint);
       if (dbPortfolio) setPortfolioItems(dbPortfolio);
       if (dbProofs) setRealWorldProofs(dbProofs);
-      if (dbSquad) setSquad(dbSquad);
+      if (dbSquad && dbSquad.members && dbSquad.members.length > 0) setSquad(dbSquad);
       if (dbCreatorPosts) setCreatorPosts(dbCreatorPosts);
       if (dbSkillsHealth && dbSkillsHealth.length > 0) setSkillsHealth(dbSkillsHealth);
       if (dbCareerTimeline && dbCareerTimeline.length > 0) setCareerTimeline(dbCareerTimeline);
       if (dbRoadmap) setRoadmap(dbRoadmap);
-      if (dbMacroSquad) setMacroSquad(dbMacroSquad);
+      if (dbMacroSquad && dbMacroSquad.milestoneUpdates && dbMacroSquad.milestoneUpdates.length > 0) setMacroSquad(dbMacroSquad);
       if (dbCommunityPosts && dbCommunityPosts.length > 0) setPosts(dbCommunityPosts);
       if (dbCreators && dbCreators.length > 0) setCreators(dbCreators);
       if (dbNotifications && dbNotifications.length > 0) setNotifications(dbNotifications);
       if (dbMascotMessages && dbMascotMessages.length > 0) setMascotMessages(dbMascotMessages);
+      if (dbPracticeProgress && dbPracticeProgress.length > 0) {
+        const progressMap: Record<string, PracticeSessionProgress> = {};
+        dbPracticeProgress.forEach((item) => {
+          progressMap[item.taskId] = item;
+        });
+        setPracticeProgressMap(progressMap);
+      }
     } catch (err) {
       console.error('Error loading Supabase data:', err);
     }
@@ -623,8 +672,158 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return true;
   };
 
-  // Complete a task in the 2-5 day Sprint Checklist
-  const completeSprintTask = (taskId: string) => {
+  const openPracticeSession = (task: SprintTask, reviewMode: boolean = false) => {
+    setSelectedPracticeTask(task);
+    setIsPracticeReviewMode(reviewMode);
+    setIsPracticeSessionOpen(true);
+  };
+
+  const closePracticeSession = () => {
+    setIsPracticeSessionOpen(false);
+    setSelectedPracticeTask(null);
+    setIsPracticeReviewMode(false);
+  };
+
+  const savePracticeNote = (taskId: string, notes: string) => {
+    const existing = practiceProgressMap[taskId] || {
+      userId: user.id,
+      taskId,
+      sprintId: sprint.id,
+      completed: false,
+      videoWatchedSeconds: 0,
+      videoCompleted: false,
+      userCode: '',
+      reflectionNotes: '',
+      quizAnswers: {},
+      quizScore: 0,
+      timeSpentSeconds: 0
+    };
+    const updated: PracticeSessionProgress = {
+      ...existing,
+      reflectionNotes: notes
+    };
+    setPracticeProgressMap(prev => ({ ...prev, [taskId]: updated }));
+    savePracticeSessionProgress(updated);
+  };
+
+  const savePracticeVideoWatched = (taskId: string, watchedSeconds: number, completed: boolean) => {
+    const existing = practiceProgressMap[taskId] || {
+      userId: user.id,
+      taskId,
+      sprintId: sprint.id,
+      completed: false,
+      videoWatchedSeconds: 0,
+      videoCompleted: false,
+      userCode: '',
+      reflectionNotes: '',
+      quizAnswers: {},
+      quizScore: 0,
+      timeSpentSeconds: 0
+    };
+    const updated: PracticeSessionProgress = {
+      ...existing,
+      videoWatchedSeconds: Math.max(existing.videoWatchedSeconds, watchedSeconds),
+      videoCompleted: completed || existing.videoCompleted
+    };
+    setPracticeProgressMap(prev => ({ ...prev, [taskId]: updated }));
+    savePracticeSessionProgress(updated);
+  };
+
+  const savePracticeCodeSolution = (taskId: string, code: string) => {
+    const existing = practiceProgressMap[taskId] || {
+      userId: user.id,
+      taskId,
+      sprintId: sprint.id,
+      completed: false,
+      videoWatchedSeconds: 0,
+      videoCompleted: false,
+      userCode: '',
+      reflectionNotes: '',
+      quizAnswers: {},
+      quizScore: 0,
+      timeSpentSeconds: 0
+    };
+    const updated: PracticeSessionProgress = {
+      ...existing,
+      userCode: code
+    };
+    setPracticeProgressMap(prev => ({ ...prev, [taskId]: updated }));
+    savePracticeSessionProgress(updated);
+  };
+
+  const savePracticeQuizResult = (taskId: string, answers: Record<string, number>, score: number) => {
+    const existing = practiceProgressMap[taskId] || {
+      userId: user.id,
+      taskId,
+      sprintId: sprint.id,
+      completed: false,
+      videoWatchedSeconds: 0,
+      videoCompleted: false,
+      userCode: '',
+      reflectionNotes: '',
+      quizAnswers: {},
+      quizScore: 0,
+      timeSpentSeconds: 0
+    };
+    const updated: PracticeSessionProgress = {
+      ...existing,
+      quizAnswers: answers,
+      quizScore: score
+    };
+    setPracticeProgressMap(prev => ({ ...prev, [taskId]: updated }));
+    savePracticeSessionProgress(updated);
+  };
+
+  const completePracticeSession = (
+    taskId: string,
+    sessionSecondsElapsed: number,
+    customArtifactSnippet?: string,
+    reflectionNotes?: string,
+    quizScore?: number,
+    quizAnswers?: Record<string, number>,
+    userCode?: string,
+    videoCompleted?: boolean
+  ) => {
+    if (sessionSecondsElapsed > 0) {
+      setSecondsFocusedToday(prev => prev + sessionSecondsElapsed);
+    }
+    const existing = practiceProgressMap[taskId] || {
+      userId: user.id,
+      taskId,
+      sprintId: sprint.id,
+      completed: true,
+      completedAt: new Date().toISOString(),
+      videoWatchedSeconds: 0,
+      videoCompleted: false,
+      userCode: '',
+      reflectionNotes: '',
+      quizAnswers: {},
+      quizScore: 0,
+      timeSpentSeconds: 0
+    };
+    const updated: PracticeSessionProgress = {
+      ...existing,
+      userId: user.id,
+      taskId,
+      sprintId: sprint.id,
+      completed: true,
+      completedAt: new Date().toISOString(),
+      timeSpentSeconds: (existing.timeSpentSeconds || 0) + sessionSecondsElapsed,
+      reflectionNotes: reflectionNotes !== undefined ? reflectionNotes : existing.reflectionNotes,
+      quizScore: quizScore !== undefined ? quizScore : existing.quizScore,
+      quizAnswers: quizAnswers !== undefined ? quizAnswers : existing.quizAnswers,
+      userCode: userCode !== undefined ? userCode : existing.userCode,
+      videoCompleted: videoCompleted !== undefined ? videoCompleted : existing.videoCompleted
+    };
+    setPracticeProgressMap(prev => ({ ...prev, [taskId]: updated }));
+    savePracticeSessionProgress(updated);
+    completeSprintTask(taskId, customArtifactSnippet, reflectionNotes);
+    setIsPracticeSessionOpen(false);
+    setSelectedPracticeTask(null);
+    setIsPracticeReviewMode(false);
+  };
+
+  const completeSprintTask = (taskId: string, customSnippet?: string, reflection?: string) => {
     if (!ensureSurveyDone('complete sprint tasks')) return;
     const targetTask = sprint.tasks.find(t => t.id === taskId);
     if (!targetTask) return;
@@ -663,12 +862,14 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           title: targetTask.artifactTitle,
           category: sprint.skillTitle,
           date: 'Just now',
-          description: `Auto-assembled artifact produced from sprint task: "${targetTask.title}".`,
+          description: reflection
+            ? `Verified deliberate practice artifact. Reflection: ${reflection}`
+            : `Auto-assembled artifact produced from sprint task: "${targetTask.title}".`,
           artifactType: targetTask.artifactType || 'code',
-          previewSnippet: `// Sprint Artifact: ${targetTask.artifactTitle}\n// Verified deliberate practice task\nexport const artifact = { verified: true, creator: "${targetTask.creatorName}" };`,
+          previewSnippet: customSnippet || `export const artifact = {\n  title: "${targetTask.artifactTitle}",\n  verified: true,\n  creator: "${targetTask.creatorName}"\n};`,
           isPublished: false,
           sourceTaskId: targetTask.id,
-          tags: [sprint.skillTitle, 'Auto-assembled']
+          tags: [sprint.skillTitle, 'Auto-assembled', 'Verified Practice']
         };
 
         setPortfolioItems(prev => [newPortfolioItem, ...prev]);
@@ -730,6 +931,25 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return nextUser;
       });
 
+      setSquad(prev => {
+        const ping: SquadActivityPing = {
+          id: `ping-${Date.now()}`,
+          memberId: user.id,
+          memberName: user.name,
+          memberAvatar: user.avatar,
+          actionText: `completed Day ${targetTask.dayNumber} deliberate practice: ${targetTask.title}`,
+          timestamp: 'Just now',
+          type: 'task_completed'
+        };
+        const alreadyCheckedIn = prev.members.find(m => m.id === user.id)?.checkedInToday;
+        return {
+          ...prev,
+          currentProgress: alreadyCheckedIn ? prev.currentProgress : Math.min(prev.targetProgress, prev.currentProgress + 1),
+          members: prev.members.map(m => m.id === user.id ? { ...m, checkedInToday: true, recentEncouragement: `Completed Day ${targetTask.dayNumber} deliberate practice: ${targetTask.title}` } : m),
+          activityPings: [ping, ...prev.activityPings]
+        };
+      });
+
       const notif: NotificationItem = {
         id: `n-${Date.now()}`,
         type: 'milestone',
@@ -785,31 +1005,72 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const checkInSquad = (encouragement?: string) => {
     if (!ensureSurveyDone('check in with your squad')) return;
-    setSquad(prev => ({
-      ...prev,
-      members: prev.members.map(m => 
-        m.id === user.id 
-          ? { ...m, checkedInToday: true, recentEncouragement: encouragement || m.recentEncouragement } 
-          : m
-      )
-    }));
 
-    const newSquadPing = {
-      id: `ping-${Date.now()}`,
-      memberId: user.id,
-      memberName: user.name,
-      memberAvatar: user.avatar,
-      actionText: encouragement ? `posted: "${encouragement}"` : 'checked in for daily focus practice',
+    setSquad(prev => {
+      const alreadyCheckedIn = prev.members.find(m => m.id === user.id)?.checkedInToday;
+      const nextProgress = alreadyCheckedIn ? prev.currentProgress : Math.min(prev.targetProgress, prev.currentProgress + 1);
+
+      const newSquadPing: SquadActivityPing = {
+        id: `ping-${Date.now()}`,
+        memberId: user.id,
+        memberName: user.name,
+        memberAvatar: user.avatar,
+        actionText: encouragement ? `posted: "${encouragement}"` : 'completed daily focus check-in',
+        timestamp: 'Just now',
+        type: 'checkin'
+      };
+
+      return {
+        ...prev,
+        currentProgress: nextProgress,
+        members: prev.members.map(m =>
+          m.id === user.id
+            ? {
+                ...m,
+                checkedInToday: true,
+                streak: alreadyCheckedIn ? m.streak : m.streak + 1,
+                recentEncouragement: encouragement || m.recentEncouragement || 'Checked in for daily practice'
+              }
+            : m
+        ),
+        activityPings: [newSquadPing, ...prev.activityPings]
+      };
+    });
+
+    setUser(prev => {
+      const nextStreak = prev.streak + 1;
+      const nextRep = prev.reputation + 10;
+      updateProfileInDb(user.id, { streak: nextStreak, reputation: nextRep });
+      return {
+        ...prev,
+        streak: nextStreak,
+        reputation: nextRep
+      };
+    });
+
+    const notif: NotificationItem = {
+      id: `n-${Date.now()}`,
+      type: 'squad_checkin',
+      title: 'Squad Check-In Verified',
+      description: encouragement ? `You posted: "${encouragement}"` : 'Daily focus check-in logged with your squad.',
       timestamp: 'Just now',
-      type: 'checkin' as const
+      read: false
     };
+    setNotifications(prev => [notif, ...prev]);
+    addNotificationToDb(notif, user.id);
 
-    setSquad(prev => ({
-      ...prev,
-      activityPings: [newSquadPing, ...prev.activityPings]
-    }));
+    try {
+      import('canvas-confetti').then(confettiModule => {
+        const confetti = confettiModule.default;
+        confetti({
+          particleCount: 40,
+          spread: 60,
+          origin: { y: 0.6 }
+        });
+      });
+    } catch (e) {}
 
-    addSquadActivityPingToDb(squad.id, user.id, user.name, user.avatar, newSquadPing.actionText, 'checkin');
+    addSquadActivityPingToDb(squad.id, user.id, user.name, user.avatar, encouragement ? `posted: "${encouragement}"` : 'checked in for daily focus practice', 'checkin');
     updateSquadMemberCheckInInDb(squad.id, user.id, encouragement);
   };
 
@@ -817,6 +1078,21 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (!ensureSurveyDone('send squad nudges')) return;
     const member = squad.members.find(m => m.id === memberId);
     if (!member) return;
+
+    const newPing: SquadActivityPing = {
+      id: `ping-${Date.now()}`,
+      memberId: user.id,
+      memberName: user.name,
+      memberAvatar: user.avatar,
+      actionText: `sent a friendly practice nudge to ${member.name}`,
+      timestamp: 'Just now',
+      type: 'nudge'
+    };
+
+    setSquad(prev => ({
+      ...prev,
+      activityPings: [newPing, ...prev.activityPings]
+    }));
 
     const notif: NotificationItem = {
       id: `n-${Date.now()}`,
@@ -828,6 +1104,390 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
     setNotifications(prev => [notif, ...prev]);
     addNotificationToDb(notif, user.id);
+  };
+
+  const sendSquadCheer = (memberId: string) => {
+    if (!ensureSurveyDone('cheer squad teammates')) return;
+    const member = squad.members.find(m => m.id === memberId);
+    if (!member) return;
+
+    const newPing: SquadActivityPing = {
+      id: `ping-${Date.now()}`,
+      memberId: user.id,
+      memberName: user.name,
+      memberAvatar: user.avatar,
+      actionText: `sent a high-five to ${member.name}`,
+      timestamp: 'Just now',
+      type: 'cheer'
+    };
+
+    setSquad(prev => ({
+      ...prev,
+      members: prev.members.map(m => m.id === memberId ? { ...m, cheerCount: (m.cheerCount || 0) + 1 } : m),
+      activityPings: [newPing, ...prev.activityPings]
+    }));
+
+    const notif: NotificationItem = {
+      id: `n-${Date.now()}`,
+      type: 'squad_checkin',
+      title: 'High-Five Sent',
+      description: `You sent a high-five cheer to ${member.name}.`,
+      timestamp: 'Just now',
+      read: false
+    };
+    setNotifications(prev => [notif, ...prev]);
+    addNotificationToDb(notif, user.id);
+  };
+
+  const submitSquadProject = (title: string, notes: string, link?: string) => {
+    if (!ensureSurveyDone('submit squad project')) return;
+
+    const deliverable = {
+      memberId: user.id,
+      memberName: user.name,
+      memberAvatar: user.avatar,
+      title,
+      notes,
+      link,
+      timestamp: 'Just now'
+    };
+
+    const newPing: SquadActivityPing = {
+      id: `ping-${Date.now()}`,
+      memberId: user.id,
+      memberName: user.name,
+      memberAvatar: user.avatar,
+      actionText: `submitted deliverable "${title}" to Team Blueprint`,
+      timestamp: 'Just now',
+      type: 'project_submission'
+    };
+
+    setSquad(prev => {
+      const activeProject = prev.activeProject || defaultSquadProject;
+      const existingSubmissions = activeProject.deliverables || [];
+      const updatedDeliverables = [deliverable, ...existingSubmissions.filter(d => d.memberId !== user.id)];
+
+      return {
+        ...prev,
+        members: prev.members.map(m => m.id === user.id ? { ...m, submittedProject: true } : m),
+        activeProject: {
+          ...activeProject,
+          submissionsCount: updatedDeliverables.length,
+          deliverables: updatedDeliverables
+        },
+        activityPings: [newPing, ...prev.activityPings]
+      };
+    });
+
+    setUser(prev => {
+      const nextRep = prev.reputation + 30;
+      updateProfileInDb(user.id, { reputation: nextRep });
+      return { ...prev, reputation: nextRep };
+    });
+
+    try {
+      import('canvas-confetti').then(confettiModule => {
+        const confetti = confettiModule.default;
+        confetti({
+          particleCount: 50,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      });
+    } catch (e) {}
+
+    const notif: NotificationItem = {
+      id: `n-${Date.now()}`,
+      type: 'milestone',
+      title: 'Squad Deliverable Submitted',
+      description: `Your contribution "${title}" has been registered in the squad blueprint.`,
+      timestamp: 'Just now',
+      read: false
+    };
+    setNotifications(prev => [notif, ...prev]);
+    addNotificationToDb(notif, user.id);
+  };
+
+  const joinSquadByCode = (code: string): boolean => {
+    const cleanCode = code.trim().toUpperCase();
+    if (!cleanCode) return false;
+
+    const matched = presetAvailableSquads.find(s => s.inviteCode.toUpperCase() === cleanCode);
+    if (matched) {
+      const hasUser = matched.members.some(m => m.id === user.id);
+      setSquad({
+        ...matched,
+        members: hasUser
+          ? matched.members
+          : [
+              ...matched.members,
+              {
+                id: user.id,
+                name: user.name,
+                handle: user.handle,
+                avatar: user.avatar,
+                streak: user.streak,
+                checkedInToday: false,
+                role: 'member',
+                cheerCount: 0,
+                submittedProject: false
+              }
+            ]
+      });
+      return true;
+    }
+
+    setSquad(prev => ({
+      ...prev,
+      inviteCode: cleanCode,
+      name: `${cleanCode} Cohort`
+    }));
+    return true;
+  };
+
+  const createCustomSquad = (payload: SquadCreatePayload) => {
+    const generatedInviteCode = `HUDDLE-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+    const newSquad: MicroSquad = {
+      id: `squad-${Date.now()}`,
+      name: payload.name,
+      skillFocus: payload.skillFocus,
+      sharedGoal: payload.sharedGoal,
+      currentProgress: 1,
+      targetProgress: payload.targetProgress || 12,
+      inviteCode: generatedInviteCode,
+      members: [
+        {
+          id: user.id,
+          name: user.name,
+          handle: user.handle,
+          avatar: user.avatar,
+          streak: user.streak,
+          checkedInToday: true,
+          recentEncouragement: 'Founded this squad',
+          role: 'lead',
+          cheerCount: 0,
+          submittedProject: false
+        }
+      ],
+      activityPings: [
+        {
+          id: `ping-${Date.now()}`,
+          memberId: user.id,
+          memberName: user.name,
+          memberAvatar: user.avatar,
+          actionText: `created squad "${payload.name}"`,
+          timestamp: 'Just now',
+          type: 'checkin'
+        }
+      ],
+      activeProject: {
+        id: `proj-${Date.now()}`,
+        title: `Team Blueprint: ${payload.skillFocus}`,
+        description: payload.sharedGoal,
+        deadline: 'Sunday, 11:59 PM',
+        status: 'in_progress',
+        submissionsCount: 0,
+        totalMembers: 4,
+        deliverables: []
+      }
+    };
+    setSquad(newSquad);
+  };
+
+  const removeSquadMember = async (memberId: string) => {
+    const leaderMember = squad.members.find(m => m.id === user.id);
+    if (leaderMember?.role !== 'lead') return;
+
+    const targetMember = squad.members.find(m => m.id === memberId);
+    if (!targetMember) return;
+
+    const removalPing: SquadActivityPing = {
+      id: `ping-${Date.now()}`,
+      memberId: user.id,
+      memberName: user.name,
+      memberAvatar: user.avatar,
+      actionText: `removed ${targetMember.name} from the squad`,
+      timestamp: 'Just now',
+      type: 'nudge'
+    };
+
+    setSquad(prev => ({
+      ...prev,
+      members: prev.members.filter(m => m.id !== memberId),
+      activityPings: [removalPing, ...prev.activityPings]
+    }));
+
+    await removeSquadMemberInDb(squad.id, memberId);
+
+    const notif: NotificationItem = {
+      id: `n-${Date.now()}`,
+      type: 'squad_checkin',
+      title: 'Squad Member Removed',
+      description: `${targetMember.name} was removed from ${squad.name}.`,
+      timestamp: 'Just now',
+      read: false
+    };
+    setNotifications(prev => [notif, ...prev]);
+    addNotificationToDb(notif, user.id);
+  };
+
+  const updateSquadMemberRole = async (memberId: string, newRole: 'member' | 'lead') => {
+    const leaderMember = squad.members.find(m => m.id === user.id);
+    if (leaderMember?.role !== 'lead') return;
+
+    const targetMember = squad.members.find(m => m.id === memberId);
+    if (!targetMember) return;
+
+    const roleTitle = newRole === 'lead' ? 'Squad Co-Lead' : 'Squad Member';
+    const ping: SquadActivityPing = {
+      id: `ping-${Date.now()}`,
+      memberId: user.id,
+      memberName: user.name,
+      memberAvatar: user.avatar,
+      actionText: `promoted ${targetMember.name} to ${roleTitle}`,
+      timestamp: 'Just now',
+      type: 'checkin'
+    };
+
+    setSquad(prev => ({
+      ...prev,
+      members: prev.members.map(m => m.id === memberId ? { ...m, role: newRole } : m),
+      activityPings: [ping, ...prev.activityPings]
+    }));
+
+    await updateSquadMemberRoleInDb(squad.id, memberId, newRole);
+
+    const notif: NotificationItem = {
+      id: `n-${Date.now()}`,
+      type: 'squad_checkin',
+      title: 'Member Role Updated',
+      description: `${targetMember.name} is now a ${roleTitle} in ${squad.name}.`,
+      timestamp: 'Just now',
+      read: false
+    };
+    setNotifications(prev => [notif, ...prev]);
+    addNotificationToDb(notif, user.id);
+  };
+
+  const updateSquadSettings = async (updates: { name?: string; sharedGoal?: string; skillFocus?: string; targetProgress?: number }) => {
+    const leaderMember = squad.members.find(m => m.id === user.id);
+    if (leaderMember?.role !== 'lead') return;
+
+    setSquad(prev => ({
+      ...prev,
+      name: updates.name ?? prev.name,
+      sharedGoal: updates.sharedGoal ?? prev.sharedGoal,
+      skillFocus: updates.skillFocus ?? prev.skillFocus,
+      targetProgress: updates.targetProgress ?? prev.targetProgress
+    }));
+
+    await updateSquadSettingsInDb(squad.id, updates);
+
+    const notif: NotificationItem = {
+      id: `n-${Date.now()}`,
+      type: 'squad_checkin',
+      title: 'Squad Settings Updated',
+      description: 'Squad goal and configuration details were updated successfully.',
+      timestamp: 'Just now',
+      read: false
+    };
+    setNotifications(prev => [notif, ...prev]);
+    addNotificationToDb(notif, user.id);
+  };
+
+  const regenerateSquadInviteCode = async (): Promise<string> => {
+    const leaderMember = squad.members.find(m => m.id === user.id);
+    if (leaderMember?.role !== 'lead') return squad.inviteCode;
+
+    const newInviteCode = `HUDDLE-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+    setSquad(prev => ({
+      ...prev,
+      inviteCode: newInviteCode
+    }));
+
+    await updateSquadSettingsInDb(squad.id, { inviteCode: newInviteCode });
+
+    const notif: NotificationItem = {
+      id: `n-${Date.now()}`,
+      type: 'squad_checkin',
+      title: 'New Invite Code Generated',
+      description: `Squad code refreshed to ${newInviteCode}. Previous codes have expired.`,
+      timestamp: 'Just now',
+      read: false
+    };
+    setNotifications(prev => [notif, ...prev]);
+    addNotificationToDb(notif, user.id);
+
+    return newInviteCode;
+  };
+
+  const submitAnonymousSquadReport = async (payload: {
+    squadId: string;
+    reportedMemberId: string;
+    reportedMemberName: string;
+    reasonCategory: ReportReasonCategory;
+    details?: string;
+  }): Promise<{ success: boolean; error?: string }> => {
+    const reportId = `rep-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    const reporterHash = `anon-${Math.random().toString(36).substring(2, 10)}`;
+
+    const report: AnonymousSquadReport = {
+      id: reportId,
+      squadId: payload.squadId,
+      reportedMemberId: payload.reportedMemberId,
+      reportedMemberName: payload.reportedMemberName,
+      reporterHash,
+      reasonCategory: payload.reasonCategory,
+      details: payload.details?.trim() || '',
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
+
+    const response = await submitSquadReportToDb(report);
+
+    const notif: NotificationItem = {
+      id: `n-${Date.now()}`,
+      type: 'squad_checkin',
+      title: 'Anonymous Report Received',
+      description: `Your anonymous report regarding ${payload.reportedMemberName} was securely sent to Trust & Safety.`,
+      timestamp: 'Just now',
+      read: false
+    };
+    setNotifications(prev => [notif, ...prev]);
+    addNotificationToDb(notif, user.id);
+
+    return response;
+  };
+
+
+  const shareProofToCommunity = (milestoneTitle: string, skillTag: string) => {
+    if (!ensureSurveyDone('share milestone proofs')) return;
+
+    const newUpdate: MacroSquadUpdate = {
+      id: `macro-up-${Date.now()}`,
+      authorName: user.name,
+      authorAvatar: user.avatar,
+      milestoneTitle,
+      skillTag,
+      timestamp: 'Just now',
+      congratsCount: 1,
+      userCongratulated: false
+    };
+
+    setMacroSquad(prev => ({
+      ...prev,
+      milestoneUpdates: [newUpdate, ...prev.milestoneUpdates]
+    }));
+
+    const notif: NotificationItem = {
+      id: `n-${Date.now()}`,
+      type: 'milestone',
+      title: 'Milestone Shared to Community',
+      description: `Your proof "${milestoneTitle}" is now visible to the global circle.`,
+      timestamp: 'Just now',
+      read: false
+    };
+    setNotifications(prev => [notif, ...prev]);
   };
 
   const congratulateMacroMilestone = (updateId: string) => {
@@ -1125,6 +1785,9 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         selectedStepModal,
         selectedCreatorModal,
         creatorUploadModalOpen,
+        selectedPracticeTask,
+        isPracticeSessionOpen,
+        isPracticeReviewMode,
         
         setActiveTab,
         setTheme,
@@ -1143,6 +1806,14 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setSelectedCreatorModal,
         setCreatorUploadModalOpen,
         setShowBingeQuizModal,
+        openPracticeSession,
+        closePracticeSession,
+        completePracticeSession,
+        practiceProgressMap,
+        savePracticeNote,
+        savePracticeVideoWatched,
+        savePracticeCodeSolution,
+        savePracticeQuizResult,
         
         toggleFocusTimer,
         resetFocusTimer,
@@ -1152,6 +1823,16 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         completeStep,
         checkInSquad,
         sendSquadNudge,
+        sendSquadCheer,
+        submitSquadProject,
+        joinSquadByCode,
+        createCustomSquad,
+        removeSquadMember,
+        updateSquadMemberRole,
+        updateSquadSettings,
+        regenerateSquadInviteCode,
+        submitAnonymousSquadReport,
+        shareProofToCommunity,
         congratulateMacroMilestone,
         createCommunityPost,
         toggleUpvotePost,

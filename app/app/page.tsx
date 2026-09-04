@@ -24,6 +24,7 @@ import { BingeQuizModal } from '../components/BingeQuizModal';
 import { ResetDemoModal } from '../components/ResetDemoModal';
 import { FloatingMascotBadge } from '../components/FloatingMascotBadge';
 import { SurveyPromptModal } from '../components/SurveyPromptModal';
+import { PracticeSessionModal } from '../components/PracticeSessionModal';
 
 export default function AppPage() {
   const router = useRouter();
@@ -60,6 +61,7 @@ export default function AppPage() {
         <BingeQuizModal />
         <ResetDemoModal />
         <SurveyPromptModal />
+        <PracticeSessionModal />
       </div>
     );
   }
@@ -127,6 +129,7 @@ export default function AppPage() {
       <BingeQuizModal />
       <ResetDemoModal />
       <SurveyPromptModal />
+      <PracticeSessionModal />
     </div>
   );
 }

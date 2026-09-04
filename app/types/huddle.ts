@@ -151,6 +151,16 @@ export interface CareerTimelineEntry {
   badge?: string;
 }
 
+export interface SquadProjectDeliverable {
+  memberId: string;
+  memberName: string;
+  memberAvatar: string;
+  title: string;
+  notes: string;
+  link?: string;
+  timestamp: string;
+}
+
 export interface SquadMember {
   id: string;
   name: string;
@@ -161,6 +171,8 @@ export interface SquadMember {
   lastCheckIn?: string;
   recentEncouragement?: string;
   role: 'member' | 'lead';
+  cheerCount?: number;
+  submittedProject?: boolean;
 }
 
 export interface SquadActivityPing {
@@ -170,7 +182,7 @@ export interface SquadActivityPing {
   memberAvatar: string;
   actionText: string;
   timestamp: string;
-  type: 'task_completed' | 'sprint_cleared' | 'nudge' | 'checkin';
+  type: 'task_completed' | 'sprint_cleared' | 'nudge' | 'checkin' | 'cheer' | 'project_submission';
 }
 
 export interface SquadProject {
@@ -181,6 +193,7 @@ export interface SquadProject {
   status: 'in_progress' | 'completed';
   submissionsCount: number;
   totalMembers: number;
+  deliverables?: SquadProjectDeliverable[];
 }
 
 export interface MicroSquad {
@@ -194,6 +207,13 @@ export interface MicroSquad {
   inviteCode: string;
   activityPings: SquadActivityPing[];
   activeProject?: SquadProject;
+}
+
+export interface SquadCreatePayload {
+  name: string;
+  skillFocus: string;
+  sharedGoal: string;
+  targetProgress: number;
 }
 
 export interface MacroSquadMember {
@@ -241,7 +261,7 @@ export interface CreatorPost {
   creatorHandle: string;
   creatorAvatar: string;
   creatorTitle: string;
-  sponsorBadge?: string; // e.g. "Sponsored by Khan Academy / AWS"
+  sponsorBadge?: string;
   skillTag: string;
   title: string;
   description: string;
@@ -353,3 +373,80 @@ export type ActiveTab =
   | 'creators'
   | 'progress'
   | 'profile';
+
+export interface PracticeVideoChapter {
+  timeSeconds: number;
+  title: string;
+}
+
+export interface PracticeVideoLesson {
+  title: string;
+  youtubeId?: string;
+  videoUrl?: string;
+  durationMinutes: number;
+  instructorName: string;
+  instructorTitle: string;
+  instructorAvatar: string;
+  chapters: PracticeVideoChapter[];
+  keyTakeaways: string[];
+}
+
+export interface PracticeCourseSection {
+  id: string;
+  title: string;
+  summary: string;
+  content: string;
+  codeSnippet?: string;
+  codeLanguage?: string;
+  diagramAscii?: string;
+  callout?: {
+    type: 'note' | 'warning' | 'production_tip';
+    title: string;
+    text: string;
+  };
+}
+
+export interface PracticeKnowledgeQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
+export interface PracticeSessionProgress {
+  id: string;
+  userId: string;
+  taskId: string;
+  sprintId: string;
+  completed: boolean;
+  completedAt?: string;
+  videoWatchedSeconds: number;
+  videoCompleted: boolean;
+  reflectionNotes: string;
+  userCode?: string;
+  quizAnswers?: Record<string, number>;
+  quizScore?: number;
+  timeSpentSeconds: number;
+}
+
+export type ReportReasonCategory = 
+  | 'harassment'
+  | 'inappropriate_content'
+  | 'spam_or_promotion'
+  | 'inactivity_ghosting'
+  | 'other';
+
+export interface AnonymousSquadReport {
+  id?: string;
+  squadId: string;
+  reportedMemberId: string;
+  reportedMemberName: string;
+  reporterHash?: string;
+  reasonCategory: ReportReasonCategory;
+  details?: string;
+  status?: 'pending' | 'reviewed' | 'dismissed';
+  createdAt?: string;
+}
+
+

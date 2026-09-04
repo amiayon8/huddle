@@ -15,6 +15,7 @@ import {
   ChevronUp,
   Lock,
   Trophy,
+  Video,
 } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
 import { DuolingoMascot } from "./DuolingoMascot";
@@ -29,6 +30,8 @@ export const DashboardView: React.FC = () => {
     isAppFocused,
     toggleFocusTimer,
     completeSprintTask,
+    openPracticeSession,
+    practiceProgressMap,
     reshuffleSprint,
     setActiveTab,
     setMascotOpen,
@@ -95,10 +98,10 @@ export const DashboardView: React.FC = () => {
           {!isSprintComplete ? (
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               <button
-                onClick={() => completeSprintTask(activeTask.id)}
-                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                onClick={() => openPracticeSession(activeTask, false)}
+                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
               >
-                <Play className="w-3.5 h-3.5" />
+                <Play className="w-3.5 h-3.5 fill-current" />
                 <span>Start practice • {activeTask.estimatedMinutes} min</span>
               </button>
               <span className="text-xs text-zinc-500">
@@ -162,6 +165,7 @@ export const DashboardView: React.FC = () => {
               (index === 0 || tasks[index - 1].completed);
             const isUpcoming = !isCompleted && !isCurrent;
             const isExpanded = expandedTaskId === task.id;
+            const progress = practiceProgressMap[task.id];
 
             const offsetClasses =
               index % 2 === 0 ? "sm:-translate-x-10" : "sm:translate-x-10";
@@ -183,9 +187,8 @@ export const DashboardView: React.FC = () => {
                   </div>
                 )}
 
-                {/* Node Button */}
                 <button
-                  onClick={() => completeSprintTask(task.id)}
+                  onClick={() => openPracticeSession(task, isCompleted)}
                   className={`relative z-10 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex flex-col items-center justify-center font-semibold transition-all cursor-pointer ${
                     isCompleted
                       ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
@@ -193,24 +196,31 @@ export const DashboardView: React.FC = () => {
                         ? "bg-indigo-600 hover:bg-indigo-700 text-white ring-4 ring-indigo-500/20 shadow-xs"
                         : "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300"
                   }`}
-                  title={isCompleted ? "Completed" : "Start practice"}
+                  title={isCompleted ? "View completed session & verified proof" : "Start online practice lesson"}
                 >
                   {isCompleted ? (
                     <Check className="w-5 h-5 stroke-[2.5]" />
                   ) : isCurrent ? (
-                    <Play className="w-4 h-4 ml-0.5" />
+                    <Play className="w-4 h-4 ml-0.5 fill-current" />
                   ) : (
                     <span className="text-sm">{task.dayNumber}</span>
                   )}
                 </button>
 
-                {/* Node Details */}
                 <div className="mt-2 text-center max-w-xs space-y-0.5">
-                  <div className="flex items-center justify-center gap-1 text-[11px] text-zinc-500">
+                  <div className="flex items-center justify-center gap-1.5 text-[11px] text-zinc-500 flex-wrap">
                     <span>Day {task.dayNumber} • {task.estimatedMinutes} min</span>
+                    <span className="inline-flex items-center gap-0.5 text-zinc-400" title="Includes video lecture">
+                      <Video className="w-3 h-3 text-red-500/80" />
+                    </span>
                     {task.producesArtifact && (
                       <span className="p-0.5 rounded text-indigo-600 dark:text-indigo-400" title="Produces verified artifact">
                         <FileCode className="w-3 h-3" />
+                      </span>
+                    )}
+                    {progress?.videoCompleted && (
+                      <span className="px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[10px] font-semibold">
+                        Watched
                       </span>
                     )}
                   </div>
@@ -229,7 +239,7 @@ export const DashboardView: React.FC = () => {
                     onClick={() =>
                       setExpandedTaskId(isExpanded ? null : task.id)
                     }
-                    className="inline-flex items-center gap-1 text-[11px] font-medium text-indigo-600 dark:text-indigo-400 hover:underline pt-0.5"
+                    className="inline-flex items-center gap-1 text-[11px] font-medium text-indigo-600 dark:text-indigo-400 hover:underline pt-0.5 cursor-pointer"
                   >
                     <span>{isExpanded ? "Hide details" : "View details"}</span>
                     {isExpanded ? (
@@ -240,10 +250,16 @@ export const DashboardView: React.FC = () => {
                   </button>
 
                   {isExpanded && (
-                    <div className="mt-2 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-left text-xs space-y-1.5 animate-in fade-in">
+                    <div className="mt-2 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-left text-xs space-y-2 animate-in fade-in">
                       <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed text-[11.5px]">
                         {task.description}
                       </p>
+                      {progress?.reflectionNotes && (
+                        <div className="pt-1.5 text-[11px] text-zinc-500 border-t border-zinc-200/60 dark:border-zinc-800/60">
+                          <span className="font-semibold text-zinc-700 dark:text-zinc-300 block">Saved Notes:</span>
+                          <p className="italic text-zinc-600 dark:text-zinc-400 truncate mt-0.5">{progress.reflectionNotes}</p>
+                        </div>
+                      )}
                       <div className="flex items-center gap-1.5 pt-1 text-[11px] text-zinc-500 border-t border-zinc-200/60 dark:border-zinc-800/60">
                         <img
                           src={task.creatorAvatar}

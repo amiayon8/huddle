@@ -1,25 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
-  <rect width="400" height="400" rx="40" fill="#2e3740" />
-  
-  <g transform="translate(100, 80)">
-    <!-- Connectivity Paths (Network/Pipelines) -->
-    <path d="M 40 40 L 40 160" fill="none" stroke="#e3efef" stroke-width="14" stroke-linecap="round" />
-    <path d="M 160 40 L 160 160" fill="none" stroke="#e3efef" stroke-width="14" stroke-linecap="round" />
-    <path d="M 40 100 L 160 100" fill="none" stroke="#e3efef" stroke-width="14" stroke-linecap="round" />
-    
-    <!-- 4-Member Squad / Stepping-Stone Nodes -->
-    <circle cx="40" cy="40" r="24" fill="#79c6c0" />
-    <circle cx="40" cy="160" r="24" fill="#79c8c0" />
-    <circle cx="160" cy="40" r="24" fill="#79c8c0" />
-    <circle cx="160" cy="160" r="24" fill="#79c6c0" />
-    
-    <!-- Inner Core (Deliberate Practice Focus) -->
-    <circle cx="40" cy="40" r="8" fill="#2e3740" />
-    <circle cx="40" cy="160" r="8" fill="#2e3740" />
-    <circle cx="160" cy="40" r="8" fill="#2e3740" />
-    <circle cx="160" cy="160" r="8" fill="#2e3740" />
-  </g>
-  
-  <!-- Logotype -->
-  <text x="200" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="46" font-weight="800" fill="#e3efef" text-anchor="middle" letter-spacing="4">HUDDLE</text>
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+	<style>
+		.s0 { fill: #2e3740 } 
+		.s1 { fill: none;stroke: #e3efef;stroke-linecap: round;stroke-width: 14 } 
+		.s2 { fill: #79c6c0 } 
+		.s3 { fill: #79c8c0 } 
+	</style>
+	<path id="Shape 3" fill-rule="evenodd" class="s0" d="m58 0h284c32.03 0 58 25.97 58 58v284c0 32.03-25.97 58-58 58h-284c-32.03 0-58-25.97-58-58v-284c0-32.03 25.97-58 58-58z"/>
+	<g>
+		<path class="s1" d="m57.14 57.14v285.72"/>
+		<path class="s1" d="m342.86 57.14v285.72"/>
+		<path class="s1" d="m57.14 200h285.72"/>
+		<path fill-rule="evenodd" class="s2" d="m57.14 114.29c-31.6 0-57.14-25.55-57.14-57.15 0-31.6 25.54-57.14 57.14-57.14 31.6 0 57.15 25.54 57.15 57.14 0 31.6-25.55 57.15-57.15 57.15z"/>
+		<path fill-rule="evenodd" class="s3" d="m57.14 400c-31.6 0-57.14-25.54-57.14-57.14 0-31.6 25.54-57.15 57.14-57.15 31.6 0 57.15 25.55 57.15 57.15 0 31.6-25.55 57.14-57.15 57.14z"/>
+		<path fill-rule="evenodd" class="s3" d="m342.86 114.29c-31.6 0-57.15-25.55-57.15-57.15 0-31.6 25.55-57.14 57.15-57.14 31.6 0 57.14 25.54 57.14 57.14 0 31.6-25.54 57.15-57.14 57.15z"/>
+		<path fill-rule="evenodd" class="s2" d="m342.86 400c-31.6 0-57.15-25.54-57.15-57.14 0-31.6 25.55-57.15 57.15-57.15 31.6 0 57.14 25.55 57.14 57.15 0 31.6-25.54 57.14-57.14 57.14z"/>
+		<path fill-rule="evenodd" class="s0" d="m57.14 76.19c-10.53 0-19.04-8.51-19.04-19.05 0-10.53 8.51-19.04 19.04-19.04 10.54 0 19.05 8.51 19.05 19.04 0 10.54-8.51 19.05-19.05 19.05z"/>
+		<path fill-rule="evenodd" class="s0" d="m57.14 361.9c-10.53 0-19.04-8.51-19.04-19.04 0-10.54 8.51-19.05 19.04-19.05 10.54 0 19.05 8.51 19.05 19.05 0 10.53-8.51 19.04-19.05 19.04z"/>
+		<path fill-rule="evenodd" class="s0" d="m342.86 76.19c-10.54 0-19.05-8.51-19.05-19.05 0-10.53 8.51-19.04 19.05-19.04 10.53 0 19.04 8.51 19.04 19.04 0 10.54-8.51 19.05-19.04 19.05z"/>
+		<path fill-rule="evenodd" class="s0" d="m342.86 361.9c-10.54 0-19.05-8.51-19.05-19.04 0-10.54 8.51-19.05 19.05-19.05 10.53 0 19.04 8.51 19.04 19.05 0 10.53-8.51 19.04-19.04 19.04z"/>
+	</g>
 </svg>
