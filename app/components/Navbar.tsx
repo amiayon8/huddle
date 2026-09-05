@@ -20,7 +20,9 @@ import {
   AlertCircle,
   Play,
   Pause,
+  Shield,
 } from "lucide-react";
+import Link from "next/link";
 import { useHuddle } from "../context/HuddleContext";
 import { ActiveTab } from "../types/huddle";
 
@@ -219,6 +221,17 @@ export const Navbar: React.FC = () => {
             </kbd>
           </button>
 
+          {user.role === "admin" && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-1.5 p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800/80 bg-indigo-50/60 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors shrink-0 cursor-pointer"
+              title="Open Admin Console"
+            >
+              <Shield className="w-3.5 h-3.5" />
+              <span className="hidden xl:inline text-[11px]">Admin</span>
+            </Link>
+          )}
+
           {!user.onboardingCompleted && (
             <button
               onClick={() => setOnboardingActive(true)}
@@ -412,6 +425,17 @@ export const Navbar: React.FC = () => {
                         <UserIcon className="w-3.5 h-3.5" />
                         Profile & Career
                       </button>
+
+                      {user.role === "admin" && (
+                        <Link
+                          href="/admin"
+                          onClick={() => setProfileDropdownOpen(false)}
+                          className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-left transition-colors cursor-pointer"
+                        >
+                          <Shield className="w-3.5 h-3.5" />
+                          <span>Admin Console</span>
+                        </Link>
+                      )}
 
                       <button
                         onClick={() => {

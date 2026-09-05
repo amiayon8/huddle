@@ -278,6 +278,8 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     joinedDate: "August 2026",
     primaryGoal: "Build resilient production software",
     careerMilestone: "Staff Backend & Distributed Systems Architect",
+    role: "admin",
+    status: "active",
     privacy: {
       showStreak: true,
       showSquad: true,

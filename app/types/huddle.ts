@@ -41,6 +41,8 @@ export interface UserProfile {
   joinedDate: string;
   primaryGoal: string;
   careerMilestone: string;
+  role?: 'admin' | 'user' | 'moderator';
+  status?: 'active' | 'suspended' | 'flagged';
   privacy: {
     showStreak: boolean;
     showSquad: boolean;
@@ -103,6 +105,23 @@ export interface SprintTask {
   producesArtifact?: boolean;
   artifactTitle?: string;
   artifactType?: 'code' | 'diagram' | 'summary' | 'live_demo';
+  realWorldActionDescription?: string;
+}
+
+export interface TaskTemplate {
+  id: string;
+  skillCategory: string;
+  dayNumber: number;
+  title: string;
+  description: string;
+  taskType: 'learn' | 'build' | 'real_world_proof';
+  creatorName: string;
+  creatorHandle: string;
+  creatorAvatar: string;
+  estimatedMinutes: number;
+  producesArtifact?: boolean;
+  artifactTitle?: string;
+  artifactType?: string;
   realWorldActionDescription?: string;
 }
 
@@ -451,4 +470,23 @@ export interface AnonymousSquadReport {
   createdAt?: string;
 }
 
+export interface AdminAuditLog {
+  id: string;
+  adminId: string;
+  adminName: string;
+  action: string;
+  targetType: string;
+  targetId?: string;
+  details?: Record<string, unknown>;
+  createdAt: string;
+}
 
+export interface AdminStats {
+  totalUsers: number;
+  totalSquads: number;
+  totalSprints: number;
+  totalReports: number;
+  pendingReports: number;
+  totalCurriculumTasks: number;
+  totalDiscussions: number;
+}

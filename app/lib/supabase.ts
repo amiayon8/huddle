@@ -18,6 +18,9 @@ import {
   MascotMessage,
   PracticeSessionProgress,
   AnonymousSquadReport,
+  AdminAuditLog,
+  AdminStats,
+  TaskTemplate,
 } from "../types/huddle";
 
 const supabaseUrl =
@@ -149,6 +152,8 @@ export async function fetchUserProfile(
       onboardingCompleted: data.onboarding_completed,
       surveyData: data.survey_data || undefined,
       joinedDate: "August 2026",
+      role: data.role || "user",
+      status: data.status || "active",
       privacy: data.privacy || {
         showStreak: true,
         showSquad: true,
@@ -163,9 +168,6 @@ export async function fetchUserProfile(
   }
 }
 
-/**
- * Update user profile in Supabase
- */
 export async function updateUserProfile(
   userId: string,
   updates: Partial<UserProfile>,
@@ -186,6 +188,8 @@ export async function updateUserProfile(
     if (updates.surveyData !== undefined)
       dbUpdates.survey_data = updates.surveyData;
     if (updates.privacy !== undefined) dbUpdates.privacy = updates.privacy;
+    if (updates.role !== undefined) dbUpdates.role = updates.role;
+    if (updates.status !== undefined) dbUpdates.status = updates.status;
 
     await supabase.from("profiles").update(dbUpdates).eq("id", userId);
   } catch (err) {
@@ -2145,3 +2149,421 @@ export async function fetchSearchSuggestions(): Promise<any[]> {
     return [];
   }
 }
+
+export async function logAdminAction(
+  adminId: string,
+  adminName: string,
+  action: string,
+  targetType: string,
+  targetId?: string,
+  details?: Record<string, unknown>,
+): Promise<void> {
+  try {
+    await supabase.from("admin_audit_logs").insert({
+      admin_id: adminId,
+      admin_name: adminName,
+      action,
+      target_type: targetType,
+      target_id: targetId || null,
+      details: details || {},
+    });
+  } catch (err) {
+    console.error("Failed to write admin audit log:", err);
+  }
+}
+
+export async function fetchAdminAuditLogs(): Promise<AdminAuditLog[]> {
+  try {
+    const { data, error } = await supabase
+      .from("admin_audit_logs")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(100);
+
+    if (error || !data) return [];
+    return data.map((d: any) => ({
+      id: d.id,
+      adminId: d.admin_id,
+      adminName: d.admin_name || "Admin",
+      action: d.action,
+      targetType: d.target_type,
+      targetId: d.target_id,
+      details: d.details || {},
+      createdAt: d.created_at,
+    }));
+  } catch (err) {
+    console.error("Error fetching audit logs:", err);
+    return [];
+  }
+}
+
+export async function fetchAdminStats(): Promise<AdminStats> {
+  try {
+    const [
+      usersRes,
+      squadsRes,
+      sprintsRes,
+      reportsRes,
+      pendingReportsRes,
+      tasksRes,
+      discussionsRes,
+    ] = await Promise.all([
+      supabase.from("profiles").select("id", { count: "exact", head: true }),
+      supabase.from("squads").select("id", { count: "exact", head: true }),
+      supabase.from("sprints").select("id", { count: "exact", head: true }),
+      supabase.from("squad_reports").select("id", { count: "exact", head: true }),
+      supabase
+        .from("squad_reports")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "pending"),
+      supabase.from("task_templates").select("id", { count: "exact", head: true }),
+      supabase.from("community_posts").select("id", { count: "exact", head: true }),
+    ]);
+
+    return {
+      totalUsers: usersRes.count ?? 0,
+      totalSquads: squadsRes.count ?? 0,
+      totalSprints: sprintsRes.count ?? 0,
+      totalReports: reportsRes.count ?? 0,
+      pendingReports: pendingReportsRes.count ?? 0,
+      totalCurriculumTasks: tasksRes.count ?? 0,
+      totalDiscussions: discussionsRes.count ?? 0,
+    };
+  } catch (err) {
+    console.error("Error fetching admin stats:", err);
+    return {
+      totalUsers: 0,
+      totalSquads: 0,
+      totalSprints: 0,
+      totalReports: 0,
+      pendingReports: 0,
+      totalCurriculumTasks: 0,
+      totalDiscussions: 0,
+    };
+  }
+}
+
+export async function fetchAllUsersAdmin(): Promise<UserProfile[]> {
+  try {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error || !data) return [];
+    return data.map((d: any) => ({
+      id: d.id,
+      name: d.name,
+      handle: d.handle,
+      email: d.email || "",
+      avatar: d.avatar,
+      bio: d.bio || "",
+      streak: d.streak ?? 0,
+      maxStreak: d.max_streak ?? 0,
+      reputation: d.reputation ?? 0,
+      squadId: d.squad_id,
+      macroSquadId: d.macro_squad_id,
+      primaryGoal: d.primary_goal,
+      careerMilestone: d.career_milestone,
+      onboardingCompleted: d.onboarding_completed,
+      surveyData: d.survey_data || undefined,
+      joinedDate: d.created_at ? new Date(d.created_at).toLocaleDateString() : "August 2026",
+      role: d.role || "user",
+      status: d.status || "active",
+      privacy: d.privacy || {
+        showStreak: true,
+        showSquad: true,
+        showReputation: true,
+        publicProfile: true,
+        hideRawRoadmaps: false,
+      },
+    }));
+  } catch (err) {
+    console.error("Error fetching all users for admin:", err);
+    return [];
+  }
+}
+
+export async function updateUserRoleAndStatusAdmin(
+  adminId: string,
+  adminName: string,
+  targetUserId: string,
+  role: "admin" | "user" | "moderator",
+  status: "active" | "suspended" | "flagged",
+): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ role, status, updated_at: new Date().toISOString() })
+      .eq("id", targetUserId);
+
+    if (error) throw error;
+
+    await logAdminAction(
+      adminId,
+      adminName,
+      "UPDATE_USER_PERMISSIONS",
+      "user",
+      targetUserId,
+      { newRole: role, newStatus: status },
+    );
+
+    return true;
+  } catch (err) {
+    console.error("Error updating user role/status:", err);
+    return false;
+  }
+}
+
+export async function fetchAllSquadsAdmin(): Promise<any[]> {
+  try {
+    const { data: squads, error: squadsErr } = await supabase
+      .from("squads")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (squadsErr || !squads) return [];
+
+    const { data: members } = await supabase.from("squad_members").select("*");
+
+    return squads.map((sq: any) => ({
+      id: sq.id,
+      name: sq.name,
+      skillFocus: sq.skill_focus,
+      sharedGoal: sq.shared_goal,
+      currentProgress: sq.current_progress,
+      targetProgress: sq.target_progress,
+      inviteCode: sq.invite_code,
+      createdAt: sq.created_at,
+      members: (members || [])
+        .filter((m: any) => m.squad_id === sq.id)
+        .map((m: any) => ({
+          id: m.id,
+          name: m.name,
+          handle: m.handle,
+          avatar: m.avatar,
+          streak: m.streak,
+          checkedInToday: m.checked_in_today,
+          role: m.role,
+        })),
+    }));
+  } catch (err) {
+    console.error("Error fetching squads for admin:", err);
+    return [];
+  }
+}
+
+export async function updateSquadAdmin(
+  adminId: string,
+  adminName: string,
+  squadId: string,
+  updates: {
+    name?: string;
+    skillFocus?: string;
+    sharedGoal?: string;
+    targetProgress?: number;
+  },
+): Promise<boolean> {
+  try {
+    const dbUpdates: any = {};
+    if (updates.name !== undefined) dbUpdates.name = updates.name;
+    if (updates.skillFocus !== undefined) dbUpdates.skill_focus = updates.skillFocus;
+    if (updates.sharedGoal !== undefined) dbUpdates.shared_goal = updates.sharedGoal;
+    if (updates.targetProgress !== undefined)
+      dbUpdates.target_progress = updates.targetProgress;
+
+    const { error } = await supabase
+      .from("squads")
+      .update(dbUpdates)
+      .eq("id", squadId);
+
+    if (error) throw error;
+
+    await logAdminAction(adminId, adminName, "UPDATE_SQUAD", "squad", squadId, updates);
+    return true;
+  } catch (err) {
+    console.error("Error updating squad:", err);
+    return false;
+  }
+}
+
+export async function fetchAllSquadReportsAdmin(): Promise<AnonymousSquadReport[]> {
+  try {
+    const { data, error } = await supabase
+      .from("squad_reports")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error || !data) return [];
+    return data.map((r: any) => ({
+      id: r.id,
+      squadId: r.squad_id,
+      reportedMemberId: r.reported_member_id,
+      reportedMemberName: r.reported_member_name || "Squad Member",
+      reasonCategory: r.reason_category,
+      details: r.details,
+      status: r.status,
+      createdAt: r.created_at,
+    }));
+  } catch (err) {
+    console.error("Error fetching squad reports:", err);
+    return [];
+  }
+}
+
+export async function resolveSquadReportAdmin(
+  adminId: string,
+  adminName: string,
+  reportId: string,
+  status: "reviewed" | "dismissed",
+): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from("squad_reports")
+      .update({ status })
+      .eq("id", reportId);
+
+    if (error) throw error;
+
+    await logAdminAction(
+      adminId,
+      adminName,
+      status === "reviewed" ? "RESOLVE_REPORT" : "DISMISS_REPORT",
+      "report",
+      reportId,
+      { status },
+    );
+    return true;
+  } catch (err) {
+    console.error("Error resolving squad report:", err);
+    return false;
+  }
+}
+
+export async function fetchAllTaskTemplatesAdmin(): Promise<TaskTemplate[]> {
+  try {
+    const { data, error } = await supabase
+      .from("task_templates")
+      .select("*")
+      .order("skill_category", { ascending: true })
+      .order("day_number", { ascending: true });
+
+    if (error || !data) return [];
+    return data.map((t: any) => ({
+      id: t.id,
+      skillCategory: t.skill_category,
+      dayNumber: t.day_number,
+      title: t.title,
+      description: t.description || "",
+      taskType: t.task_type || "learn",
+      creatorName: t.creator_name,
+      creatorHandle: t.creator_handle,
+      creatorAvatar: t.creator_avatar,
+      estimatedMinutes: t.estimated_minutes ?? 20,
+      producesArtifact: t.produces_artifact ?? false,
+      artifactTitle: t.artifact_title,
+      artifactType: t.artifact_type,
+      realWorldActionDescription: t.real_world_action_description,
+    }));
+  } catch (err) {
+    console.error("Error fetching task templates:", err);
+    return [];
+  }
+}
+
+export async function updateTaskTemplateAdmin(
+  adminId: string,
+  adminName: string,
+  taskId: string,
+  updates: Partial<TaskTemplate>,
+): Promise<boolean> {
+  try {
+    const dbUpdates: any = {};
+    if (updates.title !== undefined) dbUpdates.title = updates.title;
+    if (updates.description !== undefined) dbUpdates.description = updates.description;
+    if (updates.estimatedMinutes !== undefined)
+      dbUpdates.estimated_minutes = updates.estimatedMinutes;
+    if (updates.taskType !== undefined) dbUpdates.task_type = updates.taskType;
+    if (updates.artifactTitle !== undefined)
+      dbUpdates.artifact_title = updates.artifactTitle;
+
+    const { error } = await supabase
+      .from("task_templates")
+      .update(dbUpdates)
+      .eq("id", taskId);
+
+    if (error) throw error;
+
+    await logAdminAction(
+      adminId,
+      adminName,
+      "UPDATE_TASK_TEMPLATE",
+      "curriculum",
+      taskId,
+      updates,
+    );
+    return true;
+  } catch (err) {
+    console.error("Error updating task template:", err);
+    return false;
+  }
+}
+
+export async function fetchAllDiscussionsAdmin(): Promise<CommunityPost[]> {
+  try {
+    const { data, error } = await supabase
+      .from("community_posts")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error || !data) return [];
+    return data.map((p: any) => ({
+      id: p.id,
+      skillId: p.skill_id,
+      skillTitle: p.skill_title,
+      authorName: p.author_name,
+      authorHandle: p.author_handle,
+      authorAvatar: p.author_avatar,
+      authorReputation: p.author_reputation,
+      title: p.title,
+      content: p.content,
+      category: p.category,
+      upvotes: p.upvotes,
+      userUpvoted: p.user_upvoted,
+      repliesCount: p.replies_count,
+      replies: p.replies || [],
+      createdAt: p.created_at,
+    }));
+  } catch (err) {
+    console.error("Error fetching discussions for admin:", err);
+    return [];
+  }
+}
+
+export async function deleteDiscussionAdmin(
+  adminId: string,
+  adminName: string,
+  postId: string,
+): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from("community_posts")
+      .delete()
+      .eq("id", postId);
+
+    if (error) throw error;
+
+    await logAdminAction(
+      adminId,
+      adminName,
+      "DELETE_COMMUNITY_POST",
+      "discussion",
+      postId,
+    );
+    return true;
+  } catch (err) {
+    console.error("Error deleting discussion:", err);
+    return false;
+  }
+}
+
