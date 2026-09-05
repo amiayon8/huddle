@@ -123,9 +123,14 @@ export const Navbar: React.FC = () => {
             aria-label="Huddle Home"
           >
             <img
+              src="/logo_light.svg"
+              alt="Huddle"
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-contain shadow-xs group-hover:opacity-90 transition-opacity dark:hidden"
+            />
+            <img
               src="/logo.svg"
               alt="Huddle"
-              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-contain shadow-xs group-hover:opacity-90 transition-opacity"
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-contain shadow-xs group-hover:opacity-90 transition-opacity hidden dark:block"
             />
             <span className="font-bold text-sm sm:text-base tracking-tight text-zinc-900 dark:text-zinc-100">
               Huddle
@@ -257,7 +262,12 @@ export const Navbar: React.FC = () => {
               </button>
 
               {notificationDropdownOpen && (
-                <div className="fixed inset-x-3 top-16 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-88 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] shadow-xl p-3.5 z-50 animate-in fade-in duration-150">
+                <>
+                  <div
+                    className="fixed inset-0 z-40 sm:hidden bg-black/20 backdrop-blur-2xs"
+                    onClick={() => setNotificationDropdownOpen(false)}
+                  />
+                  <div className="fixed inset-x-3 top-16 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-88 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] shadow-xl p-3.5 z-50 animate-in fade-in duration-150">
                   <div className="flex items-center justify-between pb-2.5 border-b border-zinc-100 dark:border-zinc-800">
                     <h3 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
                       Notifications
@@ -290,6 +300,7 @@ export const Navbar: React.FC = () => {
                     ))}
                   </div>
                 </div>
+              </>
               )}
             </div>
           )}
@@ -323,7 +334,12 @@ export const Navbar: React.FC = () => {
               </button>
 
               {profileDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 max-w-[calc(100vw-1.5rem)] rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] shadow-xl p-1.5 z-50 animate-in fade-in duration-150">
+                <>
+                  <div
+                    className="fixed inset-0 z-40 sm:hidden bg-black/20 backdrop-blur-2xs"
+                    onClick={() => setProfileDropdownOpen(false)}
+                  />
+                  <div className="absolute right-0 top-full mt-2 w-56 max-w-[calc(100vw-1.5rem)] rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] shadow-xl p-1.5 z-50 animate-in fade-in duration-150">
                   <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800">
                     <div className="flex items-center justify-between gap-1.5">
                       <div className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 truncate">
@@ -452,6 +468,7 @@ export const Navbar: React.FC = () => {
                     </button>
                   </div>
                 </div>
+              </>
               )}
             </div>
           ) : (

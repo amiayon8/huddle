@@ -139,9 +139,14 @@ export const OnboardingFlow: React.FC = () => {
         <div className="px-6 pt-6 pb-4 border-b border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img
+              src="/logo_light.svg"
+              alt="Huddle"
+              className="w-7 h-7 rounded-lg object-contain dark:hidden"
+            />
+            <img
               src="/logo.svg"
               alt="Huddle"
-              className="w-7 h-7 rounded-lg object-contain"
+              className="w-7 h-7 rounded-lg object-contain hidden dark:block"
             />
             <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
               Step {step} of {totalSteps}

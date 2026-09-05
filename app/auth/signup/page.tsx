@@ -72,12 +72,16 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] flex items-center justify-center p-4 selection:bg-indigo-600 selection:text-white">
       <div className="w-full max-w-md bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl p-6 sm:p-8 space-y-6 animate-in fade-in duration-200">
-        {/* Brand Header */}
         <div className="flex items-center gap-3">
+          <img
+            src="/logo_light.svg"
+            alt="Huddle"
+            className="w-9 h-9 rounded-xl object-contain shadow-xs dark:hidden"
+          />
           <img
             src="/logo.svg"
             alt="Huddle"
-            className="w-9 h-9 rounded-xl object-contain shadow-xs"
+            className="w-9 h-9 rounded-xl object-contain shadow-xs hidden dark:block"
           />
           <div>
             <h1 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100">

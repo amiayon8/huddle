@@ -83,6 +83,7 @@ export const SquadView: React.FC = () => {
     shareProofToCommunity,
     congratulateMacroMilestone,
     setMascotOpen,
+    availableSquads,
   } = useHuddle();
 
   const [activeSquadTab, setActiveSquadTab] = useState<"micro" | "macro">("micro");
@@ -1223,7 +1224,7 @@ export const SquadView: React.FC = () => {
                     Available Track Squads
                   </div>
                   <div className="space-y-2">
-                    {presetAvailableSquads.map((preset) => {
+                    {availableSquads.map((preset) => {
                       const isCurrent = preset.id === squad.id;
                       return (
                         <div

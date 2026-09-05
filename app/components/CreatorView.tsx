@@ -31,10 +31,7 @@ export const CreatorView: React.FC = () => {
 
   const skillTags = [
     "All",
-    "System Architecture",
-    "Next.js App Router",
-    "Product UI & Micro-interactions",
-    "TypeScript Type Mechanics",
+    ...Array.from(new Set(creatorPosts.map((p) => p.skillTag).filter(Boolean))),
   ];
 
   const filteredPosts = creatorPosts.filter((p) => {

@@ -13,22 +13,21 @@ export const defaultActivityPings: SquadActivityPing[] = [];
 export const defaultMicroSquad: MicroSquad = {
   id: "squad-1",
   name: "System Architecture Crew",
-  skillCategory: "Backend & Systems",
-  avatar: "/avatars/avatar-1.svg",
+  skillFocus: "System Architecture",
+  sharedGoal: "Complete weekly deliberate engineering sessions.",
+  currentProgress: 0,
+  targetProgress: 12,
+  inviteCode: "HUDDLE-SYS-01",
   members: [],
   activityPings: [],
-  focusTrack: "System Architecture",
-  sprintNumber: 1,
-  inviteCode: "HUDDLE-SYS-01",
-  createdAt: new Date().toISOString(),
 };
 
 export const defaultMacroSquad: MacroSquad = {
   id: "macro-squad-1",
   name: "Distributed Systems Guild",
-  skillCategory: "Engineering",
-  memberCount: 0,
   description: "Senior and staff engineers designing distributed systems.",
+  trackCategory: "Engineering",
+  membersCount: 0,
   members: [],
   milestoneUpdates: [],
 };

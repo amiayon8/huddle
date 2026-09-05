@@ -22,6 +22,9 @@ import {
   UserSurveyData,
   SquadCreatePayload,
   SquadActivityPing,
+  SquadMember,
+  SquadProject,
+  SquadProjectDeliverable,
   MacroSquadUpdate,
   PracticeSessionProgress,
   AnonymousSquadReport,
@@ -1374,11 +1377,22 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     setSquad((prev) => {
-      const activeProject = prev.activeProject || defaultSquadProject;
+      const activeProject: SquadProject = prev.activeProject || {
+        id: "proj-1",
+        title: "Sprint Project",
+        description: "Shared engineering deliverable for this sprint",
+        deadline: "In 3 days",
+        status: "in_progress",
+        submissionsCount: 0,
+        totalMembers: 4,
+        deliverables: [],
+      };
       const existingSubmissions = activeProject.deliverables || [];
-      const updatedDeliverables = [
+      const updatedDeliverables: SquadProjectDeliverable[] = [
         deliverable,
-        ...existingSubmissions.filter((d) => d.memberId !== user.id),
+        ...existingSubmissions.filter(
+          (d: SquadProjectDeliverable) => d.memberId !== user.id,
+        ),
       ];
 
       return {

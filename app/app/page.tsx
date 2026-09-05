@@ -70,6 +70,8 @@ export default function AppPage() {
       if (fromAuthQuery && window.history.replaceState) {
         window.history.replaceState(null, '', window.location.pathname);
       }
+    } else {
+      setActiveTab('overview');
     }
   }, [setActiveTab]);
 
