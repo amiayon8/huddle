@@ -8,10 +8,7 @@ import {
   BookOpen,
   ExternalLink,
   Check,
-  Play,
-  FileText,
   ListChecks,
-  Award,
   Download
 } from 'lucide-react';
 import { useHuddle } from '../context/HuddleContext';
@@ -42,8 +39,8 @@ export const StepDetailModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="w-full max-w-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-xs animate-in fade-in duration-150">
+      <div className="w-full max-w-2xl bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
 
         <div className="px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
@@ -53,7 +50,7 @@ export const StepDetailModal: React.FC = () => {
 
           <button
             onClick={() => setSelectedStepModal(null)}
-            className="p-1 rounded-xl text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+            className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -80,7 +77,6 @@ export const StepDetailModal: React.FC = () => {
             </div>
           </div>
 
-          {/* Pip Companion Study Tip */}
           <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-800 flex items-start gap-3">
             <div className="w-9 h-9 p-1 rounded-lg bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-700 shrink-0 flex items-center justify-center">
               <img src="/mascot_deep_thinking.svg" alt="Pip" className="w-full h-full object-contain" />
@@ -144,7 +140,7 @@ export const StepDetailModal: React.FC = () => {
                 href={step.resourceUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-1 font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+                className="flex items-center gap-1 font-medium text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
               >
                 GitHub <ExternalLink className="w-3 h-3" />
               </a>
@@ -155,7 +151,7 @@ export const StepDetailModal: React.FC = () => {
         <div className="px-6 py-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50">
           <button
             onClick={() => setSelectedStepModal(null)}
-            className="px-3.5 py-2 rounded-xl text-xs font-medium text-zinc-600 dark:text-zinc-400 cursor-pointer"
+            className="px-3.5 py-2 rounded-xl text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             Close
           </button>
@@ -163,7 +159,7 @@ export const StepDetailModal: React.FC = () => {
           <button
             onClick={handleFinishStep}
             disabled={stepCompleted}
-            className="flex items-center gap-2 px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+            className="flex items-center gap-2 px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
           >
             {stepCompleted ? (
               <span className="flex items-center gap-1.5">

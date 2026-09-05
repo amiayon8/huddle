@@ -353,16 +353,16 @@ export const SquadView: React.FC = () => {
         <div className="flex items-center gap-2 self-start sm:self-auto">
           <button
             onClick={() => setIsSquadSwitcherOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 text-xs font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 text-xs font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors cursor-pointer"
           >
             <Compass className="w-3.5 h-3.5 text-indigo-500" />
             <span>Squad Hub</span>
           </button>
 
-          <div className="flex items-center p-0.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/70 border border-zinc-200/60 dark:border-zinc-700/60">
+          <div className="flex items-center p-0.5 rounded-lg bg-zinc-100 dark:bg-zinc-800/70 border border-zinc-200/60 dark:border-zinc-700/60">
             <button
               onClick={() => setActiveSquadTab("micro")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer ${
                 activeSquadTab === "micro"
                   ? "bg-white dark:bg-zinc-900 text-indigo-600 dark:text-indigo-400 shadow-2xs"
                   : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
@@ -374,7 +374,7 @@ export const SquadView: React.FC = () => {
 
             <button
               onClick={() => setActiveSquadTab("macro")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer ${
                 activeSquadTab === "macro"
                   ? "bg-white dark:bg-zinc-900 text-indigo-600 dark:text-indigo-400 shadow-2xs"
                   : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
@@ -468,7 +468,7 @@ export const SquadView: React.FC = () => {
                       {isEditingNote ? "Update Today's Note" : "Today's Squad Check-In"}
                     </h3>
                     <p className="text-xs text-zinc-500">
-                      Keep your 8-day streak alive and let your squad know what you explored today.
+                      Record your daily practice progress and let your squad know what you explored today.
                     </p>
                   </div>
                 </div>
@@ -529,7 +529,7 @@ export const SquadView: React.FC = () => {
                       Checked in for today
                     </span>
                     <span className="text-[11px] text-emerald-700 dark:text-emerald-400">
-                      Streak preserved (8 days)
+                      Daily progress recorded
                     </span>
                   </div>
                   <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 italic">
@@ -675,9 +675,9 @@ export const SquadView: React.FC = () => {
                   </div>
 
                   <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-medium text-[11px]">
-                      <Flame className="w-3.5 h-3.5 text-amber-500" />
-                      <span>{member.streak}d streak</span>
+                    <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium text-[11px]">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>{member.tasksCompleted || 3} milestones</span>
                     </div>
 
                     {isCurrentUser ? (

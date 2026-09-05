@@ -7,7 +7,7 @@ import {
   BookOpen,
   MessageSquare,
   User as UserIcon,
-  Flame,
+  CheckCircle2,
   Search,
   Bell,
   Moon,
@@ -47,6 +47,7 @@ export const Navbar: React.FC = () => {
     toggleFocusTimer,
     openAuthModal,
     setOnboardingActive,
+    sprint,
   } = useHuddle();
 
   const [notificationDropdownOpen, setNotificationDropdownOpen] =
@@ -125,12 +126,12 @@ export const Navbar: React.FC = () => {
             <img
               src="/logo_light.svg"
               alt="Huddle"
-              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-contain shadow-xs group-hover:opacity-90 transition-opacity dark:hidden"
+              className="w-7 h-7 sm:w-8 sm:h-8 object-contain shadow-xs group-hover:opacity-90 transition-opacity dark:hidden"
             />
             <img
               src="/logo.svg"
               alt="Huddle"
-              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-contain shadow-xs group-hover:opacity-90 transition-opacity hidden dark:block"
+              className="w-7 h-7 sm:w-8 sm:h-8 object-contain shadow-xs group-hover:opacity-90 transition-opacity hidden dark:block"
             />
             <span className="font-bold text-sm sm:text-base tracking-tight text-zinc-900 dark:text-zinc-100">
               Huddle
@@ -170,10 +171,17 @@ export const Navbar: React.FC = () => {
           {isAuthenticated && (
             <div
               className="flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] sm:text-xs font-semibold shrink-0"
-              title={`${user.streak} days daily practice streak`}
+              title={`Sprint Progress: ${sprint?.tasks ? sprint.tasks.filter((t) => t.completed).length : 0}/${sprint?.tasks?.length || 4} milestones`}
             >
-              <Flame className="w-3.5 h-3.5 text-amber-500" />
-              <span>{user.streak}</span>
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+              <span>
+                {Math.round(
+                  ((sprint?.tasks ? sprint.tasks.filter((t) => t.completed).length : 0) /
+                    Math.max(1, sprint?.tasks?.length || 4)) *
+                    100,
+                )}
+                %
+              </span>
             </div>
           )}
 
@@ -268,39 +276,39 @@ export const Navbar: React.FC = () => {
                     onClick={() => setNotificationDropdownOpen(false)}
                   />
                   <div className="fixed inset-x-3 top-16 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-88 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] shadow-xl p-3.5 z-50 animate-in fade-in duration-150">
-                  <div className="flex items-center justify-between pb-2.5 border-b border-zinc-100 dark:border-zinc-800">
-                    <h3 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                      Notifications
-                    </h3>
-                    <span className="text-[11px] text-zinc-500">
-                      {unreadNotificationCount} unread
-                    </span>
+                    <div className="flex items-center justify-between pb-2.5 border-b border-zinc-100 dark:border-zinc-800">
+                      <h3 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+                        Notifications
+                      </h3>
+                      <span className="text-[11px] text-zinc-500">
+                        {unreadNotificationCount} unread
+                      </span>
+                    </div>
+                    <div className="mt-2 space-y-1.5 max-h-72 overflow-y-auto">
+                      {notifications.map((notification) => (
+                        <div
+                          key={notification.id}
+                          onClick={() => markNotificationRead(notification.id)}
+                          className={`p-2.5 rounded-xl cursor-pointer text-xs transition-colors ${
+                            notification.read
+                              ? "bg-transparent text-zinc-500 dark:text-zinc-400"
+                              : "bg-indigo-50/50 dark:bg-indigo-950/30 text-zinc-900 dark:text-zinc-100 border border-indigo-100/80 dark:border-indigo-900/40"
+                          }`}
+                        >
+                          <div className="font-medium text-zinc-900 dark:text-zinc-100">
+                            {notification.title}
+                          </div>
+                          <div className="mt-0.5 leading-relaxed text-[11px] text-zinc-600 dark:text-zinc-400">
+                            {notification.description}
+                          </div>
+                          <div className="mt-1 text-[10px] text-zinc-400">
+                            {notification.timestamp}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="mt-2 space-y-1.5 max-h-72 overflow-y-auto">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        onClick={() => markNotificationRead(notification.id)}
-                        className={`p-2.5 rounded-xl cursor-pointer text-xs transition-colors ${
-                          notification.read
-                            ? "bg-transparent text-zinc-500 dark:text-zinc-400"
-                            : "bg-indigo-50/50 dark:bg-indigo-950/30 text-zinc-900 dark:text-zinc-100 border border-indigo-100/80 dark:border-indigo-900/40"
-                        }`}
-                      >
-                        <div className="font-medium text-zinc-900 dark:text-zinc-100">
-                          {notification.title}
-                        </div>
-                        <div className="mt-0.5 leading-relaxed text-[11px] text-zinc-600 dark:text-zinc-400">
-                          {notification.description}
-                        </div>
-                        <div className="mt-1 text-[10px] text-zinc-400">
-                          {notification.timestamp}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </>
+                </>
               )}
             </div>
           )}
@@ -340,135 +348,135 @@ export const Navbar: React.FC = () => {
                     onClick={() => setProfileDropdownOpen(false)}
                   />
                   <div className="absolute right-0 top-full mt-2 w-56 max-w-[calc(100vw-1.5rem)] rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] shadow-xl p-1.5 z-50 animate-in fade-in duration-150">
-                  <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800">
-                    <div className="flex items-center justify-between gap-1.5">
-                      <div className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 truncate">
-                        {user.name}
+                    <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800">
+                      <div className="flex items-center justify-between gap-1.5">
+                        <div className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 truncate">
+                          {user.name}
+                        </div>
+                        {isDemo && (
+                          <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 shrink-0">
+                            Demo
+                          </span>
+                        )}
                       </div>
-                      {isDemo && (
-                        <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 shrink-0">
-                          Demo
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-[10px] text-zinc-500 truncate">
-                      {user.handle}
-                    </div>
-                  </div>
-
-                  <div className="py-1">
-                    <div
-                      onClick={toggleFocusTimer}
-                      className="lg:hidden w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors"
-                    >
-                      <span className="flex items-center gap-2">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>Focus Time</span>
-                      </span>
-                      <span className="flex items-center gap-1.5 text-[10.5px]">
-                        <span className="font-mono">
-                          {formatFocusTime(secondsFocusedToday)}
-                        </span>
-                        {isTimerRunning ? (
-                          <Pause className="w-3 h-3 text-emerald-500" />
-                        ) : (
-                          <Play className="w-3 h-3 text-zinc-400" />
-                        )}
-                      </span>
+                      <div className="text-[10px] text-zinc-500 truncate">
+                        {user.handle}
+                      </div>
                     </div>
 
-                    <div
-                      onClick={toggleTheme}
-                      className="sm:hidden w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors"
-                    >
-                      <span className="flex items-center gap-2">
-                        {theme === "dark" ? (
-                          <Sun className="w-3.5 h-3.5" />
-                        ) : (
-                          <Moon className="w-3.5 h-3.5" />
-                        )}
-                        <span>Theme</span>
-                      </span>
-                      <span className="text-[10.5px] text-zinc-400 capitalize">
-                        {theme}
-                      </span>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        setActiveTab("profile");
-                        setProfileDropdownOpen(false);
-                      }}
-                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-left transition-colors cursor-pointer"
-                    >
-                      <UserIcon className="w-3.5 h-3.5" />
-                      Profile & Career
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setOnboardingActive(true);
-                        setProfileDropdownOpen(false);
-                      }}
-                      className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-left transition-colors cursor-pointer"
-                    >
-                      <span className="flex items-center gap-2">
-                        <RotateCcw className="w-3.5 h-3.5" />
-                        <span>
-                          {user.onboardingCompleted
-                            ? "Retake Intake Survey"
-                            : "Complete Intake Survey"}
-                        </span>
-                      </span>
-                      <span
-                        className={`text-[9.5px] font-bold px-1.5 py-0.2 rounded ${
-                          user.onboardingCompleted
-                            ? "bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400"
-                            : "bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400"
-                        }`}
+                    <div className="py-1">
+                      <div
+                        onClick={toggleFocusTimer}
+                        className="lg:hidden w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors"
                       >
-                        {user.onboardingCompleted ? "Done" : "Required"}
-                      </span>
-                    </button>
+                        <span className="flex items-center gap-2">
+                          <Clock className="w-3.5 h-3.5" />
+                          <span>Focus Time</span>
+                        </span>
+                        <span className="flex items-center gap-1.5 text-[10.5px]">
+                          <span className="font-mono">
+                            {formatFocusTime(secondsFocusedToday)}
+                          </span>
+                          {isTimerRunning ? (
+                            <Pause className="w-3 h-3 text-emerald-500" />
+                          ) : (
+                            <Play className="w-3 h-3 text-zinc-400" />
+                          )}
+                        </span>
+                      </div>
 
-                    <button
-                      onClick={() => {
-                        setSettingsOpen(true);
-                        setProfileDropdownOpen(false);
-                      }}
-                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-left transition-colors cursor-pointer"
-                    >
-                      <Settings className="w-3.5 h-3.5" />
-                      Settings
-                    </button>
+                      <div
+                        onClick={toggleTheme}
+                        className="sm:hidden w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors"
+                      >
+                        <span className="flex items-center gap-2">
+                          {theme === "dark" ? (
+                            <Sun className="w-3.5 h-3.5" />
+                          ) : (
+                            <Moon className="w-3.5 h-3.5" />
+                          )}
+                          <span>Theme</span>
+                        </span>
+                        <span className="text-[10.5px] text-zinc-400 capitalize">
+                          {theme}
+                        </span>
+                      </div>
 
-                    {isDemo && (
                       <button
                         onClick={() => {
+                          setActiveTab("profile");
                           setProfileDropdownOpen(false);
-                          setResetDemoModalOpen(true);
                         }}
-                        className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 text-left transition-colors cursor-pointer"
+                        className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-left transition-colors cursor-pointer"
                       >
-                        <RotateCcw className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                        <span>Full Reset</span>
+                        <UserIcon className="w-3.5 h-3.5" />
+                        Profile & Career
                       </button>
-                    )}
 
-                    <button
-                      onClick={async () => {
-                        await logout();
-                        setProfileDropdownOpen(false);
-                        openAuthModal("welcome");
-                      }}
-                      className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-left transition-colors cursor-pointer"
-                    >
-                      <LogOut className="w-3.5 h-3.5 shrink-0" />
-                      Sign Out
-                    </button>
+                      <button
+                        onClick={() => {
+                          setOnboardingActive(true);
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-left transition-colors cursor-pointer"
+                      >
+                        <span className="flex items-center gap-2">
+                          <RotateCcw className="w-3.5 h-3.5" />
+                          <span>
+                            {user.onboardingCompleted
+                              ? "Retake Intake Survey"
+                              : "Complete Intake Survey"}
+                          </span>
+                        </span>
+                        <span
+                          className={`text-[9.5px] font-bold px-1.5 py-0.2 rounded ${
+                            user.onboardingCompleted
+                              ? "bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400"
+                              : "bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400"
+                          }`}
+                        >
+                          {user.onboardingCompleted ? "Done" : "Required"}
+                        </span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setSettingsOpen(true);
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-left transition-colors cursor-pointer"
+                      >
+                        <Settings className="w-3.5 h-3.5" />
+                        Settings
+                      </button>
+
+                      {isDemo && (
+                        <button
+                          onClick={() => {
+                            setProfileDropdownOpen(false);
+                            setResetDemoModalOpen(true);
+                          }}
+                          className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 text-left transition-colors cursor-pointer"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                          <span>Full Reset</span>
+                        </button>
+                      )}
+
+                      <button
+                        onClick={async () => {
+                          await logout();
+                          setProfileDropdownOpen(false);
+                          openAuthModal("welcome");
+                        }}
+                        className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-left transition-colors cursor-pointer"
+                      >
+                        <LogOut className="w-3.5 h-3.5 shrink-0" />
+                        Sign Out
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </>
+                </>
               )}
             </div>
           ) : (

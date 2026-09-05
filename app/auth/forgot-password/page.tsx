@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
     setLoading(false);
 
     if (!res.success) {
-      setErrorMessage(res.error || "Unable to dispatch reset email.");
+      setErrorMessage(res.error || "Unable to dispatch password reset email.");
     } else {
       setSent(true);
     }
@@ -44,20 +44,20 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] flex items-center justify-center p-4 selection:bg-indigo-600 selection:text-white">
-      <div className="w-full max-w-md bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl p-6 sm:p-8 space-y-6 animate-in fade-in duration-200">
+      <div className="w-full max-w-md bg-white dark:bg-[#111218] border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl shadow-xs p-6 sm:p-8 space-y-6 animate-in fade-in duration-150">
         <div className="flex items-center gap-3">
           <img
             src="/logo_light.svg"
             alt="Huddle"
-            className="w-9 h-9 rounded-xl object-contain shadow-xs dark:hidden"
+            className="w-8 h-8 rounded-lg object-contain dark:hidden"
           />
           <img
             src="/logo.svg"
             alt="Huddle"
-            className="w-9 h-9 rounded-xl object-contain shadow-xs hidden dark:block"
+            className="w-8 h-8 rounded-lg object-contain hidden dark:block"
           />
           <div>
-            <h1 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
               Reset Password
             </h1>
             <p className="text-xs text-zinc-500">
@@ -66,31 +66,24 @@ export default function ForgotPasswordPage() {
           </div>
         </div>
 
-        {/* Pip Note */}
-        <div className="p-3.5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex items-center gap-3.5">
-          <div className="relative shrink-0 w-12 h-12">
+        <div className="p-3.5 rounded-lg bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 flex items-center gap-3">
+          <div className="relative shrink-0 w-9 h-9 rounded-lg bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-700 p-1 flex items-center justify-center">
             <img
               src="/mascot_thinking.svg"
               alt="Pip"
-              className="w-full h-full object-contain drop-shadow-xs transition-transform hover:scale-110"
+              className="w-full h-full object-contain"
             />
           </div>
-          <div className="text-xs text-zinc-700 dark:text-zinc-300">
-            <span className="font-semibold text-indigo-600 dark:text-indigo-400 block text-[11px] uppercase tracking-wider">
-              Pip Companion
-            </span>
-            <span>
-              Forgot your credentials? Enter your email and Pip will help you
-              recover access.
-            </span>
+          <div className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            Enter the email address registered with your Huddle account to securely receive a password reset link.
           </div>
         </div>
 
         {sent ? (
-          <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 text-xs text-emerald-800 dark:text-emerald-300 space-y-2">
+          <div className="p-4 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 text-xs text-emerald-800 dark:text-emerald-300 space-y-2">
             <div className="flex items-center gap-2 font-semibold">
               <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-              <span>Password reset link dispatched</span>
+              <span>Password reset link sent</span>
             </div>
             <p className="text-emerald-700 dark:text-emerald-400 leading-relaxed text-[11px]">
               If an account exists for <strong>{email}</strong>, you will
@@ -102,21 +95,21 @@ export default function ForgotPasswordPage() {
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Return to Log In</span>
+                <span>Return to Sign In</span>
               </Link>
             </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             {errorMessage && (
-              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40 text-xs text-rose-700 dark:text-rose-300 flex items-center gap-2">
+              <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40 text-xs text-rose-700 dark:text-rose-300 flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{errorMessage}</span>
               </div>
             )}
             <div className="space-y-1">
               <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
-                Email address
+                Email Address
               </label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-2.5 w-4 h-4 text-zinc-400" />
@@ -126,7 +119,7 @@ export default function ForgotPasswordPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="alex@example.com"
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full pl-10 pr-3.5 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-[#0f1015] text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
             </div>
@@ -134,7 +127,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-xs transition-colors mt-2"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-medium shadow-xs transition-colors cursor-pointer"
             >
               {loading ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -149,7 +142,7 @@ export default function ForgotPasswordPage() {
                 className="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
               >
                 <ArrowLeft className="w-3 h-3" />
-                <span>Back to Log In</span>
+                <span>Back to Sign In</span>
               </Link>
             </div>
           </form>

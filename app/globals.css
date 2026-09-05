@@ -13,9 +13,9 @@
   --text-primary: #111827;
   --text-secondary: #4b5563;
   --text-muted: #9ca3af;
-  --accent: #4f46e5;
-  --accent-hover: #4338ca;
-  --accent-subtle: rgba(79, 70, 229, 0.08);
+  --accent: #4338ca;
+  --accent-hover: #3730a3;
+  --accent-subtle: rgba(67, 56, 202, 0.08);
 }
 
 .dark {
@@ -45,7 +45,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Clean Scrollbar */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -64,7 +68,6 @@ body {
   background: rgba(140, 140, 150, 0.35);
 }
 
-/* Hide scrollbar for tabs */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }

@@ -1,31 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import confetti from "canvas-confetti";
 import {
   ArrowRight,
   ArrowLeft,
   Check,
-  Target,
-  Clock,
-  Zap,
-  Cpu,
-  Layers,
-  Code2,
-  Palette,
-  Bot,
-  ChevronRight,
-  ShieldCheck,
   CheckCircle2,
-  HelpCircle,
   Loader2,
-  BookOpen,
-  Gamepad2,
-  Music,
-  Activity,
-  PenTool,
-  Compass,
-  Briefcase,
   Calendar,
 } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
@@ -60,19 +41,16 @@ export const LandingQuestionnaire: React.FC = () => {
   const [step, setStep] = useState(1);
   const totalSteps = 5;
 
-  // Question 1: Favourite Subjects (Multiple)
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([
     "Computer Science/ICT",
   ]);
   const [subjectsOther, setSubjectsOther] = useState("");
   const [subjectsOtherActive, setSubjectsOtherActive] = useState(false);
 
-  // Question 2: Hobbies
   const [selectedHobbies, setSelectedHobbies] = useState<string[]>(["Gaming"]);
   const [hobbiesOther, setHobbiesOther] = useState("");
   const [hobbiesOtherActive, setHobbiesOtherActive] = useState(false);
 
-  // Question 3: Age & Stage
   const [ageInput, setAgeInput] = useState<string>("22");
   const [selectedAge, setSelectedAge] = useState<string>(
     "Early Career / Rising Engineer",
@@ -80,7 +58,6 @@ export const LandingQuestionnaire: React.FC = () => {
   const [ageOther, setAgeOther] = useState("");
   const [ageOtherActive, setAgeOtherActive] = useState(false);
 
-  // Helper to compute stage from age or birthyear input
   const getStageFromInput = (val: string) => {
     const num = parseInt(val.trim(), 10);
     if (isNaN(num) || num <= 0) {
@@ -133,23 +110,19 @@ export const LandingQuestionnaire: React.FC = () => {
 
   const calculatedStage = getStageFromInput(ageInput);
 
-  // Question 4: Profession (AI Dynamic)
   const [selectedProfession, setSelectedProfession] = useState<string>("");
   const [professionOther, setProfessionOther] = useState("");
   const [professionOtherActive, setProfessionOtherActive] = useState(false);
 
-  // Question 5: Skills (AI Dynamic, Multiple)
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [skillsOther, setSkillsOther] = useState("");
   const [skillsOtherActive, setSkillsOtherActive] = useState(false);
 
-  // Dynamic question data fetched from AI
   const [dynamicQuestion, setDynamicQuestion] =
     useState<DynamicQuestionData | null>(null);
   const [isLoadingDynamic, setIsLoadingDynamic] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
 
-  // Mascot emotion map
   const mascotMap: Record<string, string> = {
     idle: "/mascot_idle.svg",
     encouragement: "/mascot_encouragement.svg",
@@ -214,7 +187,6 @@ export const LandingQuestionnaire: React.FC = () => {
     };
   }, []);
 
-  // Fetch AI dynamic question data whenever step changes to 2, 3, 4, or 5
   useEffect(() => {
     if (step === 1) {
       setDynamicQuestion(null);
@@ -251,7 +223,6 @@ export const LandingQuestionnaire: React.FC = () => {
           if (json.success && json.data) {
             setDynamicQuestion(json.data);
 
-            // Auto-select first option if none selected for single-choice steps
             if (step === 4 && !selectedProfession && json.data.options?.[0]) {
               setSelectedProfession(json.data.options[0].title);
             }
@@ -265,7 +236,7 @@ export const LandingQuestionnaire: React.FC = () => {
           }
         }
       } catch (e) {
-        console.error("Failed to load dynamic question from AI:", e);
+        console.error(e);
       } finally {
         setIsLoadingDynamic(false);
       }
@@ -274,7 +245,6 @@ export const LandingQuestionnaire: React.FC = () => {
     fetchDynamicQuestion();
   }, [step]);
 
-  // Toggle multi-select item
   const toggleSelection = (
     list: string[],
     setList: (val: string[]) => void,
@@ -293,13 +263,7 @@ export const LandingQuestionnaire: React.FC = () => {
     if (step < totalSteps) {
       setStep((prev) => prev + 1);
     } else {
-      // Complete Onboarding
       setIsFinishing(true);
-      confetti({
-        particleCount: 60,
-        spread: 70,
-        origin: { y: 0.7 },
-      });
 
       const finalSkills = [
         ...selectedSkills,
@@ -335,7 +299,7 @@ export const LandingQuestionnaire: React.FC = () => {
           surveyPayload,
         );
         setIsFinishing(false);
-      }, 700);
+      }, 500);
     }
   };
 
@@ -350,7 +314,6 @@ export const LandingQuestionnaire: React.FC = () => {
     setOnboardingActive(false);
   };
 
-  // Determine current mascot emotion and note
   const currentMascotEmotion = isLoadingDynamic
     ? "deep_thinking"
     : dynamicQuestion?.mascotEmotion ||
@@ -367,14 +330,14 @@ export const LandingQuestionnaire: React.FC = () => {
   const currentMascotNote =
     dynamicQuestion?.mascotNote ||
     (step === 1
-      ? "Pick your favourite subjects! I'll generate customized questions and career paths tailored to your passions."
+      ? "Select your core subjects. Huddle personalizes technical analogies and paths around your background."
       : step === 2
-        ? "Hobbies reveal your natural flow state. Let me know what you love doing outside study!"
+        ? "Hobbies help create intuitive mental models and engineering analogies."
         : step === 3
-          ? "Every age is prime time for deliberate practice. 15 minutes a day builds unstoppable proof."
+          ? "15 minutes of deliberate practice daily builds tangible technical proof."
           : step === 4
-            ? "Pip curated these high-leverage roles matching your background and passions."
-            : "Choose which skills you want to conquer in your initial 4-day sprint!");
+            ? "Select your primary engineering role target."
+            : "Choose which skill to focus on in your 4-day sprint.");
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-100 flex flex-col justify-between p-4 sm:p-6 lg:p-8 font-sans transition-colors selection:bg-indigo-600 selection:text-white">
@@ -383,19 +346,19 @@ export const LandingQuestionnaire: React.FC = () => {
           <img
             src="/logo_light.svg"
             alt="Huddle"
-            className="w-9 h-9 rounded-xl object-contain shadow-xs dark:hidden"
+            className="w-8 h-8 rounded-xl object-contain shadow-xs dark:hidden"
           />
           <img
             src="/logo.svg"
             alt="Huddle"
-            className="w-9 h-9 rounded-xl object-contain shadow-xs hidden dark:block"
+            className="w-8 h-8 rounded-xl object-contain shadow-xs hidden dark:block"
           />
           <div>
             <span className="font-semibold text-sm tracking-tight text-zinc-900 dark:text-zinc-100">
-              Huddle • Dynamic Intake
+              Huddle
             </span>
             <span className="block text-[10.5px] text-zinc-500">
-              AI Tailored Deliberate Practice
+              Technical Onboarding Survey
             </span>
           </div>
         </div>
@@ -403,20 +366,17 @@ export const LandingQuestionnaire: React.FC = () => {
         <button
           onClick={handleSkip}
           disabled={isLoadingDynamic || isFinishing}
-          className="text-xs font-medium text-zinc-500 hover:text-amber-600 dark:hover:text-amber-400 transition-colors px-2.5 py-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40 disabled:pointer-events-none"
-          title="Browse in preview mode (actions locked until survey completed)"
+          className="text-xs font-medium text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors px-2.5 py-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
         >
-          Skip to Preview Mode →
+          Preview Mode →
         </button>
       </header>
 
-      {/* Main Questionnaire Container */}
       <main className="max-w-xl w-full mx-auto my-auto py-6 sm:py-8">
-        {/* Step Progress Bar */}
         <div className="mb-5 space-y-1.5">
           <div className="flex items-center justify-between text-xs text-zinc-400">
             <span className="font-semibold text-zinc-700 dark:text-zinc-300">
-              Question {step} of {totalSteps}
+              Step {step} of {totalSteps}
             </span>
             <span className="text-[11px] font-mono">
               {Math.round((step / totalSteps) * 100)}%
@@ -430,24 +390,23 @@ export const LandingQuestionnaire: React.FC = () => {
           </div>
         </div>
 
-        {/* Pip AI Guidance Card */}
-        <div className="mb-6 p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50 flex items-center gap-4 shadow-2xs transition-all">
-          <div className="relative shrink-0 w-14 h-14 sm:w-16 sm:h-16 p-1 rounded-2xl bg-white/80 dark:bg-[#111218]/80 border border-indigo-200/80 dark:border-indigo-800/60 shadow-xs flex items-center justify-center">
+        <div className="mb-6 p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center gap-4 transition-colors">
+          <div className="relative shrink-0 w-12 h-12 p-1 rounded-lg bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-700 flex items-center justify-center">
             <img
               src={mascotMap[currentMascotEmotion] || "/mascot_idle.svg"}
               alt="Pip"
-              className="w-full h-full object-contain drop-shadow-xs transition-transform hover:scale-105"
+              className="w-full h-full object-contain"
             />
           </div>
           <div className="text-xs text-zinc-700 dark:text-zinc-300 flex-1">
             <div className="font-semibold text-indigo-600 dark:text-indigo-400 text-[11px] uppercase tracking-wider mb-0.5">
-              Pip Intake Tutor
+              Pip Companion
             </div>
             <p className="leading-relaxed text-[12px]">
               {isLoadingDynamic ? (
                 <span className="inline-flex items-center gap-1.5 text-indigo-600 dark:text-indigo-300">
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  Generating tailored questions with AI based on your inputs...
+                  Calibrating next step...
                 </span>
               ) : (
                 currentMascotNote
@@ -456,94 +415,78 @@ export const LandingQuestionnaire: React.FC = () => {
           </div>
         </div>
 
-        {/* Dynamic Question Render Area (Blocked when AI is thinking) */}
         {isLoadingDynamic ? (
-          <div className="py-10 px-6 rounded-2xl border border-indigo-200/80 dark:border-indigo-900/60 bg-indigo-50/50 dark:bg-indigo-950/20 flex flex-col items-center justify-center text-center space-y-4 animate-in fade-in zoom-in-95 duration-200 select-none pointer-events-none">
-            <div className="relative">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 p-2 rounded-3xl bg-white dark:bg-[#111218] border-2 border-indigo-500 shadow-xl flex items-center justify-center animate-bounce">
-                <img
-                  src="/mascot_deep_thinking.svg"
-                  alt="Pip AI Thinking"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <span className="absolute -top-1 -right-1 flex h-4 w-4">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-500" />
-              </span>
+          <div className="py-10 px-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] flex flex-col items-center justify-center text-center space-y-4 animate-in fade-in duration-200 select-none pointer-events-none">
+            <div className="w-16 h-16 p-2 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center">
+              <img
+                src="/mascot_deep_thinking.svg"
+                alt="Pip AI Thinking"
+                className="w-full h-full object-contain opacity-80"
+              />
             </div>
 
             <div className="space-y-1.5 max-w-sm">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-xs font-semibold">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold">
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span>Pip AI is Thinking</span>
+                <span>Calibrating</span>
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
                 Calibrating Step {step}...
               </h3>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                Pip is computing relevant pathways based on your background. All
-                inputs are temporarily locked to ensure accuracy.
+                Evaluating path options for your selected discipline.
               </p>
             </div>
 
-            {/* Skeleton placeholders */}
             <div className="w-full max-w-md space-y-2.5 pt-2">
-              <div className="h-14 rounded-xl bg-indigo-100/60 dark:bg-indigo-950/40 border border-indigo-200/40 dark:border-indigo-900/40 animate-pulse flex items-center px-4 gap-3">
-                <div className="w-5 h-5 rounded-md bg-indigo-200 dark:bg-indigo-900/60" />
-                <div className="h-3.5 w-40 bg-indigo-200/80 dark:bg-indigo-900/60 rounded" />
+              <div className="h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 animate-pulse flex items-center px-4 gap-3">
+                <div className="w-4 h-4 rounded bg-zinc-200 dark:bg-zinc-700" />
+                <div className="h-3 w-40 bg-zinc-200 dark:bg-zinc-700 rounded" />
               </div>
-              <div className="h-14 rounded-xl bg-indigo-100/60 dark:bg-indigo-950/40 border border-indigo-200/40 dark:border-indigo-900/40 animate-pulse delay-100 flex items-center px-4 gap-3">
-                <div className="w-5 h-5 rounded-md bg-indigo-200 dark:bg-indigo-900/60" />
-                <div className="h-3.5 w-48 bg-indigo-200/80 dark:bg-indigo-900/60 rounded" />
-              </div>
-              <div className="h-14 rounded-xl bg-indigo-100/60 dark:bg-indigo-950/40 border border-indigo-200/40 dark:border-indigo-900/40 animate-pulse delay-200 flex items-center px-4 gap-3">
-                <div className="w-5 h-5 rounded-md bg-indigo-200 dark:bg-indigo-900/60" />
-                <div className="h-3.5 w-32 bg-indigo-200/80 dark:bg-indigo-900/60 rounded" />
+              <div className="h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 animate-pulse flex items-center px-4 gap-3">
+                <div className="w-4 h-4 rounded bg-zinc-200 dark:bg-zinc-700" />
+                <div className="h-3 w-48 bg-zinc-200 dark:bg-zinc-700 rounded" />
               </div>
             </div>
           </div>
         ) : (
           <div className="space-y-4 animate-in fade-in duration-200">
-            {/* Question Title & Subtitle */}
             <div>
               <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                {step === 1 && "1) Favourite Subject"}
-                {step === 2 && "2) Hobby & Passions"}
-                {step === 3 && "3) Age & Stage"}
-                {step === 4 && "4) Target Profession (AI Curated)"}
-                {step === 5 && "5) Starting Skills (AI Tailored)"}
+                {step === 1 && "Step 1: Focus Area"}
+                {step === 2 && "Step 2: Mental Models & Analogies"}
+                {step === 3 && "Step 3: Learning Stage"}
+                {step === 4 && "Step 4: Target Role"}
+                {step === 5 && "Step 5: Starting Sprint Skill"}
               </span>
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mt-0.5">
                 {step === 1
-                  ? "What is your favourite subject? (Multiple)"
+                  ? "What are your core engineering interests?"
                   : step === 3
-                    ? "How would you describe your current learning stage?"
+                    ? "What is your current engineering stage?"
                     : dynamicQuestion?.question ||
                       (step === 2
-                        ? "What is your hobby?"
+                        ? "What are your hobbies or outside interests?"
                         : step === 4
-                          ? "What do you want to be (profession)?"
-                          : "Which skill do you want to start with? (Multiple)")}
+                          ? "What role are you targeting?"
+                          : "Which skill would you like to practice first?")}
               </h1>
               <p className="text-xs text-zinc-500 mt-0.5 leading-relaxed">
                 {step === 1
-                  ? "Select all subjects that spark your curiosity. Plus specify custom subjects in Other."
+                  ? "Select one or more topics. You can also specify custom areas."
                   : step === 3
-                    ? "Pip tunes your sprint intensity, schedule rhythms, and daily depth to match where you are right now."
+                    ? "Huddle calibrates daily scope and challenge depth to your experience."
                     : dynamicQuestion?.subtitle ||
-                      "Pip calibrates your daily sprint options around this answer."}
+                      "Select the option that best fits your goals."}
               </p>
             </div>
 
-            {/* Options Grid */}
             <div className="space-y-2.5 pt-1">
-              {/* Step 3: Plain Number Input or Birth Year Input Card */}
               {step === 3 && (
-                <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#111218] border-2 border-indigo-500/40 shadow-xs space-y-3">
+                <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+                      <div className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
                         <Calendar className="w-4 h-4" />
                       </div>
                       <div>
@@ -551,15 +494,15 @@ export const LandingQuestionnaire: React.FC = () => {
                           htmlFor="age-birthyear-input"
                           className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 block"
                         >
-                          Enter your Age or Birth Year
+                          Age or Birth Year
                         </label>
                         <p className="text-[11px] text-zinc-500">
-                          Type your age (e.g. 22) or birth year (e.g. 2004)
+                          Enter your age or birth year (e.g. 24 or 2002)
                         </p>
                       </div>
                     </div>
                     {calculatedStage.age && (
-                      <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+                      <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
                         {calculatedStage.age} years old
                       </span>
                     )}
@@ -571,7 +514,7 @@ export const LandingQuestionnaire: React.FC = () => {
                       type="number"
                       min={10}
                       max={2026}
-                      placeholder="e.g. 22 or 2004"
+                      placeholder="e.g. 24"
                       value={ageInput}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -584,31 +527,29 @@ export const LandingQuestionnaire: React.FC = () => {
                           setAgeOtherActive(false);
                         }
                       }}
-                      className="w-full px-4 py-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-900/50 text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono transition-all"
+                      className="w-full px-4 py-2 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-900/50 text-base font-bold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono transition-all"
                     />
                   </div>
 
-                  {/* Real-time Stage Result Display */}
-                  <div className="p-3 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex items-center justify-between text-xs">
+                  <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-700/60 flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                       <span className="text-zinc-700 dark:text-zinc-300">
-                        Calibrated Stage:{" "}
+                        Calculated level:{" "}
                         <strong>{calculatedStage.stage}</strong>
                       </span>
                     </div>
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/40">
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
                       {calculatedStage.badge}
                     </span>
                   </div>
 
                   <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider pt-1">
-                    Or select a learning stage:
+                    Or select a level directly:
                   </div>
                 </div>
               )}
 
-              {/* Step 1: Base Subjects */}
               {step === 1 &&
                 baseSubjects.map((sub) => {
                   const isSelected = selectedSubjects.includes(sub.title);
@@ -622,7 +563,7 @@ export const LandingQuestionnaire: React.FC = () => {
                           sub.title,
                         )
                       }
-                      className={`w-full p-3.5 rounded-xl border text-left transition-all flex items-center justify-between group ${
+                      className={`w-full p-3.5 rounded-xl border text-left transition-all flex items-center justify-between group cursor-pointer ${
                         isSelected
                           ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/30 ring-1 ring-indigo-500/20"
                           : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] hover:border-zinc-300 dark:hover:border-zinc-700"
@@ -658,7 +599,6 @@ export const LandingQuestionnaire: React.FC = () => {
                   );
                 })}
 
-              {/* Steps 2-5: Dynamic Options from AI */}
               {step > 1 &&
                 dynamicQuestion?.options?.map((opt) => {
                   const isMulti = dynamicQuestion.isMultiple;
@@ -696,7 +636,7 @@ export const LandingQuestionnaire: React.FC = () => {
                     <button
                       key={opt.id}
                       onClick={handleSelect}
-                      className={`w-full p-3.5 rounded-xl border text-left transition-all flex items-center justify-between group ${
+                      className={`w-full p-3.5 rounded-xl border text-left transition-all flex items-center justify-between group cursor-pointer ${
                         isSelected
                           ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/30 ring-1 ring-indigo-500/20"
                           : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] hover:border-zinc-300 dark:hover:border-zinc-700"
@@ -720,7 +660,7 @@ export const LandingQuestionnaire: React.FC = () => {
                               {opt.title}
                             </span>
                             {opt.badge && (
-                              <span className="text-[9.5px] font-medium px-1.5 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+                              <span className="text-[9.5px] font-medium px-1.5 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
                                 {opt.badge}
                               </span>
                             )}
@@ -734,7 +674,6 @@ export const LandingQuestionnaire: React.FC = () => {
                   );
                 })}
 
-              {/* Custom "Other: ________" Option Card on EVERY Step */}
               <div
                 className={`p-3.5 rounded-xl border transition-all ${
                   (step === 1 && subjectsOtherActive) ||
@@ -779,7 +718,7 @@ export const LandingQuestionnaire: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    placeholder="Type your own custom answer..."
+                    placeholder="Type custom response..."
                     value={
                       step === 1
                         ? subjectsOther
@@ -830,12 +769,11 @@ export const LandingQuestionnaire: React.FC = () => {
         )}
       </main>
 
-      {/* Bottom Sticky Action Footer */}
       <footer className="max-w-xl w-full mx-auto flex items-center justify-between pt-4 border-t border-zinc-200 dark:border-zinc-800">
         <button
           onClick={handleBack}
           disabled={step === 1 || isFinishing || isLoadingDynamic}
-          className="px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-40 disabled:pointer-events-none transition-colors flex items-center gap-1.5"
+          className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-40 disabled:pointer-events-none transition-colors flex items-center gap-1.5 cursor-pointer"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back</span>
@@ -844,29 +782,29 @@ export const LandingQuestionnaire: React.FC = () => {
         <div className="flex items-center gap-3">
           <span className="text-xs text-zinc-400 hidden sm:inline">
             {isLoadingDynamic
-              ? "AI Calibrating..."
+              ? "Calibrating..."
               : step === totalSteps
-                ? "Ready to assemble sprint"
-                : `Next: Question ${step + 1}`}
+                ? "Ready to begin sprint"
+                : `Next: Step ${step + 1}`}
           </span>
           <button
             onClick={handleNext}
             disabled={isFinishing || isLoadingDynamic}
-            className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-sm transition-all flex items-center gap-2 hover:translate-x-0.5 active:translate-x-0 disabled:opacity-50 disabled:pointer-events-none"
+            className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center gap-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
           >
             {isFinishing ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Assembling Your Sprint...</span>
+                <span>Preparing Sprint...</span>
               </>
             ) : isLoadingDynamic ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>AI Thinking...</span>
+                <span>Processing...</span>
               </>
             ) : step === totalSteps ? (
               <>
-                <span>Launch My 4-Day Sprint</span>
+                <span>Launch Sprint</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             ) : (

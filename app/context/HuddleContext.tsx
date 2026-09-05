@@ -334,7 +334,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     currentDay: 1,
     tasks: generateTasksForSkill("sprint-1", "System Architecture"),
     mascotNarration:
-      "Ready for today? Complete your deliberate practice task to keep your streak alive!",
+      "Ready for today? Complete your deliberate practice task to advance your progress!",
     reshuffleCount: 0,
   });
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
@@ -744,16 +744,6 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
 
       await loadAllSupabaseData("user-1");
 
-      try {
-        import("canvas-confetti").then((confettiModule) => {
-          const confetti = confettiModule.default;
-          confetti({
-            particleCount: 50,
-            spread: 70,
-            origin: { y: 0.6 },
-          });
-        });
-      } catch (e) {}
 
       return { success: true };
     } catch (err: any) {
@@ -1003,20 +993,6 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     );
 
     if (nextCompleted) {
-      try {
-        import("canvas-confetti").then((confettiModule) => {
-          const confetti = confettiModule.default;
-          confetti({
-            particleCount: 40,
-            spread: 60,
-            origin: { y: 0.6 },
-            colors: ["#6366f1", "#a855f7", "#10b981", "#f59e0b"],
-          });
-        });
-      } catch (e) {
-        // Safe fallback
-      }
-
       if (targetTask.producesArtifact && targetTask.artifactTitle) {
         const newPortfolioItem: PortfolioItem = {
           id: `port-${Date.now()}`,
@@ -1145,7 +1121,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
         id: `n-${Date.now()}`,
         type: "milestone",
         title: "Sprint Task Completed",
-        description: `Day ${targetTask.dayNumber} verified! Streak is now ${user.streak + 1} days.`,
+        description: `Day ${targetTask.dayNumber} verified! Milestone recorded in your progress.`,
         timestamp: "Just now",
         read: false,
       };
@@ -1174,7 +1150,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
       type: "weekly_recap",
       title: "Sprint Reshuffled",
       description:
-        "Zero penalty applied. Your progress and streak remain fully intact.",
+        "Zero penalty applied. Your sprint progress remains fully intact.",
       timestamp: "Just now",
       read: false,
     };
@@ -1262,16 +1238,6 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     setNotifications((prev) => [notif, ...prev]);
     addNotificationToDb(notif, user.id);
 
-    try {
-      import("canvas-confetti").then((confettiModule) => {
-        const confetti = confettiModule.default;
-        confetti({
-          particleCount: 40,
-          spread: 60,
-          origin: { y: 0.6 },
-        });
-      });
-    } catch (e) {}
 
     addSquadActivityPingToDb(
       squad.id,
@@ -1415,16 +1381,6 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
       return { ...prev, reputation: nextRep };
     });
 
-    try {
-      import("canvas-confetti").then((confettiModule) => {
-        const confetti = confettiModule.default;
-        confetti({
-          particleCount: 50,
-          spread: 70,
-          origin: { y: 0.6 },
-        });
-      });
-    } catch (e) {}
 
     const notif: NotificationItem = {
       id: `n-${Date.now()}`,

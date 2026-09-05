@@ -10,13 +10,10 @@ interface MarkdownRendererProps {
 }
 
 export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, className = '' }) => {
-  // Helper to parse LaTeX math inline and block
   const renderMathAndText = (text: string) => {
-    // Replace block math $$...$$ and inline math $...$
     const parts: React.ReactNode[] = [];
     let lastIndex = 0;
 
-    // Regex matching $$...$$ (block) and $...$ (inline)
     const mathRegex = /(\$\$[\s\S]*?\$\$|\$[^$\n]+\$)/g;
     let match;
 
@@ -25,7 +22,6 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
       const matchStart = match.index;
       const matchEnd = match.index + match[0].length;
 
-      // Text before math
       if (matchStart > lastIndex) {
         parts.push(renderFormattedInline(text.substring(lastIndex, matchStart), `txt-${keyCounter++}`));
       }
@@ -57,8 +53,8 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
             />
           );
         }
-      } catch (err) {
-        parts.push(<code key={`math-err-${keyCounter++}`} className="text-amber-500  text-xs">{rawMath}</code>);
+      } catch {
+        parts.push(<code key={`math-err-${keyCounter++}`} className="text-amber-500 text-xs">{rawMath}</code>);
       }
 
       lastIndex = matchEnd;
@@ -71,9 +67,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
     return parts.length > 0 ? parts : text;
   };
 
-  // Helper for inline styles (bold, italic, code, links)
   const renderFormattedInline = (inlineText: string, baseKey: string): React.ReactNode => {
-    // Regex for bold **text**, italic *text*, inline code `code`, link [text](url)
     const inlineRegex = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/g;
     const pieces: React.ReactNode[] = [];
     let lastIdx = 0;
@@ -103,7 +97,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
         );
       } else if (token.startsWith('`') && token.endsWith('`')) {
         pieces.push(
-          <code key={`${baseKey}-c-${count++}`} className="px-1.5 py-0.5 rounded-lg bg-zinc-200/80 dark:bg-zinc-800  text-[11px] text-indigo-600 dark:text-indigo-300 border border-zinc-300/40 dark:border-zinc-700/50">
+          <code key={`${baseKey}-c-${count++}`} className="px-1.5 py-0.5 rounded-lg bg-zinc-200/80 dark:bg-zinc-800 text-[11px] text-indigo-600 dark:text-indigo-300 border border-zinc-300/40 dark:border-zinc-700/50">
             {token.slice(1, -1)}
           </code>
         );
@@ -133,7 +127,6 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
     return <React.Fragment key={baseKey}>{pieces}</React.Fragment>;
   };
 
-  // Split content into blocks (code blocks, headings, lists, paragraphs, tables)
   const blocks = useMemo(() => {
     const lines = content.split('\n');
     const result: React.ReactNode[] = [];
@@ -145,7 +138,6 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
 
-      // Code Block Start / End
       if (line.trim().startsWith('```')) {
         if (!inCodeBlock) {
           inCodeBlock = true;
@@ -171,7 +163,6 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
         continue;
       }
 
-      // Headings
       if (line.startsWith('### ')) {
         result.push(
           <h3 key={`h3-${blockIndex++}`} className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100 mt-3 mb-1">
@@ -197,17 +188,15 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
         continue;
       }
 
-      // Blockquotes
       if (line.startsWith('> ')) {
         result.push(
-          <blockquote key={`quote-${blockIndex++}`} className="my-2 pl-3.5 py-1.5 border-l-3 border-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/20 text-xs italic text-zinc-700 dark:text-zinc-300 rounded-r-xl">
+          <blockquote key={`quote-${blockIndex++}`} className="my-2 pl-3.5 py-1.5 border-l-2 border-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/20 text-xs italic text-zinc-700 dark:text-zinc-300 rounded-r-xl">
             {renderMathAndText(line.slice(2))}
           </blockquote>
         );
         continue;
       }
 
-      // Bullet lists
       if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
         result.push(
           <div key={`li-${blockIndex++}`} className="flex items-start gap-2.5 my-1 text-xs text-zinc-700 dark:text-zinc-300 pl-1">
@@ -220,7 +209,6 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
         continue;
       }
 
-      // Numbered lists
       const numMatch = line.trim().match(/^(\d+)\.\s+(.*)/);
       if (numMatch) {
         result.push(
@@ -234,12 +222,10 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
         continue;
       }
 
-      // Empty line
       if (!line.trim()) {
         continue;
       }
 
-      // Normal paragraph
       result.push(
         <p key={`p-${blockIndex++}`} className="my-1.5 leading-relaxed text-xs sm:text-[13px] text-zinc-700 dark:text-zinc-300">
           {renderMathAndText(line)}

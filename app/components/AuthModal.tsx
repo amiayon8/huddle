@@ -115,7 +115,6 @@ export const AuthModal: React.FC = () => {
           </div>
         </div>
 
-        {/* Error Alert */}
         {errorMessage && (
           <div className="mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40 text-xs text-rose-800 dark:text-rose-300 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
@@ -123,7 +122,6 @@ export const AuthModal: React.FC = () => {
           </div>
         )}
 
-        {/* Success Alert */}
         {successMessage && (
           <div className="mb-4 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
             <Check className="w-4 h-4 text-emerald-500 shrink-0" />

@@ -7,7 +7,7 @@ Huddle is a deliberate practice platform for software engineers. It organizes co
 Traditional learning platforms focus on passive video consumption or long tutorials. Huddle emphasizes daily deliberate execution:
 - **Stepping-Stone Units**: Guided curriculum nodes with clear progression from fundamentals to production implementation.
 - **4-Day Deliberate Sprints**: Focused daily exercises designed to take 15 to 20 minutes and produce tangible engineering artifacts.
-- **Zero-Penalty Reshuffling**: Reschedule sprint timelines anytime without resetting practice streaks.
+- **Zero-Penalty Reshuffling**: Reschedule sprint timelines anytime without resetting practice progress.
 - **Friend Squads**: 4-person accountability groups sharing weekly progress, check-ins, and peer encouragement.
 - **Learning Library**: Digestible 15-minute engineering guides with downloadable blueprints and syntax-highlighted code.
 - **Developer Profile**: Verified engineering proofs, milestone badges, and skill health tracking with privacy controls.
@@ -88,7 +88,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 Visual stepping-stone units guide engineers through core concepts, code builds, and production architecture proofs. Each day features one clear task with estimated time and artifact deliverables.
 
 ### 2. Friend Squads
-Small 4-person squads with shared weekly goals, member streak tracking, activity pings, and mutual check-ins.
+Small 4-person squads with shared weekly goals, member milestone tracking, activity pings, and mutual check-ins.
 
 ### 3. Learning Library
 Curated engineering lessons with reading times, architecture blueprints, and code examples. Engineers can filter by topic tags or search by keyword.
@@ -97,4 +97,4 @@ Curated engineering lessons with reading times, architecture blueprints, and cod
 Technical Q&A filtered by category with inline reply threads, verified solution markers, and code formatting.
 
 ### 5. Developer Profile
-Showcases verified GitHub pull requests, architecture decision records, streak achievements, and skill health with public/private visibility toggles.
+Showcases verified GitHub pull requests, architecture decision records, milestone achievements, and skill health with public/private visibility toggles.

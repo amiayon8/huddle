@@ -71,7 +71,6 @@ export const SettingsModal: React.FC = () => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
       <div className="w-full max-w-xl bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row max-h-[85vh]">
         
-        {/* Navigation Sidebar */}
         <div className="w-full md:w-48 p-3.5 border-b md:border-b-0 md:border-r border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 space-y-1">
           <div className="flex items-center justify-between pb-2">
             <span className="text-[11px] font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">
@@ -163,7 +162,6 @@ export const SettingsModal: React.FC = () => {
           </div>
         </div>
 
-        {/* Content Pane */}
         <div className="flex-1 p-5 sm:p-6 overflow-y-auto space-y-4">
           <div className="hidden md:flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
             <h3 className="font-bold text-sm text-zinc-900 dark:text-zinc-100 capitalize">
@@ -284,7 +282,7 @@ export const SettingsModal: React.FC = () => {
                 <input type="checkbox" defaultChecked className="accent-indigo-600" />
               </div>
               <div className="flex items-center justify-between p-2.5 rounded-lg border border-zinc-200 dark:border-zinc-800">
-                <span>Focus streak preservation alert</span>
+                <span>Daily practice progress alert</span>
                 <input type="checkbox" defaultChecked className="accent-indigo-600" />
               </div>
             </div>
@@ -327,7 +325,7 @@ export const SettingsModal: React.FC = () => {
               <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 space-y-1">
                 <div className="font-semibold text-zinc-900 dark:text-zinc-100">Zero-Penalty Philosophy</div>
                 <p className="text-[11px] leading-relaxed">
-                  Pip never penalizes missed days or broken streaks. Reshuffling a 4-day sprint is always 100% free and supportive.
+                  Pip never penalizes missed days. Reshuffling a 4-day sprint is always 100% free and supportive.
                 </p>
               </div>
 

@@ -260,19 +260,6 @@ export const PracticeSessionModal: React.FC = () => {
 
   const handleFinalizeSession = () => {
     setCurrentStep(4);
-    try {
-      import("canvas-confetti").then((confettiModule) => {
-        const confetti = confettiModule.default;
-        confetti({
-          particleCount: 60,
-          spread: 70,
-          origin: { y: 0.6 },
-          colors: ["#6366f1", "#10b981", "#3b82f6", "#8b5cf6"]
-        });
-      });
-    } catch {
-      return;
-    }
   };
 
   const calculateFinalQuizScore = () => {
@@ -968,9 +955,9 @@ export const PracticeSessionModal: React.FC = () => {
                 </div>
 
                 <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800">
-                  <span className="text-[11px] text-zinc-500 block">Streak</span>
+                  <span className="text-[11px] text-zinc-500 block">Progress</span>
                   <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 block">
-                    {user.streak + 1} Days
+                    Verified
                   </span>
                 </div>
 

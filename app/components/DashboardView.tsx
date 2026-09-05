@@ -7,15 +7,12 @@ import {
   Check,
   RotateCcw,
   FileCode,
-  ArrowRight,
-  BookOpen,
   CheckCircle2,
   Clock,
   ChevronDown,
   ChevronUp,
-  Lock,
-  Trophy,
   Video,
+  ArrowRight,
 } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
 import { DuolingoMascot } from "./DuolingoMascot";
@@ -29,36 +26,34 @@ export const DashboardView: React.FC = () => {
     isTimerRunning,
     isAppFocused,
     toggleFocusTimer,
-    completeSprintTask,
     openPracticeSession,
     practiceProgressMap,
     reshuffleSprint,
     setActiveTab,
-    setMascotOpen,
   } = useHuddle();
 
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
-  const formatTime = (secs: number) => {
-    const mins = Math.floor(secs / 60);
-    const remainderSecs = secs % 60;
-    return `${mins}m ${remainderSecs < 10 ? "0" : ""}${remainderSecs}s`;
+  const formatFocusTime = (totalSeconds: number) => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const remainingSeconds = totalSeconds % 60;
+    return `${minutes}m ${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}s`;
   };
 
   const tasks = sprint?.tasks || [];
-  const completedCount = tasks.filter((t) => t.completed).length;
+  const completedCount = tasks.filter((task) => task.completed).length;
   const totalTasks = tasks.length;
   const sprintProgressPercent =
     totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
 
   const activeTask =
-    tasks.find((t) => !t.completed) ||
+    tasks.find((task) => !task.completed) ||
     (tasks.length > 0 ? tasks[tasks.length - 1] : null);
   const isSprintComplete = totalTasks > 0 && completedCount === totalTasks;
 
   if (!activeTask) {
     return (
-      <div className="max-w-3xl mx-auto py-16 flex flex-col items-center justify-center gap-3 text-zinc-500">
+      <div className="max-w-4xl mx-auto py-16 flex flex-col items-center justify-center gap-3 text-zinc-500">
         <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
         <span className="text-xs font-medium">Loading sprint...</span>
       </div>
@@ -66,18 +61,23 @@ export const DashboardView: React.FC = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 pb-16 animate-in fade-in duration-200">
-      {/* Sprint Overview */}
-      <div className="p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] shadow-xs space-y-4">
+    <div className="max-w-4xl mx-auto space-y-6 pb-16 animate-in fade-in duration-150">
+      <div className="rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] p-6 space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-          <span className="px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-medium text-[11px]">
-            Sprint • Day {activeTask.dayNumber} of {sprint.durationDays}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold text-[11px] tracking-wide uppercase">
+              Day {activeTask.dayNumber} of {sprint.durationDays}
+            </span>
+            <span className="text-zinc-400 dark:text-zinc-500">•</span>
+            <span className="text-zinc-500 font-medium text-xs">
+              {sprint.skillTitle}
+            </span>
+          </div>
 
           <button
             onClick={() => reshuffleSprint()}
             className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-colors cursor-pointer"
-            title="Move this practice without losing your streak"
+            title="Reschedule sprint without losing progress"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reschedule</span>
@@ -85,43 +85,51 @@ export const DashboardView: React.FC = () => {
         </div>
 
         <div className="space-y-1">
-          <h1 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
             {sprint.skillTitle}
           </h1>
-          <p className="text-xs text-zinc-500">
-            Target: <span className="text-zinc-700 dark:text-zinc-300 font-medium">{sprint.careerMilestone}</span>
+          <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
+            Target milestone:{" "}
+            <span className="text-zinc-800 dark:text-zinc-200 font-medium">
+              {sprint.careerMilestone}
+            </span>
           </p>
         </div>
 
-        {/* Primary Action */}
-        <div className="pt-1">
+        <div className="pt-2">
           {!isSprintComplete ? (
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               <button
                 onClick={() => openPracticeSession(activeTask, false)}
-                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                className="px-5 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
-                <span>Start practice • {activeTask.estimatedMinutes} min</span>
+                <span>Start Day {activeTask.dayNumber} Practice</span>
+                <span className="text-indigo-200 font-normal">
+                  ({activeTask.estimatedMinutes} min)
+                </span>
               </button>
-              <span className="text-xs text-zinc-500">
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">
                 {activeTask.title}
               </span>
             </div>
           ) : (
-            <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-medium">
+            <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-medium">
               <CheckCircle2 className="w-4 h-4" />
-              <span>Sprint finished. {completedCount} of {totalTasks} days complete.</span>
+              <span>
+                Sprint completed. {completedCount} of {totalTasks} deliverables
+                verified.
+              </span>
             </div>
           )}
         </div>
 
-        {/* Progress Bar */}
-        <div className="space-y-1.5 pt-2 border-t border-zinc-100 dark:border-zinc-800/80">
-          <div className="flex justify-between text-[11px] text-zinc-500">
-            <span>Progress</span>
+        <div className="space-y-1.5 pt-3 border-t border-zinc-100 dark:border-zinc-800/80">
+          <div className="flex justify-between text-xs text-zinc-500">
+            <span>Sprint Progress</span>
             <span className="font-medium text-zinc-700 dark:text-zinc-300">
-              {completedCount} of {totalTasks} days complete
+              {completedCount} of {totalTasks} days completed (
+              {sprintProgressPercent}%)
             </span>
           </div>
           <div className="w-full h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
@@ -133,198 +141,227 @@ export const DashboardView: React.FC = () => {
         </div>
       </div>
 
-      {/* Pip Mascot Guide */}
       <DuolingoMascot
         emotion={isSprintComplete ? "success" : "encouragement"}
         size="md"
         showQuickActions={true}
       />
 
-      {/* Sequential Practice Path */}
-      <div className="p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] shadow-xs space-y-6">
-        <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-4">
+      <div className="rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] p-6 space-y-6">
+        <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800/80 pb-4">
           <div>
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              Practice path
+              4-Day Sprint Schedule
             </h2>
-            <p className="text-xs text-zinc-500">
-              Daily 15-to-20 minute sessions.
+            <p className="text-xs text-zinc-500 mt-0.5">
+              Daily structured deliberate practice modules with verified
+              deliverables.
             </p>
           </div>
-          <span className="text-xs text-zinc-500 font-medium">
-            {completedCount}/{totalTasks}
+          <span className="text-xs font-medium text-zinc-500">
+            {completedCount}/{totalTasks} Complete
           </span>
         </div>
 
-        {/* Path Nodes */}
-        <div className="relative flex flex-col items-center space-y-8 py-2">
+        <div className="space-y-3">
           {tasks.map((task, index) => {
             const isCompleted = task.completed;
             const isCurrent =
-              !isCompleted &&
-              (index === 0 || tasks[index - 1].completed);
-            const isUpcoming = !isCompleted && !isCurrent;
+              !isCompleted && (index === 0 || tasks[index - 1].completed);
             const isExpanded = expandedTaskId === task.id;
             const progress = practiceProgressMap[task.id];
-
-            const offsetClasses =
-              index % 2 === 0 ? "sm:-translate-x-10" : "sm:translate-x-10";
 
             return (
               <div
                 key={task.id}
-                className={`relative flex flex-col items-center transition-all ${offsetClasses}`}
+                className={`rounded-lg border transition-all ${
+                  isCurrent
+                    ? "border-indigo-500/60 bg-indigo-50/20 dark:bg-indigo-950/15"
+                    : isCompleted
+                      ? "border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/40 dark:bg-zinc-900/20"
+                      : "border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-[#111218]"
+                }`}
               >
-                {index < tasks.length - 1 && (
-                  <div className="absolute top-14 left-1/2 -translate-x-1/2 w-0.5 h-8 bg-zinc-200 dark:bg-zinc-800 -z-0" />
-                )}
-
-                {isCurrent && (
-                  <div className="mb-1.5 flex flex-col items-center">
-                    <span className="px-2 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-semibold tracking-wide">
-                      Current
-                    </span>
-                  </div>
-                )}
-
-                <button
-                  onClick={() => openPracticeSession(task, isCompleted)}
-                  className={`relative z-10 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex flex-col items-center justify-center font-semibold transition-all cursor-pointer ${
-                    isCompleted
-                      ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
-                      : isCurrent
-                        ? "bg-indigo-600 hover:bg-indigo-700 text-white ring-4 ring-indigo-500/20 shadow-xs"
-                        : "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300"
-                  }`}
-                  title={isCompleted ? "View completed session & verified proof" : "Start online practice lesson"}
-                >
-                  {isCompleted ? (
-                    <Check className="w-5 h-5 stroke-[2.5]" />
-                  ) : isCurrent ? (
-                    <Play className="w-4 h-4 ml-0.5 fill-current" />
-                  ) : (
-                    <span className="text-sm">{task.dayNumber}</span>
-                  )}
-                </button>
-
-                <div className="mt-2 text-center max-w-xs space-y-0.5">
-                  <div className="flex items-center justify-center gap-1.5 text-[11px] text-zinc-500 flex-wrap">
-                    <span>Day {task.dayNumber} • {task.estimatedMinutes} min</span>
-                    <span className="inline-flex items-center gap-0.5 text-zinc-400" title="Includes video lecture">
-                      <Video className="w-3 h-3 text-red-500/80" />
-                    </span>
-                    {task.producesArtifact && (
-                      <span className="p-0.5 rounded text-indigo-600 dark:text-indigo-400" title="Produces verified artifact">
-                        <FileCode className="w-3 h-3" />
-                      </span>
-                    )}
-                    {progress?.videoCompleted && (
-                      <span className="px-1.5 py-0.2 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[10px] font-semibold">
-                        Watched
-                      </span>
-                    )}
-                  </div>
-
-                  <h3
-                    className={`text-xs font-semibold ${
-                      isCompleted
-                        ? "text-zinc-500 line-through"
-                        : "text-zinc-900 dark:text-zinc-100"
-                    }`}
-                  >
-                    {task.title}
-                  </h3>
-
-                  <button
-                    onClick={() =>
-                      setExpandedTaskId(isExpanded ? null : task.id)
-                    }
-                    className="inline-flex items-center gap-1 text-[11px] font-medium text-indigo-600 dark:text-indigo-400 hover:underline pt-0.5 cursor-pointer"
-                  >
-                    <span>{isExpanded ? "Hide details" : "View details"}</span>
-                    {isExpanded ? (
-                      <ChevronUp className="w-3 h-3" />
-                    ) : (
-                      <ChevronDown className="w-3 h-3" />
-                    )}
-                  </button>
-
-                  {isExpanded && (
-                    <div className="mt-2 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 text-left text-xs space-y-2 animate-in fade-in">
-                      <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed text-[11.5px]">
-                        {task.description}
-                      </p>
-                      {progress?.reflectionNotes && (
-                        <div className="pt-1.5 text-[11px] text-zinc-500 border-t border-zinc-200/60 dark:border-zinc-800/60">
-                          <span className="font-semibold text-zinc-700 dark:text-zinc-300 block">Saved Notes:</span>
-                          <p className="italic text-zinc-600 dark:text-zinc-400 truncate mt-0.5">{progress.reflectionNotes}</p>
-                        </div>
+                <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-start gap-3.5 min-w-0">
+                    <button
+                      onClick={() => openPracticeSession(task, isCompleted)}
+                      className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors cursor-pointer ${
+                        isCompleted
+                          ? "bg-emerald-600 text-white"
+                          : isCurrent
+                            ? "bg-indigo-600 text-white shadow-xs"
+                            : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 border border-zinc-200 dark:border-zinc-700"
+                      }`}
+                      title={
+                        isCompleted
+                          ? "Review completed practice"
+                          : "Start practice"
+                      }
+                    >
+                      {isCompleted ? (
+                        <Check className="w-4 h-4 stroke-[2.5]" />
+                      ) : (
+                        <span className="text-xs font-semibold">
+                          {task.dayNumber}
+                        </span>
                       )}
-                      <div className="flex items-center gap-1.5 pt-1 text-[11px] text-zinc-500 border-t border-zinc-200/60 dark:border-zinc-800/60">
-                        <img
-                          src={task.creatorAvatar}
-                          alt={task.creatorName}
-                          className="w-3.5 h-3.5 rounded-full object-cover"
-                        />
-                        <span>By {task.creatorName}</span>
+                    </button>
+
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-[11px] font-medium text-zinc-500">
+                          Day {task.dayNumber} • {task.estimatedMinutes} min
+                        </span>
+                        {task.producesArtifact && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                            <FileCode className="w-3 h-3" />
+                            <span>Artifact</span>
+                          </span>
+                        )}
+                        {progress?.videoCompleted && (
+                          <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300">
+                            Watched
+                          </span>
+                        )}
+                        {isCurrent && (
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-indigo-600 text-white">
+                            Current
+                          </span>
+                        )}
                       </div>
+
+                      <h3
+                        className={`text-sm font-semibold truncate ${
+                          isCompleted
+                            ? "text-zinc-500 dark:text-zinc-400 line-through"
+                            : "text-zinc-900 dark:text-zinc-100"
+                        }`}
+                      >
+                        {task.title}
+                      </h3>
                     </div>
-                  )}
+                  </div>
+
+                  <div className="flex items-center gap-2 sm:self-center shrink-0">
+                    <button
+                      onClick={() => openPracticeSession(task, isCompleted)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                        isCompleted
+                          ? "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300"
+                          : isCurrent
+                            ? "bg-indigo-600 hover:bg-indigo-700 text-white"
+                            : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400"
+                      }`}
+                    >
+                      {isCompleted ? "Review" : "Start"}
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        setExpandedTaskId(isExpanded ? null : task.id)
+                      }
+                      className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+                      aria-label="Toggle details"
+                    >
+                      {isExpanded ? (
+                        <ChevronUp className="w-4 h-4" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
+
+                {isExpanded && (
+                  <div className="px-4 pb-4 pt-1 border-t border-zinc-100 dark:border-zinc-800 text-xs space-y-2.5">
+                    <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                      {task.description}
+                    </p>
+
+                    {progress?.reflectionNotes && (
+                      <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-900/80 border border-zinc-200/60 dark:border-zinc-800/60 space-y-1">
+                        <span className="font-semibold text-zinc-700 dark:text-zinc-300 text-[11px]">
+                          Saved Reflection:
+                        </span>
+                        <p className="text-zinc-600 dark:text-zinc-400 text-xs italic">
+                          {progress.reflectionNotes}
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-2 pt-1 text-[11px] text-zinc-500">
+                      <img
+                        src={task.creatorAvatar}
+                        alt={task.creatorName}
+                        className="w-4 h-4 rounded-full object-cover"
+                      />
+                      <span>Curated by {task.creatorName}</span>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
 
-          {/* Capstone Milestone */}
-          <div className="relative flex flex-col items-center pt-2">
-            <div
-              className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
-                isSprintComplete
-                  ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 border border-emerald-200 dark:border-emerald-800"
-                  : "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 border border-zinc-200 dark:border-zinc-700"
-              }`}
+          <div className="rounded-lg border border-dashed border-zinc-200 dark:border-zinc-800 p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div
+                className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                  isSprintComplete
+                    ? "bg-emerald-600 text-white"
+                    : "bg-zinc-100 dark:bg-zinc-800 text-zinc-400"
+                }`}
+              >
+                <CheckCircle2 className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 block">
+                  Capstone Sprint Deliverable
+                </span>
+                <span className="text-[11px] text-zinc-500">
+                  Verified proof artifact saved to your engineering profile.
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setActiveTab("profile")}
+              className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer flex items-center gap-1"
             >
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-            <div className="mt-1.5 text-center">
-              <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 block">
-                Sprint proof
-              </span>
-              <span className="text-[11px] text-zinc-500">
-                Saved to portfolio
-              </span>
-            </div>
+              <span>View Portfolio</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Squad Summary */}
-      <div className="p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] shadow-xs space-y-3">
+      <div className="rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] p-5 space-y-4">
         <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
-              <Users className="w-3.5 h-3.5 text-indigo-500" />
-              <span>Squad</span>
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-indigo-500" />
+            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              Micro-Squad Sync
             </h3>
-            <p className="text-xs text-zinc-500 mt-0.5">
-              {squad.currentProgress} of {squad.targetProgress} checked in this week.
-            </p>
+            <span className="text-xs text-zinc-400">•</span>
+            <span className="text-xs text-zinc-500">
+              {squad.currentProgress}/{squad.targetProgress} active
+            </span>
           </div>
 
           <button
             onClick={() => setActiveTab("squad")}
-            className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+            className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
           >
-            View squad
+            Open Squad Room
           </button>
         </div>
 
-        {/* Activity Feed */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {squad.activityPings.slice(0, 2).map((ping) => (
             <div
               key={ping.id}
-              className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800 flex items-center gap-2.5 text-xs"
+              className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800/80 flex items-center gap-3 text-xs"
             >
               <img
                 src={ping.memberAvatar}
@@ -332,7 +369,7 @@ export const DashboardView: React.FC = () => {
                 className="w-7 h-7 rounded-lg object-cover"
               />
               <div className="flex-1 min-w-0">
-                <div className="font-medium text-zinc-900 dark:text-zinc-100 truncate text-[11.5px]">
+                <div className="font-semibold text-zinc-900 dark:text-zinc-100 truncate text-xs">
                   {ping.memberName}
                 </div>
                 <div className="text-zinc-500 text-[11px] truncate">

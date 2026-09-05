@@ -130,7 +130,6 @@ export default function AppPage() {
     <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-100 flex flex-col font-sans transition-colors">
       <Navbar />
 
-      {/* Preview Mode Alert Banner if Survey Incomplete */}
       {!user.onboardingCompleted && (
         <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 sm:px-6">
           <div className="max-w-7xl w-full mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">

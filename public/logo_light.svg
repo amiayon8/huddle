@@ -5,16 +5,16 @@
 		<image width="300" height="14" id="img3" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAAOCAYAAACVbiH8AAAA10lEQVR4AezWMQrDMAwF0DQH6tq1R+/atRdqkcFFQw4gyy8QEM4iPZlPziM998fz62XgDrgDle5AiqjjH1jRYP6gJkCAQAWBnE0jsPJBhQb1QIAAgSwwM+qcRf6o7ilgKgIrC0RWjT+slYfQOwEC+wgIrH12bVICywsIrOVXaAACFwJNjwRW08Uai0BHAYHVcatmItBUQGA1XayxCHQUEFhXW3VGgEBJgfPzft1KdqYpAgQIJIHIqvGHFUU6VxIgQKCUwMyoEVjR2TyI2ktgHwGTVhfI2fQDAAD//8TKmUcAAAAGSURBVAMARPv6hB8DdjsAAAAASUVORK5CYII="/>
 	</defs>
 	<style>
-		.s0 { fill: #d8d8d8 } 
+		.s0 { fill: #f8f9fc } 
 		.s1 { fill: #79c6c0 } 
 		.s2 { fill: #79c8c0 } 
 		.s3 { fill: #2e3740 } 
 	</style>
 	<path id="Shape 3" fill-rule="evenodd" class="s0" d="m58 0h284c32.03 0 58 25.97 58 58v284c0 32.03-25.97 58-58 58h-284c-32.03 0-58-25.97-58-58v-284c0-32.03 25.97-58 58-58z"/>
 	<g>
-		<use  href="#img1" transform="matrix(1,0,0,1,50,50)"/>
-		<use  href="#img2" transform="matrix(1,0,0,1,335,50)"/>
-		<use  href="#img3" transform="matrix(1,0,0,1,50,193)"/>
+		<use id="img1" href="#img1" transform="matrix(1,0,0,1,50,50)"/>
+		<use id="img2" href="#img2" transform="matrix(1,0,0,1,335,50)"/>
+		<use id="img3" href="#img3" transform="matrix(1,0,0,1,50,193)"/>
 		<path fill-rule="evenodd" class="s1" d="m57.14 114.29c-31.6 0-57.14-25.55-57.14-57.15 0-31.6 25.54-57.14 57.14-57.14 31.6 0 57.15 25.54 57.15 57.14 0 31.6-25.55 57.15-57.15 57.15z"/>
 		<path fill-rule="evenodd" class="s2" d="m57.14 400c-31.6 0-57.14-25.54-57.14-57.14 0-31.6 25.54-57.15 57.14-57.15 31.6 0 57.15 25.55 57.15 57.15 0 31.6-25.55 57.14-57.15 57.14z"/>
 		<path fill-rule="evenodd" class="s2" d="m342.86 114.29c-31.6 0-57.15-25.55-57.15-57.15 0-31.6 25.55-57.14 57.15-57.14 31.6 0 57.14 25.54 57.14 57.14 0 31.6-25.54 57.15-57.14 57.15z"/>

@@ -42,7 +42,6 @@ export const CreatorUploadModal: React.FC = () => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
       <div className="w-full max-w-lg bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
 
-        {/* Header */}
         <div className="p-4 sm:p-5 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
@@ -53,20 +52,19 @@ export const CreatorUploadModal: React.FC = () => {
                 Creator Studio Upload
               </h3>
               <p className="text-xs text-zinc-500">
-                Publish bite-sized engineering guides & blueprints
+                Publish bite-sized engineering guides and blueprints
               </p>
             </div>
           </div>
 
           <button
             onClick={() => setCreatorUploadModalOpen(false)}
-            className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="p-4 sm:p-5 overflow-y-auto space-y-3.5 text-xs">
 
           <div className="space-y-1">
@@ -101,7 +99,7 @@ export const CreatorUploadModal: React.FC = () => {
 
             <div className="space-y-1">
               <label className="font-medium text-zinc-700 dark:text-zinc-300">
-                Sponsorship / Partner Tag
+                Author Designation
               </label>
               <input
                 type="text"
@@ -134,7 +132,7 @@ export const CreatorUploadModal: React.FC = () => {
               placeholder="When multiple servers read and update a Redis counter simultaneously, client-side math causes stale overwrites..."
               value={contentSnippet}
               onChange={(e) => setContentSnippet(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs "
+              className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs font-mono"
             />
           </div>
 
@@ -158,13 +156,13 @@ export const CreatorUploadModal: React.FC = () => {
             <button
               type="button"
               onClick={() => setCreatorUploadModalOpen(false)}
-              className="px-3.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-medium transition-colors"
+              className="px-3.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-medium transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-xs transition-colors"
+              className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
             >
               Publish Guide
             </button>

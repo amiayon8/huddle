@@ -1846,7 +1846,7 @@ export async function resetDemoAccountInDb(): Promise<{
         reshuffle_count: 0,
         last_reshuffled_at: null,
         mascot_narration:
-          "Ready for today? Complete your deliberate practice task to keep your streak alive!",
+          "Ready for today? Complete your deliberate practice task to advance your progress!",
       })
       .eq("user_id", "user-1");
 

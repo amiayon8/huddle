@@ -172,6 +172,7 @@ export interface SquadMember {
   recentEncouragement?: string;
   role: 'member' | 'lead';
   cheerCount?: number;
+  tasksCompleted?: number;
   submittedProject?: boolean;
 }
 

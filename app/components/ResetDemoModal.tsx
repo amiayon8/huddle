@@ -44,8 +44,8 @@ export const ResetDemoModal: React.FC = () => {
 
       setSuccessMessage(
         shouldLogout
-          ? "Demo account reset successfully! Signing out..."
-          : "Demo account restored to pristine baseline state!",
+          ? "Demo account reset successfully. Signing out..."
+          : "Demo account restored to baseline state.",
       );
 
       setTimeout(() => {
@@ -74,16 +74,14 @@ export const ResetDemoModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
       <div className="relative w-full max-w-md bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl p-6 sm:p-7 transition-colors">
-        {/* Close button */}
         <button
           onClick={handleClose}
           disabled={loadingAction !== null}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-40"
+          className="absolute top-4 right-4 p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-40 cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>
 
-        {/* Header */}
         <div className="flex items-center gap-3.5 mb-4">
           <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 p-1 flex items-center justify-center shrink-0 shadow-xs">
             <img
@@ -102,12 +100,11 @@ export const ResetDemoModal: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              Pip will restore sandbox state back to pristine Day 1
+              Restore sandbox state back to pristine Day 1
             </p>
           </div>
         </div>
 
-        {/* Error Alert */}
         {errorMessage && (
           <div className="mb-4 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40 text-xs text-rose-800 dark:text-rose-300 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
@@ -115,7 +112,6 @@ export const ResetDemoModal: React.FC = () => {
           </div>
         )}
 
-        {/* Success Alert */}
         {successMessage && (
           <div className="mb-4 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2 animate-in fade-in duration-150">
             <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -123,7 +119,6 @@ export const ResetDemoModal: React.FC = () => {
           </div>
         )}
 
-        {/* Description & Reset Checklist */}
         <div className="space-y-3 mb-6">
           <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
             This will reset all progress and database state for the demo account
@@ -156,19 +151,17 @@ export const ResetDemoModal: React.FC = () => {
             <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
               <CheckCircle2 className="w-3.5 h-3.5 text-amber-500 shrink-0" />
               <span>
-                Micro-squad progress reset to 7/12 & extra pings cleared
+                Micro-squad progress reset to 7/12 and extra activity cleared
               </span>
             </div>
             <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
               <CheckCircle2 className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-              <span>Focus timer & stats restored to baseline</span>
+              <span>Focus timer and statistics restored to baseline</span>
             </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="space-y-2">
-          {/* Reset & Sign Out */}
           <button
             onClick={() => handleReset(true)}
             disabled={loadingAction !== null}
@@ -177,17 +170,16 @@ export const ResetDemoModal: React.FC = () => {
             {loadingAction === "reset_logout" ? (
               <>
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span>Resetting & Signing Out...</span>
+                <span>Resetting and signing out...</span>
               </>
             ) : (
               <>
                 <LogOut className="w-3.5 h-3.5" />
-                <span>Full Reset & Sign Out</span>
+                <span>Full Reset and Sign Out</span>
               </>
             )}
           </button>
 
-          {/* Reset & Stay In App */}
           <button
             onClick={() => handleReset(false)}
             disabled={loadingAction !== null}
@@ -196,17 +188,16 @@ export const ResetDemoModal: React.FC = () => {
             {loadingAction === "reset_stay" ? (
               <>
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-500" />
-                <span>Resetting Demo State...</span>
+                <span>Resetting demo state...</span>
               </>
             ) : (
               <>
                 <RotateCcw className="w-3.5 h-3.5 text-amber-500" />
-                <span>Reset & Continue Exploring</span>
+                <span>Reset and Continue Exploring</span>
               </>
             )}
           </button>
 
-          {/* Cancel */}
           <button
             onClick={handleClose}
             disabled={loadingAction !== null}
