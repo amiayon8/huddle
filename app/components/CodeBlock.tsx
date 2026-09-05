@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Copy, Check, Terminal, FileCode } from 'lucide-react';
+import { Copy, Check, Terminal } from 'lucide-react';
 
 interface CodeBlockProps {
   code: string;
@@ -13,12 +13,10 @@ const formatCode = (raw: string): string => {
   if (!raw) return '';
   let formatted = raw.trim();
 
-  // If code is already multi-line, preserve existing lines
   if (formatted.includes('\n')) {
     return formatted;
   }
 
-  // Handle collapsed comments
   if (formatted.startsWith('--')) {
     formatted = formatted.replace(/^(--[^\n]*?)\s+(local\b|if\b|function\b|redis\.call)/, '$1\n$2');
   } else if (formatted.startsWith('//')) {
@@ -27,7 +25,6 @@ const formatCode = (raw: string): string => {
     formatted = formatted.replace(/^(#[^\n]*?)\s+(def\b|import\b|class\b|if\b)/, '$1\n$2');
   }
 
-  // Break statements onto new lines if flattened
   formatted = formatted
     .replace(/;\s*/g, ';\n')
     .replace(/\s+(local\s+[a-zA-Z_0-9]+)/g, '\n$1')
@@ -38,7 +35,7 @@ const formatCode = (raw: string): string => {
     .replace(/\s+(return\s+)/g, '\n$1')
     .replace(/\s+(redis\.call\()/g, '\n$1');
 
-  const lines = formatted.split('\n').map((l) => l.trim()).filter((l) => l.length > 0);
+  const lines = formatted.split('\n').map((line) => line.trim()).filter((line) => line.length > 0);
   let indentLevel = 0;
   const indentedLines: string[] = [];
 
@@ -55,7 +52,9 @@ const formatCode = (raw: string): string => {
   return indentedLines.join('\n');
 };
 
-const highlightSyntax = (rawCode: string, lang: string): React.ReactNode[] => {
+const TOKEN_PATTERN = /(".*?"|'.*?'|`.*?`|\/\/[^\n]*|--[^\n]*|#[^\n]*|\bredis\.(?:call|pcall)\b|\b(?:local|if|then|else|elseif|end|return|function|const|let|var|import|export|from|async|await|select|where|not|and|or|class|interface|type|extends|implements|new|try|catch|finally|throw|typeof|instanceof|def|elif|in|is|yield|lambda|for|while|do|break|continue|switch|case|default|public|private|protected|static|readonly|as)\b|\b(?:KEYS|ARGV)\b|\b(?:true|false|null|undefined|nil|None)\b|\b\d+(?:\.\d+)?\b)/g;
+
+const highlightSyntax = (rawCode: string): React.ReactNode[] => {
   const formattedCode = formatCode(rawCode);
   const lines = formattedCode.split('\n');
 
@@ -74,7 +73,7 @@ const highlightSyntax = (rawCode: string, lang: string): React.ReactNode[] => {
       );
     }
 
-    const tokens = line.split(/(".*?"|'.*?'|\b(?:local|if|then|else|elseif|end|return|function|const|let|var|import|export|from|async|await|select|from|where|not|and|or|true|false|KEYS|ARGV)\b|\b\d+\b)/g);
+    const tokens = line.split(TOKEN_PATTERN);
 
     return (
       <div key={lineIndex} className="table-row">
@@ -85,7 +84,7 @@ const highlightSyntax = (rawCode: string, lang: string): React.ReactNode[] => {
           {tokens.map((token, tokenIndex) => {
             if (!token) return null;
 
-            if (token.startsWith('"') || token.startsWith("'")) {
+            if (token.startsWith('"') || token.startsWith("'") || token.startsWith('`')) {
               return (
                 <span key={tokenIndex} className="text-emerald-400 font-medium">
                   {token}
@@ -93,7 +92,15 @@ const highlightSyntax = (rawCode: string, lang: string): React.ReactNode[] => {
               );
             }
 
-            if (/^(local|if|then|else|elseif|end|return|function|const|let|var|import|export|from|async|await|select|where|not|and|or)$/i.test(token)) {
+            if (token.startsWith('//') || token.startsWith('--') || token.startsWith('#')) {
+              return (
+                <span key={tokenIndex} className="text-zinc-500 italic">
+                  {token}
+                </span>
+              );
+            }
+
+            if (/^(local|if|then|else|elseif|end|return|function|const|let|var|import|export|from|async|await|select|where|not|and|or|class|interface|type|extends|implements|new|try|catch|finally|throw|typeof|instanceof|def|elif|in|is|yield|lambda|for|while|do|break|continue|switch|case|default|public|private|protected|static|readonly|as)$/i.test(token)) {
               return (
                 <span key={tokenIndex} className="text-indigo-400 font-semibold">
                   {token}
@@ -109,7 +116,7 @@ const highlightSyntax = (rawCode: string, lang: string): React.ReactNode[] => {
               );
             }
 
-            if (/^(true|false)$/.test(token)) {
+            if (/^(true|false|null|undefined|nil|None)$/.test(token)) {
               return (
                 <span key={tokenIndex} className="text-rose-400 font-semibold">
                   {token}
@@ -117,7 +124,7 @@ const highlightSyntax = (rawCode: string, lang: string): React.ReactNode[] => {
               );
             }
 
-            if (/^\d+$/.test(token)) {
+            if (/^\d+(?:\.\d+)?$/.test(token)) {
               return (
                 <span key={tokenIndex} className="text-amber-400 font-semibold">
                   {token}
@@ -125,13 +132,29 @@ const highlightSyntax = (rawCode: string, lang: string): React.ReactNode[] => {
               );
             }
 
-            if (token.includes('redis.call')) {
-              const parts = token.split('redis.call');
+            if (token === 'redis.call' || token === 'redis.pcall') {
+              return (
+                <span key={tokenIndex} className="text-sky-300 font-bold">
+                  {token}
+                </span>
+              );
+            }
+
+            if (token.includes('redis.call') || token.includes('redis.pcall')) {
+              const subTokens = token.split(/(redis\.(?:call|pcall))/g);
               return (
                 <span key={tokenIndex}>
-                  {parts[0]}
-                  <span className="text-sky-300 font-bold">redis.call</span>
-                  {parts.slice(1).join('redis.call')}
+                  {subTokens.map((subToken, subIndex) =>
+                    subToken === 'redis.call' || subToken === 'redis.pcall' ? (
+                      <span key={subIndex} className="text-sky-300 font-bold">
+                        {subToken}
+                      </span>
+                    ) : (
+                      <span key={subIndex} className="text-zinc-200">
+                        {subToken}
+                      </span>
+                    )
+                  )}
                 </span>
               );
             }
@@ -208,7 +231,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ code, language, filename }
 
       <div className="p-4 overflow-x-auto font-mono leading-relaxed select-text">
         <div className="table w-full">
-          {highlightSyntax(code, detected)}
+          {highlightSyntax(code)}
         </div>
       </div>
     </div>
