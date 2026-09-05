@@ -1,15 +1,30 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Mail, ArrowLeft, CheckCircle2, AlertCircle } from "lucide-react";
+import { useHuddle } from "../../context/HuddleContext";
 import { resetPasswordUser } from "../../lib/supabase";
 
 export default function ForgotPasswordPage() {
+  const router = useRouter();
+  const { isAuthenticated, authLoading, setActiveTab } = useHuddle();
+
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("redirected_from_auth", "true");
+      }
+      setActiveTab("explore");
+      router.push("/app?from=auth");
+    }
+  }, [isAuthenticated, authLoading, router, setActiveTab]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

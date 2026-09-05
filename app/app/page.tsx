@@ -28,14 +28,50 @@ import { PracticeSessionModal } from '../components/PracticeSessionModal';
 
 export default function AppPage() {
   const router = useRouter();
-  const { activeTab, user, onboardingActive, setOnboardingActive, hasSkippedToPreview, isAuthenticated, authLoading } = useHuddle();
+  const {
+    activeTab,
+    setActiveTab,
+    user,
+    onboardingActive,
+    setOnboardingActive,
+    hasSkippedToPreview,
+    isAuthenticated,
+    authLoading,
+  } = useHuddle();
 
-  // Route protection: If not logged in, redirect from /app to /auth/login
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/auth/login');
     }
   }, [isAuthenticated, authLoading, router]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const searchParams = new URLSearchParams(window.location.search);
+    const fromAuthQuery = searchParams.get('from') === 'auth' || searchParams.get('tab') === 'explore';
+    const fromAuthSession = sessionStorage.getItem('redirected_from_auth') === 'true';
+    const referrer = document.referrer;
+    const fromAuthReferrer = Boolean(
+      referrer &&
+      (referrer.includes('/auth/login') ||
+       referrer.includes('/auth/signup') ||
+       referrer.includes('/auth/forgot-password') ||
+       referrer.includes('/login') ||
+       referrer.includes('/signup') ||
+       referrer.includes('/forgot-password'))
+    );
+
+    if (fromAuthQuery || fromAuthSession || fromAuthReferrer) {
+      setActiveTab('explore');
+      if (fromAuthSession) {
+        sessionStorage.removeItem('redirected_from_auth');
+      }
+      if (fromAuthQuery && window.history.replaceState) {
+        window.history.replaceState(null, '', window.location.pathname);
+      }
+    }
+  }, [setActiveTab]);
 
   if (authLoading) {
     return (
@@ -49,7 +85,6 @@ export default function AppPage() {
     return null;
   }
 
-  // If user has not completed questionnaire and has not skipped to preview, or questionnaire triggered
   if ((!user.onboardingCompleted && !hasSkippedToPreview) || onboardingActive) {
     return (
       <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-100 font-sans transition-colors">
@@ -69,6 +104,7 @@ export default function AppPage() {
   const renderActiveView = () => {
     switch (activeTab) {
       case 'dashboard':
+      case 'overview':
         return <DashboardView />;
       case 'journey':
         return <JourneyView />;

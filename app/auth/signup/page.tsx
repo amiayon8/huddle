@@ -16,7 +16,7 @@ import { useHuddle } from "../../context/HuddleContext";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { isAuthenticated, authLoading, signup, setOnboardingActive } =
+  const { isAuthenticated, authLoading, signup, setOnboardingActive, setActiveTab } =
     useHuddle();
 
   const [fullName, setFullName] = useState("");
@@ -28,9 +28,13 @@ export default function SignupPage() {
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      router.push("/app");
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("redirected_from_auth", "true");
+      }
+      setActiveTab("explore");
+      router.push("/app?from=auth");
     }
-  }, [isAuthenticated, authLoading, router]);
+  }, [isAuthenticated, authLoading, router, setActiveTab]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,9 +50,13 @@ export default function SignupPage() {
       setSuccessMsg(
         "Account created successfully! Preparing your first sprint...",
       );
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("redirected_from_auth", "true");
+      }
+      setActiveTab("explore");
       setOnboardingActive(true);
       setTimeout(() => {
-        router.push("/app");
+        router.push("/app?from=auth");
       }, 700);
     }
   };

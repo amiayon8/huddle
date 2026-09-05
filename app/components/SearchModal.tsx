@@ -1,17 +1,30 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, X, BookOpen, Users, UserCheck, Flame, ArrowRight } from 'lucide-react';
 import { useHuddle } from '../context/HuddleContext';
+import { fetchSearchSuggestions } from '../lib/supabase';
 
 export const SearchModal: React.FC = () => {
   const { searchOpen, setSearchOpen, setActiveTab, creators, posts } = useHuddle();
   const [query, setQuery] = useState('');
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchSearchSuggestions().then((data) => {
+      if (data && data.length > 0) setSuggestions(data);
+    });
+  }, []);
 
   if (!searchOpen) return null;
 
-  const recentSearches = ['Distributed caching', 'Sliding window rate limit', 'Next.js App Router', 'Elena Rostova'];
-  const suggestedTopics = ['#system-design', '#react-server-components', '#typescript-mechanics', '#ui-micro-interactions'];
+  const recentSearches = suggestions.length > 0
+    ? suggestions.map(s => s.title).slice(0, 4)
+    : ['System Architecture', 'Next.js App Router', 'Advanced TypeScript', 'Elena Rostova'];
+
+  const suggestedTopics = suggestions.length > 0
+    ? suggestions.filter(s => s.category === 'Track').map(s => `#${s.title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`)
+    : ['#system-design', '#react-server-components', '#typescript-mechanics', '#ui-micro-interactions'];
 
   const filteredCreators = creators.filter(c => 
     c.name.toLowerCase().includes(query.toLowerCase()) || 

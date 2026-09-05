@@ -38,7 +38,6 @@ import {
   SquadMember, 
   ReportReasonCategory 
 } from "../types/huddle";
-import { presetAvailableSquads } from "../lib/defaultSquadData";
 
 const quickCheckinTags = [
   "Completed today's deliberate practice",

@@ -1,0 +1,214 @@
+MOCK DATA FILES AND LINES - Huddle Codebase
+==============================================
+
+This document lists all files containing mock/hardcoded data that should be replaced with real database-driven data for a production site.
+
+---
+
+1. app/lib/defaultSquadData.ts (ENTIRE FILE - 343 lines)
+   - Lines 3-56: defaultSquadMembers - 4 hardcoded squad members with names, handles, avatars, streaks, check-ins, encouragement text
+   - Lines 58-86: defaultSquadProject - Hardcoded project with deliverables from specific members
+   - Lines 88-125: defaultActivityPings - 4 hardcoded activity pings
+   - Lines 127-138: defaultMicroSquad - Complete hardcoded micro-squad
+   - Lines 140-211: defaultMacroSquad - Hardcoded macro squad with 3 members and 4 milestone updates
+   - Lines 213-343: presetAvailableSquads - 3 hardcoded preset squads with full member data, activity pings, projects
+   - All avatars use unsplash.com placeholder images
+
+2. app/lib/practiceCourseContent.ts (ENTIRE FILE - 729 lines)
+   - Lines 11-93: Next.js video lessons (4 days) with hardcoded YouTube IDs, instructor names, avatars, chapters, key takeaways
+   - Lines 96-179: TypeScript video lessons (4 days) with hardcoded content
+   - Lines 182-263: System Architecture video lessons (4 days) with hardcoded content
+   - Lines 273-320: Next.js course sections (Day 1) with hardcoded content, diagrams, code snippets
+   - Lines 321-363: Next.js course sections (Day 2) with hardcoded content
+   - Lines 369-412: TypeScript course sections (Day 1) with hardcoded content
+   - Lines 415-486: System Architecture course sections (Day 1) with hardcoded content, diagrams, code
+   - Lines 487-545: System Architecture course sections (Day 2) with hardcoded content
+   - Lines 546-564: System Architecture course sections (Day 3) with hardcoded content
+   - Lines 565-582: System Architecture course sections (Day 4) with hardcoded content
+   - Lines 591-618: Next.js knowledge questions (Day 1) with hardcoded questions/options
+   - Lines 619-632: Next.js knowledge questions (Day 2) with hardcoded questions
+   - Lines 637-654: TypeScript knowledge questions (Day 1) with hardcoded questions
+   - Lines 657-696: System Architecture knowledge questions (Day 1) with hardcoded questions
+   - Lines 697-711: System Architecture knowledge questions (Day 2) with hardcoded questions
+   - Lines 712-728: System Architecture knowledge questions (Day 3-4) with hardcoded questions
+
+3. app/lib/practiceSessions.ts (ENTIRE FILE - 1307 lines)
+   - Lines 87-220: systemArchitectureCurriculum (4 days) - hardcoded briefings, exercises, artifacts
+   - Lines 221-311: systemArchitectureCurriculum (Day 2) - hardcoded idempotency content
+   - Lines 312-421: systemArchitectureCurriculum (Day 3) - hardcoded saga orchestration content
+   - Lines 422-476: systemArchitectureCurriculum (Day 4) - hardcoded RFC audit content
+   - Lines 479-566: nextjsCurriculum (Day 1) - hardcoded streaming SSR content
+   - Lines 567-632: nextjsCurriculum (Day 2) - hardcoded optimistic UI content
+   - Lines 633-699: nextjsCurriculum (Day 3) - hardcoded edge runtime caching content
+   - Lines 700-749: nextjsCurriculum (Day 4) - hardcoded PR audit content
+   - Lines 752-804: typescriptCurriculum (Day 1) - hardcoded template literal types content
+   - Lines 806-855: typescriptCurriculum (Day 2) - hardcoded conditional types content
+   - Lines 857-935: typescriptCurriculum (Day 3) - hardcoded discriminated unions content
+   - Lines 936-978: typescriptCurriculum (Day 4) - hardcoded SDK publishing content
+   - Lines 981-1047: uiEngineeringCurriculum (Day 1) - hardcoded design tokens content
+   - Lines 1048-1107: uiEngineeringCurriculum (Day 2) - hardcoded GPU animations content
+   - Lines 1108-1211: uiEngineeringCurriculum (Day 3) - hardcoded accessibility content
+   - Lines 1212-1254: uiEngineeringCurriculum (Day 4) - hardcoded design system PR content
+
+4. app/context/HuddleContext.tsx (1644+ lines)
+   - Lines 266-290: Hardcoded initial user profile (Alex Chen, @alexchen.dev, hello@thenicedev.xyz, unsplash avatar, bio, streak=8, reputation=240, squadId=squad-1)
+   - Lines 293-302: Hardcoded initial roadmap state
+   - Lines 303-304: Hardcoded initial squad/macroSquad from defaultSquadData imports
+   - Lines 310-320: Hardcoded initial sprint with generateTasksForSkill("sprint-1", "System Architecture")
+   - Lines 333-336: Hardcoded focus timer state (1080 seconds = 18 mins, isTimerRunning=true)
+   - Lines 372-375: isDemo logic checks for user-1 and hello@thenicedev.xyz
+   - Lines 377-448: loadAllSupabaseData defaults to "user-1"
+   - Lines 461-472: Demo fallback loads data for "user-1"
+   - Lines 689-696: loginDemo sets demo state and loads "user-1"
+   - Lines 1090-1119: Hardcoded squad ping creation with user data
+   - Lines 1121-1130: Hardcoded notification creation
+   - Lines 1407-1444: joinSquadByCode uses presetAvailableSquads (mock data)
+   - Lines 1446-1493: createCustomSquad creates hardcoded squad structure
+   - Lines 1495-1530: removeSquadMember with hardcoded ping
+   - Lines 1532-1573: updateSquadMemberRole with hardcoded ping
+   - Lines 1575-1605: updateSquadSettings with hardcoded notification
+   - Lines 1607-1631: regenerateSquadInviteCode with hardcoded code format
+   - Lines 1789-1809+: resetDemoAccountInDb resets to hardcoded Alex Chen baseline
+
+5. app/lib/supabase.ts (1809+ lines)
+   - Lines 56-57: Hardcoded default avatar URL (unsplash) in signUpUser
+   - Lines 226-230: Hardcoded default creator avatar in fetchCurrentSprint
+   - Lines 241-245: Fallback to generateTasksForSkill (mock) when no tasks in DB
+   - Lines 598-608: Hardcoded activeProject in fetchSquad (title, description, deadline, submissions)
+   - Lines 911-920: Hardcoded macroSquad members (Liam Ross only, with unsplash avatar)
+   - Lines 930-931: Hardcoded timestamp "2 hours ago" for milestone updates
+   - Lines 964: Hardcoded timestamp "3 hours ago" for community posts
+   - Lines 965: Hardcoded empty replies array
+   - Lines 1398-1475: generateTasksForSkill - Next.js track (4 hardcoded tasks with unsplash avatars)
+   - Lines 1478-1546: generateTasksForSkill - TypeScript track (4 hardcoded tasks with unsplash avatars)
+   - Lines 1549-1621: generateTasksForSkill - UI Engineering track (4 hardcoded tasks with unsplash avatars)
+   - Lines 1624-1691: generateTasksForSkill - System Architecture track (4 hardcoded tasks with unsplash avatars)
+   - Lines 1798-1809: resetDemoAccountInDb - Hardcoded Alex Chen profile reset data
+
+6. app/components/PublicProfileView.tsx (668 lines)
+   - Lines 56-63: avatarPresets array with 6 hardcoded unsplash.com URLs
+   - Lines 81-114: Hardcoded badges array (4 badges with static data)
+
+7. app/components/SearchModal.tsx (149 lines)
+   - Lines 13-14: Hardcoded recentSearches and suggestedTopics arrays
+
+8. app/components/MascotDrawer.tsx (744 lines)
+   - Lines 58-96: createDefaultMessages function with hardcoded personalized messages using user survey data
+   - Lines 118-125: Hardcoded initial session with createDefaultMessages()
+   - Lines 162-168: handleStartNewChat creates session with createDefaultMessages()
+   - Lines 190-197: handleDeleteSession fallback creates session with createDefaultMessages()
+   - Lines 640-715: Dynamic quick prompt chips based on survey data (but with hardcoded fallback values)
+
+9. app/components/OnboardingFlow.tsx (494 lines)
+   - Lines 38-69: availableSkills array (7 hardcoded skills with categories/descriptions)
+   - Lines 71-83: experienceLevels, commitmentOptions, goalOptions, paceOptions (hardcoded arrays)
+   - Lines 23-30: Hardcoded default selections for skills, experience, commitment, goal, pace, followedCreators
+   - Lines 344-380: Uses creators from context (which comes from mock data)
+
+10. app/api/mascot/route.ts (285 lines)
+    - Lines 178-190: Hardcoded system prompt template with user context placeholders
+    - Lines 222-224: Hardcoded fallback reply when OpenRouter fails
+    - Lines 250-270: Hardcoded mascot emotion selection logic based on reply content
+
+11. app/api/questionnaire/route.ts (593 lines)
+    - Lines 276-351: generateSmartFallback Step 2 (Hobbies) - 6 hardcoded hobby options
+    - Lines 354-389: generateSmartFallback Step 3 (Age/Stage) - 4 hardcoded stage options
+    - Lines 392-434: generateSmartFallback Step 4 (Gaming+CS/Math) - 5 hardcoded profession options
+    - Lines 437-472: generateSmartFallback Step 4 (Art/Creative) - 4 hardcoded profession options
+    - Lines 475-510: generateSmartFallback Step 4 (Business) - 4 hardcoded profession options
+    - Lines 513-547: generateSmartFallback Step 4 (Default) - 4 hardcoded profession options
+    - Lines 550-592: generateSmartFallback Step 5 (Skills) - 6 hardcoded skill options
+
+12. app/components/CreatorView.tsx (292 lines)
+    - Lines 32-38: skillTags array (hardcoded filter tags)
+    - Uses creators and creatorPosts from context (mock data)
+
+13. app/components/CommunityView.tsx (419 lines)
+    - Lines 137-138: Hardcoded filter categories array
+    - Uses posts from context (mock data)
+
+14. app/components/SquadView.tsx (1072+ lines)
+    - Lines 43-49: quickCheckinTags array (5 hardcoded check-in suggestions)
+    - Lines 51-57: communityFilterTags array (6 hardcoded filter tags)
+    - Lines 59-66: standardFocusTracks array (6 hardcoded skill tracks)
+    - Uses squad, macroSquad, presetAvailableSquads from context/imports (mock data)
+
+15. app/components/LandingQuestionnaire.tsx (858 lines)
+    - Lines 63-65: Hardcoded default selectedSubjects = ["Computer Science/ICT"]
+    - Lines 70-72: Hardcoded default selectedHobbies = ["Gaming"]
+    - Lines 75-78: Hardcoded default ageInput = "22", selectedAge = "Early Career / Rising Engineer"
+    - Lines 163-194: baseSubjects array (6 hardcoded subject options with badges)
+    - Lines 152-160: mascotMap with hardcoded SVG paths
+    - Uses dynamic AI generation but falls back to hardcoded options
+
+16. app/components/AuthModal.tsx (312 lines)
+    - Lines 189, 207: Hardcoded placeholder text "Alex Rivera", "alex@example.com"
+    - Uses demo login which loads mock user-1 data
+
+17. app/components/ResetDemoModal.tsx (221 lines)
+    - Lines 132: Hardcoded email "hello@thenicedev.xyz" in description
+    - Lines 141, 146, 152, 158, 163: Hardcoded reset checklist items
+
+18. app/components/StepDetailModal.tsx (not fully read - check for mock data)
+19. app/components/JourneyView.tsx (not fully read - check for mock data)
+20. app/components/ProgressView.tsx (not fully read - check for mock data)
+21. app/components/DashboardView.tsx (not fully read - check for mock data)
+22. app/components/BingeQuizModal.tsx (not fully read - check for mock data)
+23. app/components/SurveyPromptModal.tsx (not fully read - check for mock data)
+24. app/components/SettingsModal.tsx (not fully read - check for mock data)
+25. app/components/DuolingoMascot.tsx (not fully read - check for mock data)
+26. app/components/FloatingMascotBadge.tsx (not fully read - check for mock data)
+27. app/components/CodeBlock.tsx (not fully read - check for mock data)
+28. app/components/MarkdownRenderer.tsx (not fully read - check for mock data)
+29. app/components/MobileNav.tsx (not fully read - check for mock data)
+30. app/components/Navbar.tsx (not fully read - check for mock data)
+
+---
+
+SUMMARY: KEY MOCK DATA PATTERNS TO REPLACE
+
+1. **Hardcoded User Profile**: Alex Chen (@alexchen.dev, hello@thenicedev.xyz) appears in:
+   - HuddleContext.tsx initial state
+   - supabase.ts resetDemoAccountInDb
+   - defaultSquadData.ts as squad member
+   - Multiple components referencing user-1
+
+2. **Hardcoded Squad Members**: Elena Rostova, Marcus Vance, Priya Patel, Carlos Mendez, Amina Diallo, Kenji Sato, Rachel Rivera, Liam Chen appear in:
+   - defaultSquadData.ts (multiple squads)
+   - practiceCourseContent.ts (as instructors)
+   - practiceSessions.ts (as creators)
+   - supabase.ts generateTasksForSkill
+
+3. **Hardcoded Avatars**: All use unsplash.com URLs with specific photo IDs:
+   - photo-1534528741775-53994a69daeb (Alex Chen)
+   - photo-1573496359142-b8d87734a5a2 (Elena Rostova)
+   - photo-1507003211169-0a1dd7228f2d (Marcus Vance)
+   - photo-1580489944761-15a19d654956 (Priya Patel)
+   - photo-1500648767791-00dcc994a43e (Liam Ross)
+   - photo-1544005313-94ddf0286df2 (Sophia Kim)
+   - photo-1472099645785-5658abf4ff4e (David O'Connor)
+   - photo-1494790108377-be9c29b29330 (Sarah Jenkins)
+   - photo-1519085360753-af0119f7cbe7 (Tariq Mansoor/Kenji Sato)
+   - photo-1506794778202-cad84cf45f1d (Carlos Mendez)
+   - photo-1534528741775-53994a69daeb (Amina Diallo - duplicate of Alex)
+   - photo-1519085360753-af0119f7cbe7 (Kenji Sato - duplicate)
+   - photo-1544005313-94ddf0286df2 (Rachel Rivera - duplicate of Sophia)
+
+4. **Hardcoded Curriculum Content**: All practice sessions, video lessons, course sections, knowledge questions, exercises, and artifacts are hardcoded in practiceCourseContent.ts and practiceSessions.ts
+
+5. **Hardcoded Fallback Data**: supabase.ts generateTasksForSkill, questionnaire API generateSmartFallback, mascot API fallback replies
+
+6. **Demo Account Detection**: Multiple files check for user-1 or hello@thenicedev.xyz to determine demo mode
+
+---
+
+RECOMMENDED REPLACEMENT STRATEGY
+
+1. Remove all hardcoded data from defaultSquadData.ts, practiceCourseContent.ts, practiceSessions.ts
+2. Replace HuddleContext.tsx initial state with proper database loading (return empty arrays/null until DB loads)
+3. Replace supabase.ts generateTasksForSkill with database-driven task generation
+4. Replace questionnaire API generateSmartFallback with database-driven dynamic options
+5. Replace all unsplash.com avatar URLs with user-uploaded avatars or generated placeholders
+6. Remove demo user detection logic (user-1, hello@thenicedev.xyz)
+7. Ensure all components consume data from HuddleContext (which loads from Supabase) rather than importing mock data directly
+8. Add proper seeding scripts for initial database population instead of hardcoded constants

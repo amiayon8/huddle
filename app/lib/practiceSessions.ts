@@ -1275,7 +1275,7 @@ export function getPracticeSessionForTask(task: SprintTask, skillTitle: string):
     skillTitle,
     taskTitle: task.title,
     creatorName: task.creatorName || 'Elena Rostova',
-    creatorAvatar: task.creatorAvatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+    creatorAvatar: task.creatorAvatar || '/avatars/avatar-2.svg',
     creatorHandle: task.creatorHandle || '@elena_distrib',
     videoLesson: getVideoLessonForTask(skillTitle, task.dayNumber),
     courseSections: getCourseSectionsForTask(skillTitle, task.dayNumber),

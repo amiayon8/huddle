@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
 import { UserSurveyData } from "../types/huddle";
+import { fetchQuestionnaireConfig } from "../lib/supabase";
 
 interface DynamicQuestionData {
   question: string;
@@ -159,8 +160,7 @@ export const LandingQuestionnaire: React.FC = () => {
     error: "/mascot_error.svg",
   };
 
-  // Base options for Question 1: Favourite Subject
-  const baseSubjects = [
+  const defaultSubjects = [
     {
       id: "science",
       title: "Science",
@@ -192,6 +192,27 @@ export const LandingQuestionnaire: React.FC = () => {
       badge: "Logic",
     },
   ];
+
+  const [baseSubjects, setBaseSubjects] = useState(defaultSubjects);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchQuestionnaireConfig("subjects").then((configs) => {
+      if (isMounted && configs && configs.length > 0) {
+        setBaseSubjects(
+          configs.map((c) => ({
+            id: c.id,
+            title: c.title,
+            desc: c.description,
+            badge: c.badge || "Core",
+          })),
+        );
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Fetch AI dynamic question data whenever step changes to 2, 3, 4, or 5
   useEffect(() => {

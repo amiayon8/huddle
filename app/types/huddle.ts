@@ -365,6 +365,7 @@ export interface BingeQuizQuestion {
 
 export type ActiveTab = 
   | 'dashboard'
+  | 'overview'
   | 'journey'
   | 'squad'
   | 'macro_squad'

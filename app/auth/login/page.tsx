@@ -14,19 +14,22 @@ import { useHuddle } from "../../context/HuddleContext";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { isAuthenticated, authLoading, login, loginDemo } = useHuddle();
+  const { isAuthenticated, authLoading, login, loginDemo, setActiveTab } = useHuddle();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // If already logged in, redirect to /app
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      router.push("/app");
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("redirected_from_auth", "true");
+      }
+      setActiveTab("explore");
+      router.push("/app?from=auth");
     }
-  }, [isAuthenticated, authLoading, router]);
+  }, [isAuthenticated, authLoading, router, setActiveTab]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,14 +41,22 @@ export default function LoginPage() {
       setErrorMsg(res.error || "Invalid email or password");
       setLoading(false);
     } else {
-      router.push("/app");
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("redirected_from_auth", "true");
+      }
+      setActiveTab("explore");
+      router.push("/app?from=auth");
     }
   };
 
   const handleDemoLogin = async () => {
     setLoading(true);
     await loginDemo();
-    router.push("/app");
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("redirected_from_auth", "true");
+    }
+    setActiveTab("explore");
+    router.push("/app?from=auth");
   };
 
   if (authLoading) {

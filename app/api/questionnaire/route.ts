@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { supabase } from "@/app/lib/supabase";
 
 interface QuestionnairePayload {
   step: number; // 2 (hobby), 3 (age), 4 (profession), 5 (skills)
@@ -196,7 +197,7 @@ Return strictly valid JSON with this schema:
             method: "POST",
             headers: {
               Authorization: `Bearer ${apiKey}`,
-              "HTTP-Referer": "https://huddle.dev",
+              "HTTP-Referer": "https://huddle.thenicedev.xyz",
               "X-Title": "Huddle Dynamic Questionnaire",
               "Content-Type": "application/json",
             },
@@ -253,8 +254,7 @@ Return strictly valid JSON with this schema:
       }
     }
 
-    // Fallback dynamic generator based on inputs
-    const fallbackData = generateSmartFallback(step, answers);
+    const fallbackData = await generateSmartFallback(step, answers);
     return NextResponse.json({
       success: true,
       dynamic: false,
@@ -272,322 +272,62 @@ Return strictly valid JSON with this schema:
   }
 }
 
-// Deterministic intelligent fallback when OpenRouter is unreachable or rate-limited
-function generateSmartFallback(
+async function generateSmartFallback(
   step: number,
   answers: QuestionnairePayload["answers"],
 ) {
-  const subjects = [
-    ...(answers.subjects || []),
-    ...(answers.subjectsOther ? [answers.subjectsOther] : []),
-  ];
-  const isCS = subjects.some(
-    (s) =>
-      s.toLowerCase().includes("computer") || s.toLowerCase().includes("ict"),
-  );
-  const isMath = subjects.some((s) => s.toLowerCase().includes("math"));
-  const isBusiness = subjects.some((s) => s.toLowerCase().includes("business"));
-  const isArt = subjects.some(
-    (s) =>
-      s.toLowerCase().includes("art") || s.toLowerCase().includes("humanities"),
-  );
-
-  const hobbies = [
-    ...(answers.hobbies || []),
-    ...(answers.hobbiesOther ? [answers.hobbiesOther] : []),
-  ];
-  const isGaming = hobbies.some(
-    (h) =>
-      h.toLowerCase().includes("game") || h.toLowerCase().includes("gaming"),
-  );
-  const isMusic = hobbies.some((h) => h.toLowerCase().includes("music"));
-  const isCreative = hobbies.some(
-    (h) =>
-      h.toLowerCase().includes("art") || h.toLowerCase().includes("creative"),
-  );
-
-  if (step === 2) {
-    return {
-      question: "What is your hobby?",
-      subtitle: isCS
-        ? "Many developers draw creative inspiration from their hobbies outside coding!"
-        : "Hobbies reveal how you naturally learn, explore, and stay in flow.",
-      mascotEmotion: "encouragement",
-      mascotNote:
-        "Pip loves combining analytical subjects with playful hobbies. Tell me what energizes you!",
-      isMultiple: true,
-      options: [
-        {
-          id: "gaming",
-          title: "Gaming",
-          desc: "Interactive worlds, mechanics & strategy",
-          badge: "Flow",
-        },
-        {
-          id: "music",
-          title: "Listening to/Making Music",
-          desc: "Audio composition, rhythms & production",
-          badge: "Creative",
-        },
-        {
-          id: "sports",
-          title: "Sports & Physical Activities",
-          desc: "Endurance, teamwork & motor skills",
-          badge: "Active",
-        },
-        {
-          id: "reading",
-          title: "Reading",
-          desc: "Books, technical papers & speculative fiction",
-          badge: "Focus",
-        },
-        {
-          id: "art",
-          title: "Art & Creative Activities",
-          desc: "Digital sketching, 3D modeling & crafts",
-          badge: "Visual",
-        },
-      ],
-    };
-  }
+  let category = "hobbies";
+  let question = "What is your hobby?";
+  let subtitle = "Hobbies reveal how you naturally learn, explore, and stay in flow.";
+  let mascotEmotion = "encouragement";
+  let mascotNote = "Pip loves combining analytical subjects with playful hobbies. Tell me what energizes you!";
+  let isMultiple = true;
 
   if (step === 3) {
-    return {
-      question: "How would you describe your current learning stage?",
-      subtitle:
-        "Pip tunes your sprint intensity, schedule rhythms, and daily depth to match where you are right now.",
-      mascotEmotion: "thinking",
-      mascotNote:
-        "Enter your age or birth year below! Pip will calibrate your daily workload to your current career rhythm.",
-      isMultiple: false,
-      options: [
-        {
-          id: "student",
-          title: "Student / Early Explorer",
-          desc: "Foundational practice, building mental models & curiosity (Age <18)",
-          badge: "Explorer",
-        },
-        {
-          id: "rising",
-          title: "Early Career / Rising Engineer",
-          desc: "University student or early-career builder (Age 18–24)",
-          badge: "Rising",
-        },
-        {
-          id: "midlevel",
-          title: "Mid-Level / Skill Upskilling",
-          desc: "Working engineer deepening architecture & systems (Age 25–34)",
-          badge: "Core",
-        },
-        {
-          id: "leadership",
-          title: "Senior / Leadership & Staff Track",
-          desc: "Experienced practitioner & technical leader (Age 35+)",
-          badge: "Staff",
-        },
-      ],
-    };
+    category = "stages";
+    question = "Which best describes your current stage?";
+    subtitle = "This helps calibrate the pace, foundational depth, and challenge level of your sprint.";
+    mascotEmotion = "thinking";
+    mascotNote = "Whether you are just starting out or leading teams, the journey is customized for you.";
+    isMultiple = false;
+  } else if (step === 4) {
+    category = "professions";
+    question = "Which target profession or milestone excites you most?";
+    subtitle = "We will design deliberate practice sprints to build real-world evidence for this exact role.";
+    mascotEmotion = "planning";
+    mascotNote = "Every craft milestone comes with concrete artifacts and community-verified proofs.";
+    isMultiple = false;
+  } else if (step === 5) {
+    category = "skills";
+    question = "Which starting skills would you like to level up first?";
+    subtitle = "Select 1 to 3 core skills. You can expand your tech tree at any time.";
+    mascotEmotion = "deep_thinking";
+    mascotNote = "Pick the skills that excite you right now. We will craft a focused 4-day sprint around your top choice.";
+    isMultiple = true;
   }
 
-  if (step === 4) {
-    // Tailored professions based on subject + hobby
-    if (isGaming && (isCS || isMath)) {
-      return {
-        question: "What do you want to be (profession)?",
-        subtitle: `Pip tailored these roles for your passion in ${subjects.join(" & ")} and Gaming.`,
-        mascotEmotion: "planning",
-        mascotNote:
-          "Gaming paired with computing is one of the highest-demand engineering intersections!",
-        isMultiple: false,
-        options: [
-          {
-            id: "game-engine-dev",
-            title: "Game Engine & Graphics Engineer",
-            desc: "Low-level C++, shader pipelines, real-time physics & Vulkan",
-            badge: "High Demand",
-          },
-          {
-            id: "distributed-backend",
-            title: "Multiplayer Systems & Backend Architect",
-            desc: "High-concurrency servers, WebSocket pipelines & distributed state",
-            badge: "Popular",
-          },
-          {
-            id: "ai-engineer",
-            title: "AI Game Systems & Agentic Developer",
-            desc: "Autonomous NPC behavior trees, LLM agents & procedural logic",
-            badge: "Emerging",
-          },
-          {
-            id: "fullstack-product",
-            title: "Interactive Web & Game Platform Engineer",
-            desc: "Next.js, Canvas/WebGL, real-time apps & community platforms",
-            badge: "Versatile",
-          },
-          {
-            id: "solutions-arch",
-            title: "Cloud Infrastructure & SRE Architect",
-            desc: "Zero-downtime clusters, Kubernetes & global CDN delivery",
-            badge: "Resilient",
-          },
-        ],
-      };
-    }
+  const { data: dbOptions } = await supabase
+    .from("questionnaire_config")
+    .select("*")
+    .eq("category", category)
+    .order("sort_order", { ascending: true });
 
-    if (isArt || isCreative) {
-      return {
-        question: "What do you want to be (profession)?",
-        subtitle:
-          "Pip tailored these roles combining design, aesthetics, and technical execution.",
-        mascotEmotion: "planning",
-        mascotNote:
-          "Design engineers who code have an extraordinary unfair advantage in modern software.",
-        isMultiple: false,
-        options: [
-          {
-            id: "design-engineer",
-            title: "Product Design Engineer (Frontend)",
-            desc: "Tailwind, Framer Motion, accessible micro-interactions & polished UX",
-            badge: "Unfair Advantage",
-          },
-          {
-            id: "creative-technologist",
-            title: "Creative Technologist / 3D Web Dev",
-            desc: "Three.js, WebGL shaders, generative art & interactive installations",
-            badge: "Art & Code",
-          },
-          {
-            id: "fullstack-eng",
-            title: "Full-Stack Software Engineer",
-            desc: "End-to-end user experience, robust API design & clean interfaces",
-            badge: "Comprehensive",
-          },
-          {
-            id: "technical-pm",
-            title: "Design-Savvy Technical Product Lead",
-            desc: "Bridging product vision, engineering constraints & UX excellence",
-            badge: "Leadership",
-          },
-        ],
-      };
-    }
+  const options =
+    dbOptions && dbOptions.length > 0
+      ? dbOptions.map((row) => ({
+          id: row.id,
+          title: row.title,
+          desc: row.description,
+          badge: row.badge,
+        }))
+      : [];
 
-    if (isBusiness) {
-      return {
-        question: "What do you want to be (profession)?",
-        subtitle:
-          "Pip tailored these high-impact commercial & technical leadership tracks.",
-        mascotEmotion: "planning",
-        mascotNote:
-          "Software literacy combined with business strategy creates impactful tech founders and CTOs.",
-        isMultiple: false,
-        options: [
-          {
-            id: "tech-founder",
-            title: "Technical Founder & Solopreneur",
-            desc: "Rapid prototype builds, SaaS architecture & product distribution",
-            badge: "Impact",
-          },
-          {
-            id: "solutions-architect",
-            title: "Enterprise Solutions Architect",
-            desc: "Cloud economics, distributed system tradeoffs & client integrations",
-            badge: "Enterprise",
-          },
-          {
-            id: "fintech-eng",
-            title: "Fintech Systems & Payments Engineer",
-            desc: "Idempotent transactions, event-sourcing & secure ledger infrastructure",
-            badge: "Fintech",
-          },
-          {
-            id: "tech-lead",
-            title: "Engineering Manager / Tech Lead",
-            desc: "Team leverage, architecture roadmaps & engineering excellence",
-            badge: "Leadership",
-          },
-        ],
-      };
-    }
-
-    // Default general tech professions
-    return {
-      question: "What do you want to be (profession)?",
-      subtitle: `Pip curated these career pathways based on your ${subjects.join(", ")} interests.`,
-      mascotEmotion: "planning",
-      mascotNote:
-        "Choose your horizon! Pip will build a daily deliberate roadmap toward this craft.",
-      isMultiple: false,
-      options: [
-        {
-          id: "staff-architect",
-          title: "Staff Distributed Systems Architect",
-          desc: "High-scale backend, asynchronous event buses & resilient cloud infrastructure",
-          badge: "Staff Track",
-        },
-        {
-          id: "ai-engineer",
-          title: "AI Application & Agentic Systems Engineer",
-          desc: "LLM tool calling, deterministic evals, RAG pipelines & prompt engines",
-          badge: "Cutting Edge",
-        },
-        {
-          id: "fullstack-product",
-          title: "Full-Stack Product Engineer",
-          desc: "Next.js App Router, React Server Components & transactional databases",
-          badge: "Popular",
-        },
-        {
-          id: "quant-dev",
-          title: "High-Performance / Quantitative Systems Engineer",
-          desc: "Algorithmic optimization, low-latency data structures & math modeling",
-          badge: "Math & Logic",
-        },
-      ],
-    };
-  }
-
-  // Step 5: Skills tailored to chosen profession
-  const professionTitle =
-    answers.professionOther || answers.profession || "Software Engineering";
   return {
-    question: "Which skill do you want to start with?",
-    subtitle: `Select 1 or more core capabilities to kickstart your journey toward ${professionTitle}.`,
-    mascotEmotion: "success",
-    mascotNote:
-      "Consistency beats intensity! We will break your chosen skills into 1 daily 15-minute action.",
-    isMultiple: true,
-    options: [
-      {
-        id: "sys-arch",
-        title: "System Architecture & Scalability",
-        desc: "Distributed caching with Redis, asynchronous queues & database sharding",
-        badge: "Foundation",
-      },
-      {
-        id: "next-rsc",
-        title: "Next.js App Router & Server Components",
-        desc: "Stream rendering, server actions & modern production web architecture",
-        badge: "Frontend",
-      },
-      {
-        id: "ai-agents",
-        title: "AI Engineering & Agentic Workflows",
-        desc: "Multi-step tool calling, structured JSON output & deterministic testing",
-        badge: "AI Era",
-      },
-      {
-        id: "ts-mechanics",
-        title: "TypeScript Type Mechanics & Design",
-        desc: "Generics, mapped types, conditional inference & self-documenting codebases",
-        badge: "Robustness",
-      },
-      {
-        id: "ui-craft",
-        title: "Product UI & Micro-interactions",
-        desc: "Accessible component libraries, subtle motion curves & premium aesthetics",
-        badge: "UX Polish",
-      },
-    ],
+    question,
+    subtitle,
+    mascotEmotion,
+    mascotNote,
+    isMultiple,
+    options,
   };
 }

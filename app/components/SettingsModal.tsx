@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Sun, Moon, Shield, Bell, User as UserIcon, Bot, Check, LogOut, RotateCcw } from 'lucide-react';
 import { useHuddle } from '../context/HuddleContext';
 
@@ -23,6 +23,34 @@ export const SettingsModal: React.FC = () => {
   const [careerMilestone, setCareerMilestone] = useState(user.careerMilestone);
   const [primaryGoal, setPrimaryGoal] = useState(user.primaryGoal);
   const [saved, setSaved] = useState(false);
+  const [isPipDismissed, setIsPipDismissed] = useState(false);
+
+  useEffect(() => {
+    const syncDismissed = () => {
+      if (typeof window !== 'undefined') {
+        setIsPipDismissed(Boolean(localStorage.getItem('huddle_pip_dismissed')));
+      }
+    };
+    syncDismissed();
+    window.addEventListener('storage', syncDismissed);
+    window.addEventListener('huddle_pip_visibility_change', syncDismissed);
+    return () => {
+      window.removeEventListener('storage', syncDismissed);
+      window.removeEventListener('huddle_pip_visibility_change', syncDismissed);
+    };
+  }, []);
+
+  const togglePipDismissal = () => {
+    if (typeof window === 'undefined') return;
+    if (isPipDismissed) {
+      localStorage.removeItem('huddle_pip_dismissed');
+      setIsPipDismissed(false);
+    } else {
+      localStorage.setItem('huddle_pip_dismissed', 'true');
+      setIsPipDismissed(true);
+    }
+    window.dispatchEvent(new Event('huddle_pip_visibility_change'));
+  };
 
   if (!settingsOpen) return null;
 
@@ -301,6 +329,22 @@ export const SettingsModal: React.FC = () => {
                 <p className="text-[11px] leading-relaxed">
                   Pip never penalizes missed days or broken streaks. Reshuffling a 4-day sprint is always 100% free and supportive.
                 </p>
+              </div>
+
+              <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-3">
+                <div>
+                  <div className="font-semibold text-zinc-900 dark:text-zinc-100">Floating Mascot Badge</div>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                    Show Pip assistant badge in the bottom-right corner of the screen.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={togglePipDismissal}
+                  className="shrink-0 px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-750 font-medium text-[11px] text-zinc-800 dark:text-zinc-200 cursor-pointer transition-colors"
+                >
+                  {isPipDismissed ? 'Restore Pip' : 'Dismiss Pip'}
+                </button>
               </div>
             </div>
           )}

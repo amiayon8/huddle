@@ -28,6 +28,7 @@ import {
   getPracticeSessionForTask,
   PracticeSessionContent
 } from "../lib/practiceSessions";
+import { fetchPracticeCurriculum } from "../lib/supabase";
 import { CodeBlock } from "./CodeBlock";
 
 type CourseModuleTab = "video" | "text" | "quiz" | "workbench" | "artifact";
@@ -79,9 +80,31 @@ export const PracticeSessionModal: React.FC = () => {
   const notesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const task = selectedPracticeTask;
-  const sessionContent: PracticeSessionContent | null = task
-    ? getPracticeSessionForTask(task, sprint.skillTitle)
-    : null;
+  const [sessionContent, setSessionContent] = useState<PracticeSessionContent | null>(() => {
+    return task ? getPracticeSessionForTask(task, sprint.skillTitle) : null;
+  });
+
+  useEffect(() => {
+    if (!task) {
+      setSessionContent(null);
+      return;
+    }
+
+    let isMounted = true;
+    fetchPracticeCurriculum(sprint.skillTitle, task.dayNumber).then((dbContent) => {
+      if (isMounted) {
+        if (dbContent) {
+          setSessionContent(dbContent);
+        } else {
+          setSessionContent(getPracticeSessionForTask(task, sprint.skillTitle));
+        }
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [task?.id, task?.dayNumber, sprint.skillTitle]);
 
   useEffect(() => {
     if (task && sessionContent) {
@@ -119,7 +142,7 @@ export const PracticeSessionModal: React.FC = () => {
       setShowConfirmationClose(false);
       setNotesSaveStatus("");
     }
-  }, [task?.id, isPracticeReviewMode]);
+  }, [task?.id, sessionContent, isPracticeReviewMode]);
 
   useEffect(() => {
     if (!isPracticeSessionOpen || isPracticeReviewMode || currentStep === 4) {

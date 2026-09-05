@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ArrowRight,
   ArrowLeft,
@@ -15,6 +15,7 @@ import {
   Compass,
 } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
+import { fetchQuestionnaireConfig } from "../lib/supabase";
 
 export const OnboardingFlow: React.FC = () => {
   const { onboardingActive, finishOnboarding, creators } = useHuddle();
@@ -35,7 +36,7 @@ export const OnboardingFlow: React.FC = () => {
 
   const totalSteps = 9;
 
-  const availableSkills = [
+  const initialSkills = [
     {
       title: "System Architecture",
       category: "Engineering",
@@ -67,6 +68,26 @@ export const OnboardingFlow: React.FC = () => {
       desc: "Tool calling, prompt chains, evaluation",
     },
   ];
+
+  const [skillsList, setSkillsList] = useState(initialSkills);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchQuestionnaireConfig("skills").then((configs) => {
+      if (isMounted && configs && configs.length > 0) {
+        setSkillsList(
+          configs.map((c) => ({
+            title: c.title,
+            category: c.badge || "Engineering",
+            desc: c.description,
+          })),
+        );
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const experienceLevels = ["Beginner", "Intermediate", "Advanced"];
   const commitmentOptions = ["10 mins / day", "20 mins / day", "40 mins / day"];
@@ -162,7 +183,7 @@ export const OnboardingFlow: React.FC = () => {
                 </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {availableSkills.map((sk) => {
+                {skillsList.map((sk) => {
                   const isSelected = selectedSkills.includes(sk.title);
                   return (
                     <div
