@@ -8,7 +8,7 @@ import { useHuddle } from "../../context/HuddleContext";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isAuthenticated, authLoading } = useHuddle();
+  const { login, loginDemo, isAuthenticated, authLoading } = useHuddle();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,15 +21,16 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const success = await login(email, password);
-      if (success) {
+      const res = await login(email, password);
+      if (res && res.success) {
         if (typeof window !== "undefined") {
           sessionStorage.setItem("redirected_from_auth", "true");
         }
         router.push("/app?from=auth");
       } else {
         setErrorMsg(
-          "Invalid credentials. Please verify your email and password.",
+          (res && res.error) ||
+            "Invalid credentials. Please verify your email and password.",
         );
       }
     } catch {
@@ -43,17 +44,13 @@ export default function LoginPage() {
     setErrorMsg("");
     setLoading(true);
     try {
-      const success = await login("alex@example.com", "password123");
-      if (success) {
-        if (typeof window !== "undefined") {
-          sessionStorage.setItem("redirected_from_auth", "true");
-        }
-        router.push("/app?from=auth");
-      } else {
-        setErrorMsg("Unable to load demonstration account. Please retry.");
+      await loginDemo();
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("redirected_from_auth", "true");
       }
+      router.push("/app?from=auth");
     } catch {
-      setErrorMsg("Connection error while loading demonstration account.");
+      setErrorMsg("Connection error while loading demo account.");
     } finally {
       setLoading(false);
     }
@@ -184,7 +181,7 @@ export default function LoginPage() {
           disabled={loading}
           className="w-full py-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 text-zinc-700 dark:text-zinc-300 font-medium text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
         >
-          <span>Use Demonstration Account</span>
+          <span>Use demo Account</span>
         </button>
 
         <div className="text-center text-xs text-zinc-500 pt-1">

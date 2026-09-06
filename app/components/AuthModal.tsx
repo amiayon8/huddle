@@ -6,7 +6,7 @@ import { useHuddle } from '../context/HuddleContext';
 import { signInUser, signUpUser, resetPasswordUser } from '../lib/supabase';
 
 export const AuthModal: React.FC = () => {
-  const { authModalOpen, closeAuthModal, authMode, setOnboardingActive, updateUserProfile, loginDemo } = useHuddle();
+  const { authModalOpen, closeAuthModal, authMode, setOnboardingActive, updateUserProfile, loginDemo, isAuthenticated } = useHuddle();
   const [mode, setMode] = useState<'welcome' | 'login' | 'signup' | 'forgot'>(authMode || 'welcome');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +15,13 @@ export const AuthModal: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  if (!authModalOpen) return null;
+  React.useEffect(() => {
+    if (authMode) {
+      setMode(authMode);
+    }
+  }, [authMode]);
+
+  if (!authModalOpen || isAuthenticated) return null;
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -53,7 +53,6 @@ export const ResetDemoModal: React.FC = () => {
         setResetDemoModalOpen(false);
         if (shouldLogout) {
           router.push("/auth/login");
-          openAuthModal("welcome");
         }
       }, 700);
     } catch (err: any) {

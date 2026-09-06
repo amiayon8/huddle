@@ -2567,3 +2567,484 @@ export async function deleteDiscussionAdmin(
   }
 }
 
+export async function createUserAdmin(
+  adminId: string,
+  adminName: string,
+  userData: {
+    name: string;
+    email: string;
+    handle?: string;
+    role?: "admin" | "moderator" | "user";
+    status?: "active" | "flagged" | "suspended";
+    primaryGoal?: string;
+    careerMilestone?: string;
+  },
+): Promise<{ success: boolean; user?: UserProfile; error?: string }> {
+  try {
+    const newId = `usr_${Date.now()}`;
+    const handle =
+      userData.handle ||
+      `@${userData.name.toLowerCase().replace(/\s+/g, ".")}`;
+    const newProfile: any = {
+      id: newId,
+      name: userData.name,
+      handle,
+      email: userData.email,
+      avatar: `/avatars/avatar-${Math.floor(Math.random() * 8) + 1}.svg`,
+      bio: "",
+      streak: 0,
+      max_streak: 0,
+      reputation: 0,
+      role: userData.role || "user",
+      status: userData.status || "active",
+      primary_goal: userData.primaryGoal || "Master Technical Foundations",
+      career_milestone: userData.careerMilestone || "Software Engineer",
+      onboarding_completed: true,
+      privacy: {
+        showStreak: true,
+        showSquad: true,
+        showReputation: true,
+        publicProfile: true,
+        hideRawRoadmaps: false,
+      },
+      created_at: new Date().toISOString(),
+    };
+
+    const { error } = await supabase.from("profiles").insert(newProfile);
+    if (error) throw error;
+
+    await logAdminAction(
+      adminId,
+      adminName,
+      "CREATE_USER",
+      "user",
+      newId,
+      { name: userData.name, email: userData.email, role: userData.role },
+    );
+
+    const mappedUser: UserProfile = {
+      id: newId,
+      name: newProfile.name,
+      handle: newProfile.handle,
+      email: newProfile.email,
+      avatar: newProfile.avatar,
+      bio: newProfile.bio,
+      streak: 0,
+      maxStreak: 0,
+      reputation: 0,
+      squadId: null,
+      macroSquadId: null,
+      role: newProfile.role,
+      status: newProfile.status,
+      primaryGoal: newProfile.primary_goal,
+      careerMilestone: newProfile.career_milestone,
+      onboardingCompleted: true,
+      joinedDate: "Just now",
+      privacy: newProfile.privacy,
+    };
+
+    return { success: true, user: mappedUser };
+  } catch (err: any) {
+    console.error("Error creating user from admin:", err);
+    return { success: false, error: err.message || "Failed to create user" };
+  }
+}
+
+export async function updateUserFullAdmin(
+  adminId: string,
+  adminName: string,
+  targetUserId: string,
+  updates: {
+    name?: string;
+    email?: string;
+    handle?: string;
+    role?: "admin" | "user" | "moderator";
+    status?: "active" | "suspended" | "flagged";
+    primaryGoal?: string;
+    careerMilestone?: string;
+  },
+): Promise<boolean> {
+  try {
+    const dbUpdates: any = { updated_at: new Date().toISOString() };
+    if (updates.name !== undefined) dbUpdates.name = updates.name;
+    if (updates.email !== undefined) dbUpdates.email = updates.email;
+    if (updates.handle !== undefined) dbUpdates.handle = updates.handle;
+    if (updates.role !== undefined) dbUpdates.role = updates.role;
+    if (updates.status !== undefined) dbUpdates.status = updates.status;
+    if (updates.primaryGoal !== undefined)
+      dbUpdates.primary_goal = updates.primaryGoal;
+    if (updates.careerMilestone !== undefined)
+      dbUpdates.career_milestone = updates.careerMilestone;
+
+    const { error } = await supabase
+      .from("profiles")
+      .update(dbUpdates)
+      .eq("id", targetUserId);
+
+    if (error) throw error;
+
+    await logAdminAction(
+      adminId,
+      adminName,
+      "UPDATE_USER_FULL",
+      "user",
+      targetUserId,
+      updates,
+    );
+
+    return true;
+  } catch (err) {
+    console.error("Error updating user full details:", err);
+    return false;
+  }
+}
+
+export async function deleteUserAdmin(
+  adminId: string,
+  adminName: string,
+  targetUserId: string,
+): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from("profiles")
+      .delete()
+      .eq("id", targetUserId);
+
+    if (error) throw error;
+
+    await logAdminAction(
+      adminId,
+      adminName,
+      "DELETE_USER",
+      "user",
+      targetUserId,
+      { targetUserId },
+    );
+
+    return true;
+  } catch (err) {
+    console.error("Error deleting user:", err);
+    return false;
+  }
+}
+
+export async function createSquadAdmin(
+  adminId: string,
+  adminName: string,
+  squadData: {
+    name: string;
+    skillFocus: string;
+    sharedGoal: string;
+    targetProgress: number;
+    inviteCode?: string;
+  },
+): Promise<{ success: boolean; squad?: any; error?: string }> {
+  try {
+    const newId = `squad-${Date.now()}`;
+    const inviteCode =
+      squadData.inviteCode ||
+      `HUDDLE-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+
+    const newSquad = {
+      id: newId,
+      name: squadData.name,
+      skill_focus: squadData.skillFocus,
+      shared_goal: squadData.sharedGoal,
+      current_progress: 0,
+      target_progress: squadData.targetProgress || 12,
+      invite_code: inviteCode,
+      created_at: new Date().toISOString(),
+    };
+
+    const { error } = await supabase.from("squads").insert(newSquad);
+    if (error) throw error;
+
+    await logAdminAction(
+      adminId,
+      adminName,
+      "CREATE_SQUAD",
+      "squad",
+      newId,
+      { name: squadData.name, skillFocus: squadData.skillFocus },
+    );
+
+    return {
+      success: true,
+      squad: {
+        id: newId,
+        name: newSquad.name,
+        skillFocus: newSquad.skill_focus,
+        sharedGoal: newSquad.shared_goal,
+        currentProgress: 0,
+        targetProgress: newSquad.target_progress,
+        inviteCode: newSquad.invite_code,
+        createdAt: newSquad.created_at,
+        members: [],
+      },
+    };
+  } catch (err: any) {
+    console.error("Error creating squad:", err);
+    return { success: false, error: err.message || "Failed to create squad" };
+  }
+}
+
+export async function deleteSquadAdmin(
+  adminId: string,
+  adminName: string,
+  squadId: string,
+): Promise<boolean> {
+  try {
+    await supabase.from("squad_members").delete().eq("squad_id", squadId);
+    const { error } = await supabase.from("squads").delete().eq("id", squadId);
+    if (error) throw error;
+
+    await logAdminAction(
+      adminId,
+      adminName,
+      "DELETE_SQUAD",
+      "squad",
+      squadId,
+      { squadId },
+    );
+
+    return true;
+  } catch (err) {
+    console.error("Error deleting squad:", err);
+    return false;
+  }
+}
+
+export async function createTaskTemplateAdmin(
+  adminId: string,
+  adminName: string,
+  taskData: {
+    skillCategory: string;
+    dayNumber: number;
+    title: string;
+    description: string;
+    taskType: "learn" | "build" | "real_world_proof";
+    estimatedMinutes: number;
+    creatorName?: string;
+    creatorHandle?: string;
+    producesArtifact?: boolean;
+    artifactTitle?: string;
+  },
+): Promise<{ success: boolean; task?: TaskTemplate; error?: string }> {
+  try {
+    const newId = `template-${Date.now()}`;
+    const newTemplate = {
+      id: newId,
+      skill_category: taskData.skillCategory,
+      day_number: taskData.dayNumber,
+      title: taskData.title,
+      description: taskData.description,
+      task_type: taskData.taskType,
+      estimated_minutes: taskData.estimatedMinutes || 20,
+      creator_name: taskData.creatorName || adminName || "Staff Engineer",
+      creator_handle: taskData.creatorHandle || "@huddle.admin",
+      creator_avatar: "/avatars/avatar-1.svg",
+      produces_artifact: taskData.producesArtifact ?? true,
+      artifact_title: taskData.artifactTitle || `${taskData.title} Artifact`,
+      artifact_type: "code",
+    };
+
+    const { error } = await supabase.from("task_templates").insert(newTemplate);
+    if (error) throw error;
+
+    await logAdminAction(
+      adminId,
+      adminName,
+      "CREATE_TASK_TEMPLATE",
+      "curriculum",
+      newId,
+      { title: taskData.title, skillCategory: taskData.skillCategory },
+    );
+
+    return {
+      success: true,
+      task: {
+        id: newId,
+        skillCategory: newTemplate.skill_category,
+        dayNumber: newTemplate.day_number,
+        title: newTemplate.title,
+        description: newTemplate.description,
+        taskType: newTemplate.task_type as any,
+        creatorName: newTemplate.creator_name,
+        creatorHandle: newTemplate.creator_handle,
+        creatorAvatar: newTemplate.creator_avatar,
+        estimatedMinutes: newTemplate.estimated_minutes,
+        producesArtifact: newTemplate.produces_artifact,
+        artifactTitle: newTemplate.artifact_title,
+      },
+    };
+  } catch (err: any) {
+    console.error("Error creating task template:", err);
+    return {
+      success: false,
+      error: err.message || "Failed to create task template",
+    };
+  }
+}
+
+export async function deleteTaskTemplateAdmin(
+  adminId: string,
+  adminName: string,
+  taskId: string,
+): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from("task_templates")
+      .delete()
+      .eq("id", taskId);
+
+    if (error) throw error;
+
+    await logAdminAction(
+      adminId,
+      adminName,
+      "DELETE_TASK_TEMPLATE",
+      "curriculum",
+      taskId,
+      { taskId },
+    );
+
+    return true;
+  } catch (err) {
+    console.error("Error deleting task template:", err);
+    return false;
+  }
+}
+
+export async function createDiscussionAdmin(
+  adminId: string,
+  adminName: string,
+  postData: {
+    title: string;
+    content: string;
+    category: "question" | "discussion" | "code-review" | "tip";
+    skillTitle?: string;
+  },
+): Promise<{ success: boolean; post?: CommunityPost; error?: string }> {
+  try {
+    const newId = `post-${Date.now()}`;
+    const newPost = {
+      id: newId,
+      skill_id: "system-architecture",
+      skill_title: postData.skillTitle || "System Architecture",
+      author_name: adminName || "Huddle Moderator",
+      author_handle: "@admin",
+      author_avatar: "/avatars/avatar-1.svg",
+      author_reputation: 999,
+      title: postData.title,
+      content: postData.content,
+      category: postData.category || "discussion",
+      upvotes: 0,
+      user_upvoted: false,
+      replies_count: 0,
+      created_at: new Date().toISOString(),
+    };
+
+    const { error } = await supabase.from("community_posts").insert(newPost);
+    if (error) throw error;
+
+    await logAdminAction(
+      adminId,
+      adminName,
+      "CREATE_COMMUNITY_POST",
+      "discussion",
+      newId,
+      { title: postData.title, category: postData.category },
+    );
+
+    return {
+      success: true,
+      post: {
+        id: newId,
+        skillId: newPost.skill_id,
+        skillTitle: newPost.skill_title,
+        authorName: newPost.author_name,
+        authorHandle: newPost.author_handle,
+        authorAvatar: newPost.author_avatar,
+        authorReputation: newPost.author_reputation,
+        title: newPost.title,
+        content: newPost.content,
+        category: newPost.category,
+        upvotes: 0,
+        userUpvoted: false,
+        repliesCount: 0,
+        createdAt: newPost.created_at,
+        replies: [],
+      },
+    };
+  } catch (err: any) {
+    console.error("Error creating discussion:", err);
+    return {
+      success: false,
+      error: err.message || "Failed to create discussion",
+    };
+  }
+}
+
+export async function updateDiscussionAdmin(
+  adminId: string,
+  adminName: string,
+  postId: string,
+  updates: {
+    title?: string;
+    content?: string;
+    category?: "question" | "discussion" | "code-review" | "tip";
+  },
+): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from("community_posts")
+      .update(updates)
+      .eq("id", postId);
+
+    if (error) throw error;
+
+    await logAdminAction(
+      adminId,
+      adminName,
+      "UPDATE_COMMUNITY_POST",
+      "discussion",
+      postId,
+      updates,
+    );
+
+    return true;
+  } catch (err) {
+    console.error("Error updating discussion:", err);
+    return false;
+  }
+}
+
+export async function deleteSquadReportAdmin(
+  adminId: string,
+  adminName: string,
+  reportId: string,
+): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from("squad_reports")
+      .delete()
+      .eq("id", reportId);
+
+    if (error) throw error;
+
+    await logAdminAction(
+      adminId,
+      adminName,
+      "DELETE_REPORT",
+      "report",
+      reportId,
+      { reportId },
+    );
+
+    return true;
+  } catch (err) {
+    console.error("Error deleting squad report:", err);
+    return false;
+  }
+}
+

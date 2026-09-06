@@ -21,12 +21,15 @@ import {
   Play,
   Pause,
   Shield,
+  Menu,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useHuddle } from "../context/HuddleContext";
 import { ActiveTab } from "../types/huddle";
 
 export const Navbar: React.FC = () => {
+  const router = useRouter();
   const {
     user,
     isAuthenticated,
@@ -47,7 +50,8 @@ export const Navbar: React.FC = () => {
     isTimerRunning,
     isAppFocused,
     toggleFocusTimer,
-    openAuthModal,
+    sidebarOpen,
+    setSidebarOpen,
     setOnboardingActive,
     sprint,
   } = useHuddle();
@@ -119,7 +123,19 @@ export const Navbar: React.FC = () => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/85 dark:bg-[#090a0f]/85 backdrop-blur-md transition-colors">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 h-14 flex items-center justify-between gap-2 sm:gap-4">
-        <div className="flex items-center gap-3 md:gap-5 lg:gap-7 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 md:gap-5 lg:gap-7 shrink-0">
+          {/* Mobile Sidebar Hamburger Trigger */}
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="md:hidden p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors focus:outline-none cursor-pointer relative shrink-0"
+            aria-label="Open sidebar menu"
+          >
+            <Menu className="w-4 h-4" />
+            {(!user.onboardingCompleted || unreadNotificationCount > 0) && (
+              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            )}
+          </button>
+
           <button
             onClick={() => setActiveTab("dashboard")}
             className="flex items-center gap-2 group focus:outline-none cursor-pointer shrink-0"
@@ -172,7 +188,7 @@ export const Navbar: React.FC = () => {
         <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 shrink-0">
           {isAuthenticated && (
             <div
-              className="flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] sm:text-xs font-semibold shrink-0"
+              className="hidden md:flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] sm:text-xs font-semibold shrink-0"
               title={`Sprint Progress: ${sprint?.tasks ? sprint.tasks.filter((t) => t.completed).length : 0}/${sprint?.tasks?.length || 4} milestones`}
             >
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
@@ -224,7 +240,7 @@ export const Navbar: React.FC = () => {
           {user.role === "admin" && (
             <Link
               href="/admin"
-              className="flex items-center gap-1.5 p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800/80 bg-indigo-50/60 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors shrink-0 cursor-pointer"
+              className="hidden md:flex items-center gap-1.5 p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800/80 bg-indigo-50/60 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors shrink-0 cursor-pointer"
               title="Open Admin Console"
             >
               <Shield className="w-3.5 h-3.5" />
@@ -235,7 +251,7 @@ export const Navbar: React.FC = () => {
           {!user.onboardingCompleted && (
             <button
               onClick={() => setOnboardingActive(true)}
-              className="px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[11px] sm:text-xs font-semibold shadow-xs transition-colors cursor-pointer shrink-0 flex items-center gap-1"
+              className="hidden md:flex px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[11px] sm:text-xs font-semibold shadow-xs transition-colors cursor-pointer shrink-0 items-center gap-1"
               title="Intake survey required to unlock sprint actions"
             >
               <AlertCircle className="w-3 h-3 sm:hidden shrink-0" />
@@ -246,7 +262,7 @@ export const Navbar: React.FC = () => {
 
           <button
             onClick={() => setMascotOpen(!mascotOpen)}
-            className={`relative p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg sm:rounded-xl border transition-all flex items-center gap-1.5 sm:gap-2 group cursor-pointer shrink-0 ${
+            className={`hidden md:flex relative p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg sm:rounded-xl border transition-all items-center gap-1.5 sm:gap-2 group cursor-pointer shrink-0 ${
               mascotOpen
                 ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 ring-2 ring-indigo-500/20 shadow-xs"
                 : "border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30"
@@ -491,7 +507,7 @@ export const Navbar: React.FC = () => {
                         onClick={async () => {
                           await logout();
                           setProfileDropdownOpen(false);
-                          openAuthModal("welcome");
+                          router.push("/auth/login");
                         }}
                         className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-left transition-colors cursor-pointer"
                       >
@@ -506,13 +522,13 @@ export const Navbar: React.FC = () => {
           ) : (
             <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
               <button
-                onClick={() => openAuthModal("login")}
+                onClick={() => router.push("/auth/login")}
                 className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
               >
                 Log In
               </button>
               <button
-                onClick={() => openAuthModal("signup")}
+                onClick={() => router.push("/auth/signup")}
                 className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
               >
                 Sign Up

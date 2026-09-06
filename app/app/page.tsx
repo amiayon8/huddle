@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useHuddle } from '../context/HuddleContext';
 import { Navbar } from '../components/Navbar';
-import { MobileNav } from '../components/MobileNav';
+import { Sidebar } from '../components/Sidebar';
 import { DashboardView } from '../components/DashboardView';
 import { JourneyView } from '../components/JourneyView';
 import { SquadView } from '../components/SquadView';
@@ -37,6 +37,7 @@ export default function AppPage() {
     hasSkippedToPreview,
     isAuthenticated,
     authLoading,
+    closeAuthModal,
   } = useHuddle();
 
   useEffect(() => {
@@ -44,6 +45,10 @@ export default function AppPage() {
       router.push('/auth/login');
     }
   }, [isAuthenticated, authLoading, router]);
+
+  useEffect(() => {
+    closeAuthModal();
+  }, [closeAuthModal]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -149,11 +154,11 @@ export default function AppPage() {
         </div>
       )}
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-20 md:pb-12">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-10 sm:pb-12">
         {renderActiveView()}
       </main>
 
-      <MobileNav />
+      <Sidebar />
       <FloatingMascotBadge />
 
       <AuthModal />

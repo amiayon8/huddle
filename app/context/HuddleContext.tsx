@@ -129,6 +129,7 @@ interface HuddleContextType {
   showBingeQuizModal: boolean;
 
   // UI states
+  sidebarOpen: boolean;
   searchOpen: boolean;
   settingsOpen: boolean;
   mascotOpen: boolean;
@@ -151,6 +152,7 @@ interface HuddleContextType {
   setTheme: (theme: "dark" | "light") => void;
   toggleTheme: () => void;
   setSearchOpen: (open: boolean) => void;
+  setSidebarOpen: (open: boolean) => void;
   setSettingsOpen: (open: boolean) => void;
   setResetDemoModalOpen: (open: boolean) => void;
   setMascotOpen: (open: boolean) => void;
@@ -357,6 +359,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
   const [showBingeQuizModal, setShowBingeQuizModal] = useState(false);
 
   // UI modal toggles
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mascotOpen, setMascotOpen] = useState(false);
@@ -488,7 +491,9 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
             typeof window !== "undefined" &&
             localStorage.getItem("huddle_is_demo") === "true";
           if (isDemoStored) {
+            setIsAuthenticated(true);
             setIsDemoState(true);
+            setAuthModalOpen(false);
             await loadAllSupabaseData("user-1");
           } else {
             setIsAuthenticated(false);
@@ -673,6 +678,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
         localStorage.removeItem("huddle_is_demo");
       }
       setIsAuthenticated(true);
+      setAuthModalOpen(false);
       const profile = await fetchUserProfile(authUser.id);
       if (profile) setUser(profile);
       return { success: true };
@@ -693,6 +699,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
         localStorage.removeItem("huddle_is_demo");
       }
       setIsAuthenticated(true);
+      setAuthModalOpen(false);
       const profile = await fetchUserProfile(authUser.id);
       if (profile) setUser(profile);
       return { success: true };
@@ -702,6 +709,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = async () => {
     setIsDemoState(false);
+    setAuthModalOpen(false);
     if (typeof window !== "undefined") {
       localStorage.removeItem("huddle_is_demo");
       sessionStorage.removeItem("redirected_from_auth");
@@ -714,6 +722,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
   const loginDemo = async () => {
     setIsAuthenticated(true);
     setIsDemoState(true);
+    setAuthModalOpen(false);
     if (typeof window !== "undefined") {
       localStorage.setItem("huddle_is_demo", "true");
     }
@@ -724,6 +733,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     shouldLogout: boolean = false,
   ): Promise<{ success: boolean; error?: string }> => {
     try {
+      setAuthModalOpen(false);
       const res = await resetDemoAccountInDb();
       if (!res.success) {
         return res;
@@ -2096,6 +2106,8 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
         setTheme,
         toggleTheme,
         setSearchOpen,
+        sidebarOpen,
+        setSidebarOpen,
         setSettingsOpen,
         setResetDemoModalOpen,
         setMascotOpen,

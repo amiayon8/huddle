@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   Loader2,
   Calendar,
+  Sparkles,
 } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
 import { UserSurveyData } from "../types/huddle";
@@ -17,13 +18,13 @@ interface DynamicQuestionData {
   question: string;
   subtitle: string;
   mascotEmotion:
-    | "idle"
-    | "encouragement"
-    | "thinking"
-    | "deep_thinking"
-    | "planning"
-    | "success"
-    | "error";
+  | "idle"
+  | "encouragement"
+  | "thinking"
+  | "deep_thinking"
+  | "planning"
+  | "success"
+  | "error";
   mascotNote: string;
   isMultiple: boolean;
   options: Array<{
@@ -37,6 +38,71 @@ interface DynamicQuestionData {
 export const LandingQuestionnaire: React.FC = () => {
   const { finishOnboarding, setHasSkippedToPreview, setOnboardingActive } =
     useHuddle();
+
+  // Intro typewriter sequence before Step 1
+  const fullIntroText =
+    "Hey, glad you’re here. However you found your way to Huddle. Let’s figure out one small thing worthy building today";
+
+  const [isIntro, setIsIntro] = useState(true);
+  const [typedText, setTypedText] = useState("");
+  const [isTypingComplete, setIsTypingComplete] = useState(false);
+  const [isExitingIntro, setIsExitingIntro] = useState(false);
+  const [introFadedIn, setIntroFadedIn] = useState(false);
+
+  // Fade in container
+  useEffect(() => {
+    const fadeTimer = setTimeout(() => {
+      setIntroFadedIn(true);
+    }, 120);
+    return () => clearTimeout(fadeTimer);
+  }, []);
+
+  // Typewriter animation
+  useEffect(() => {
+    if (!introFadedIn || !isIntro) return;
+
+    let index = 0;
+    const typingInterval = setInterval(() => {
+      if (index < fullIntroText.length) {
+        setTypedText(fullIntroText.slice(0, index + 1));
+        index++;
+      } else {
+        clearInterval(typingInterval);
+        setIsTypingComplete(true);
+      }
+    }, 28);
+
+    return () => clearInterval(typingInterval);
+  }, [introFadedIn, isIntro]);
+
+  const handleStartSurvey = () => {
+    if (isExitingIntro) return;
+    setIsExitingIntro(true);
+    setTimeout(() => {
+      setIsIntro(false);
+    }, 450);
+  };
+
+  const handleFastForwardOrStart = () => {
+    if (!isTypingComplete) {
+      setTypedText(fullIntroText);
+      setIsTypingComplete(true);
+    } else {
+      handleStartSurvey();
+    }
+  };
+
+  useEffect(() => {
+    if (!isIntro) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        handleFastForwardOrStart();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isIntro, isTypingComplete, isExitingIntro]);
 
   const [step, setStep] = useState(1);
   const totalSteps = 5;
@@ -317,15 +383,15 @@ export const LandingQuestionnaire: React.FC = () => {
   const currentMascotEmotion = isLoadingDynamic
     ? "deep_thinking"
     : dynamicQuestion?.mascotEmotion ||
-      (step === 1
-        ? "planning"
-        : step === 2
-          ? "encouragement"
-          : step === 3
-            ? "thinking"
-            : step === 4
-              ? "deep_thinking"
-              : "success");
+    (step === 1
+      ? "planning"
+      : step === 2
+        ? "encouragement"
+        : step === 3
+          ? "thinking"
+          : step === 4
+            ? "deep_thinking"
+            : "success");
 
   const currentMascotNote =
     dynamicQuestion?.mascotNote ||
@@ -373,449 +439,511 @@ export const LandingQuestionnaire: React.FC = () => {
       </header>
 
       <main className="max-w-xl w-full mx-auto my-auto py-6 sm:py-8">
-        <div className="mb-5 space-y-1.5">
-          <div className="flex items-center justify-between text-xs text-zinc-400">
-            <span className="font-semibold text-zinc-700 dark:text-zinc-300">
-              Step {step} of {totalSteps}
-            </span>
-            <span className="text-[11px] font-mono">
-              {Math.round((step / totalSteps) * 100)}%
-            </span>
-          </div>
-          <div className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-indigo-600 transition-all duration-300 rounded-full"
-              style={{ width: `${(step / totalSteps) * 100}%` }}
-            />
-          </div>
-        </div>
-
-        <div className="mb-6 p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center gap-4 transition-colors">
-          <div className="relative shrink-0 w-12 h-12 p-1 rounded-lg bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-700 flex items-center justify-center">
-            <img
-              src={mascotMap[currentMascotEmotion] || "/mascot_idle.svg"}
-              alt="Pip"
-              className="w-full h-full object-contain"
-            />
-          </div>
-          <div className="text-xs text-zinc-700 dark:text-zinc-300 flex-1">
-            <div className="font-semibold text-indigo-600 dark:text-indigo-400 text-[11px] uppercase tracking-wider mb-0.5">
-              Pip Companion
-            </div>
-            <p className="leading-relaxed text-[12px]">
-              {isLoadingDynamic ? (
-                <span className="inline-flex items-center gap-1.5 text-indigo-600 dark:text-indigo-300">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  Calibrating next step...
-                </span>
-              ) : (
-                currentMascotNote
-              )}
-            </p>
-          </div>
-        </div>
-
-        {isLoadingDynamic ? (
-          <div className="py-10 px-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] flex flex-col items-center justify-center text-center space-y-4 animate-in fade-in duration-200 select-none pointer-events-none">
-            <div className="w-16 h-16 p-2 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center">
-              <img
-                src="/mascot_deep_thinking.svg"
-                alt="Pip AI Thinking"
-                className="w-full h-full object-contain opacity-80"
-              />
-            </div>
-
-            <div className="space-y-1.5 max-w-sm">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold">
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span>Calibrating</span>
+        {isIntro ? (
+          <div
+            onClick={handleFastForwardOrStart}
+            className={`transition-all duration-700 ease-out ${!introFadedIn
+                ? "opacity-0 translate-y-6 scale-95"
+                : isExitingIntro
+                  ? "opacity-0 -translate-y-8 scale-95 transition-all duration-400 ease-in"
+                  : "opacity-100 translate-y-0 scale-100"
+              }`}
+          >
+            <div className="max-w-lg mx-auto text-center space-y-6">
+              {/* Pip Mascot with glow */}
+              <div className="relative inline-block">
+                <div className="absolute inset-0 bg-indigo-500/25 dark:bg-indigo-500/35 blur-2xl rounded-full scale-150 animate-pulse" />
+                <div className="relative w-20 h-20 sm:w-24 sm:h-24 p-3 rounded-2xl bg-white dark:bg-[#11131e] border border-indigo-200 dark:border-indigo-800/80 shadow-2xl shadow-indigo-500/10 flex items-center justify-center transition-transform hover:scale-105 duration-300">
+                  <img
+                    src="/mascot_encouragement.svg"
+                    alt="Pip"
+                    className="w-full h-full object-contain drop-shadow-md"
+                  />
+                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900 animate-pulse" />
+                </div>
               </div>
-              <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-                Calibrating Step {step}...
-              </h3>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                Evaluating path options for your selected discipline.
-              </p>
-            </div>
 
-            <div className="w-full max-w-md space-y-2.5 pt-2">
-              <div className="h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 animate-pulse flex items-center px-4 gap-3">
-                <div className="w-4 h-4 rounded bg-zinc-200 dark:bg-zinc-700" />
-                <div className="h-3 w-40 bg-zinc-200 dark:bg-zinc-700 rounded" />
+              {/* Pip Badge */}
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/50 text-xs font-semibold shadow-2xs">
+                  <span>Pip • Your Deliberate Practice Companion</span>
+                </div>
               </div>
-              <div className="h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 animate-pulse flex items-center px-4 gap-3">
-                <div className="w-4 h-4 rounded bg-zinc-200 dark:bg-zinc-700" />
-                <div className="h-3 w-48 bg-zinc-200 dark:bg-zinc-700 rounded" />
+
+              {/* Speech Card with Faded + Typewriter */}
+              <div className="relative p-6 sm:p-8 rounded-3xl bg-white/85 dark:bg-[#11131e]/85 backdrop-blur-xl border border-zinc-200/80 dark:border-white/[0.08] shadow-2xl text-left space-y-5">
+                <p className="text-base sm:text-lg md:text-xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100 leading-relaxed font-sans min-h-[5.5rem]">
+                  {typedText}
+                  {!isTypingComplete && (
+                    <span className="inline-block w-2 h-5 ml-1 bg-indigo-500 animate-pulse rounded-xs align-middle" />
+                  )}
+                </p>
+
+                <div className="pt-2 flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800/60">
+                  <span className="text-[11px] text-zinc-400 font-medium">
+                    {isTypingComplete
+                      ? "Click to begin"
+                      : "Tap anywhere to fast-forward"}
+                  </span>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleStartSurvey();
+                    }}
+                    className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-xs flex items-center gap-1.5 transition-all hover:scale-102 active:scale-98 cursor-pointer"
+                  >
+                    <span>Let's begin</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         ) : (
-          <div className="space-y-4 animate-in fade-in duration-200">
-            <div>
-              <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                {step === 1 && "Step 1: Focus Area"}
-                {step === 2 && "Step 2: Mental Models & Analogies"}
-                {step === 3 && "Step 3: Learning Stage"}
-                {step === 4 && "Step 4: Target Role"}
-                {step === 5 && "Step 5: Starting Sprint Skill"}
-              </span>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mt-0.5">
-                {step === 1
-                  ? "What are your core engineering interests?"
-                  : step === 3
-                    ? "What is your current engineering stage?"
-                    : dynamicQuestion?.question ||
-                      (step === 2
-                        ? "What are your hobbies or outside interests?"
-                        : step === 4
-                          ? "What role are you targeting?"
-                          : "Which skill would you like to practice first?")}
-              </h1>
-              <p className="text-xs text-zinc-500 mt-0.5 leading-relaxed">
-                {step === 1
-                  ? "Select one or more topics. You can also specify custom areas."
-                  : step === 3
-                    ? "Huddle calibrates daily scope and challenge depth to your experience."
-                    : dynamicQuestion?.subtitle ||
-                      "Select the option that best fits your goals."}
-              </p>
-            </div>
-
-            <div className="space-y-2.5 pt-1">
-              {step === 3 && (
-                <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
-                        <Calendar className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="age-birthyear-input"
-                          className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 block"
-                        >
-                          Age or Birth Year
-                        </label>
-                        <p className="text-[11px] text-zinc-500">
-                          Enter your age or birth year (e.g. 24 or 2002)
-                        </p>
-                      </div>
-                    </div>
-                    {calculatedStage.age && (
-                      <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
-                        {calculatedStage.age} years old
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <input
-                      id="age-birthyear-input"
-                      type="number"
-                      min={10}
-                      max={2026}
-                      placeholder="e.g. 24"
-                      value={ageInput}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setAgeInput(val);
-                        const computed = getStageFromInput(val);
-                        if (computed.age) {
-                          setSelectedAge(
-                            `${computed.stage} (${computed.age} yrs old)`,
-                          );
-                          setAgeOtherActive(false);
-                        }
-                      }}
-                      className="w-full px-4 py-2 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-900/50 text-base font-bold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono transition-all"
-                    />
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-700/60 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span className="text-zinc-700 dark:text-zinc-300">
-                        Calculated level:{" "}
-                        <strong>{calculatedStage.stage}</strong>
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
-                      {calculatedStage.badge}
-                    </span>
-                  </div>
-
-                  <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider pt-1">
-                    Or select a level directly:
-                  </div>
-                </div>
-              )}
-
-              {step === 1 &&
-                baseSubjects.map((sub) => {
-                  const isSelected = selectedSubjects.includes(sub.title);
-                  return (
-                    <button
-                      key={sub.id}
-                      onClick={() =>
-                        toggleSelection(
-                          selectedSubjects,
-                          setSelectedSubjects,
-                          sub.title,
-                        )
-                      }
-                      className={`w-full p-3.5 rounded-xl border text-left transition-all flex items-center justify-between group cursor-pointer ${
-                        isSelected
-                          ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/30 ring-1 ring-indigo-500/20"
-                          : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] hover:border-zinc-300 dark:hover:border-zinc-700"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors shrink-0 ${
-                            isSelected
-                              ? "bg-indigo-600 border-indigo-600 text-white"
-                              : "border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800"
-                          }`}
-                        >
-                          {isSelected && (
-                            <Check className="w-3 h-3 stroke-[3]" />
-                          )}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-xs sm:text-sm text-zinc-900 dark:text-zinc-100">
-                              {sub.title}
-                            </span>
-                            <span className="text-[9.5px] font-medium px-1.5 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
-                              {sub.badge}
-                            </span>
-                          </div>
-                          <p className="text-xs text-zinc-500 mt-0.5">
-                            {sub.desc}
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-
-              {step > 1 &&
-                dynamicQuestion?.options?.map((opt) => {
-                  const isMulti = dynamicQuestion.isMultiple;
-                  const isSelected = isMulti
-                    ? step === 2
-                      ? selectedHobbies.includes(opt.title)
-                      : selectedSkills.includes(opt.title)
-                    : step === 3
-                      ? selectedAge === opt.title
-                      : selectedProfession === opt.title;
-
-                  const handleSelect = () => {
-                    if (step === 2) {
-                      toggleSelection(
-                        selectedHobbies,
-                        setSelectedHobbies,
-                        opt.title,
-                      );
-                    } else if (step === 3) {
-                      setSelectedAge(opt.title);
-                      setAgeOtherActive(false);
-                    } else if (step === 4) {
-                      setSelectedProfession(opt.title);
-                      setProfessionOtherActive(false);
-                    } else if (step === 5) {
-                      toggleSelection(
-                        selectedSkills,
-                        setSelectedSkills,
-                        opt.title,
-                      );
-                    }
-                  };
-
-                  return (
-                    <button
-                      key={opt.id}
-                      onClick={handleSelect}
-                      className={`w-full p-3.5 rounded-xl border text-left transition-all flex items-center justify-between group cursor-pointer ${
-                        isSelected
-                          ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/30 ring-1 ring-indigo-500/20"
-                          : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] hover:border-zinc-300 dark:hover:border-zinc-700"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors shrink-0 ${
-                            isSelected
-                              ? "bg-indigo-600 border-indigo-600 text-white"
-                              : "border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800"
-                          }`}
-                        >
-                          {isSelected && (
-                            <Check className="w-3 h-3 stroke-[3]" />
-                          )}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-xs sm:text-sm text-zinc-900 dark:text-zinc-100">
-                              {opt.title}
-                            </span>
-                            {opt.badge && (
-                              <span className="text-[9.5px] font-medium px-1.5 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
-                                {opt.badge}
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-xs text-zinc-500 mt-0.5">
-                            {opt.desc}
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-
-              <div
-                className={`p-3.5 rounded-xl border transition-all ${
-                  (step === 1 && subjectsOtherActive) ||
-                  (step === 2 && hobbiesOtherActive) ||
-                  (step === 3 && ageOtherActive) ||
-                  (step === 4 && professionOtherActive) ||
-                  (step === 5 && skillsOtherActive)
-                    ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/30 ring-1 ring-indigo-500/20"
-                    : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218]"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    id={`other-check-step-${step}`}
-                    checked={
-                      step === 1
-                        ? subjectsOtherActive
-                        : step === 2
-                          ? hobbiesOtherActive
-                          : step === 3
-                            ? ageOtherActive
-                            : step === 4
-                              ? professionOtherActive
-                              : skillsOtherActive
-                    }
-                    onChange={(e) => {
-                      const checked = e.target.checked;
-                      if (step === 1) setSubjectsOtherActive(checked);
-                      if (step === 2) setHobbiesOtherActive(checked);
-                      if (step === 3) setAgeOtherActive(checked);
-                      if (step === 4) setProfessionOtherActive(checked);
-                      if (step === 5) setSkillsOtherActive(checked);
-                    }}
-                    className="w-4 h-4 rounded text-indigo-600 accent-indigo-600 cursor-pointer"
-                  />
-                  <label
-                    htmlFor={`other-check-step-${step}`}
-                    className="text-xs sm:text-sm font-semibold text-zinc-900 dark:text-zinc-100 cursor-pointer shrink-0"
-                  >
-                    Other:
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Type custom response..."
-                    value={
-                      step === 1
-                        ? subjectsOther
-                        : step === 2
-                          ? hobbiesOther
-                          : step === 3
-                            ? ageOther
-                            : step === 4
-                              ? professionOther
-                              : skillsOther
-                    }
-                    onFocus={() => {
-                      if (step === 1) setSubjectsOtherActive(true);
-                      if (step === 2) setHobbiesOtherActive(true);
-                      if (step === 3) setAgeOtherActive(true);
-                      if (step === 4) setProfessionOtherActive(true);
-                      if (step === 5) setSkillsOtherActive(true);
-                    }}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (step === 1) {
-                        setSubjectsOther(val);
-                        setSubjectsOtherActive(true);
-                      }
-                      if (step === 2) {
-                        setHobbiesOther(val);
-                        setHobbiesOtherActive(true);
-                      }
-                      if (step === 3) {
-                        setAgeOther(val);
-                        setAgeOtherActive(true);
-                      }
-                      if (step === 4) {
-                        setProfessionOther(val);
-                        setProfessionOtherActive(true);
-                      }
-                      if (step === 5) {
-                        setSkillsOther(val);
-                        setSkillsOtherActive(true);
-                      }
-                    }}
-                    className="flex-1 bg-transparent border-b border-zinc-300 dark:border-zinc-700 px-2 py-1 text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-indigo-600 transition-colors"
-                  />
-                </div>
+          <div className="animate-in fade-in slide-in-from-bottom-6 duration-500">
+            <div className="mb-5 space-y-1.5">
+              <div className="flex items-center justify-between text-xs text-zinc-400">
+                <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+                  Step {step} of {totalSteps}
+                </span>
+                <span className="text-[11px] font-mono">
+                  {Math.round((step / totalSteps) * 100)}%
+                </span>
+              </div>
+              <div className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-indigo-600 transition-all duration-300 rounded-full"
+                  style={{ width: `${(step / totalSteps) * 100}%` }}
+                />
               </div>
             </div>
+
+            <div className="mb-6 p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center gap-4 transition-colors">
+              <div className="relative shrink-0 w-12 h-12 p-1 rounded-lg bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-700 flex items-center justify-center">
+                <img
+                  src={mascotMap[currentMascotEmotion] || "/mascot_idle.svg"}
+                  alt="Pip"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="text-xs text-zinc-700 dark:text-zinc-300 flex-1">
+                <div className="font-semibold text-indigo-600 dark:text-indigo-400 text-[11px] uppercase tracking-wider mb-0.5">
+                  Pip Companion
+                </div>
+                <p className="leading-relaxed text-[12px]">
+                  {isLoadingDynamic ? (
+                    <span className="inline-flex items-center gap-1.5 text-indigo-600 dark:text-indigo-300">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      Calibrating next step...
+                    </span>
+                  ) : (
+                    currentMascotNote
+                  )}
+                </p>
+              </div>
+            </div>
+
+            {isLoadingDynamic ? (
+              <div className="py-10 px-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] flex flex-col items-center justify-center text-center space-y-4 animate-in fade-in duration-200 select-none pointer-events-none">
+                <div className="w-16 h-16 p-2 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center">
+                  <img
+                    src="/mascot_deep_thinking.svg"
+                    alt="Pip AI Thinking"
+                    className="w-full h-full object-contain opacity-80"
+                  />
+                </div>
+
+                <div className="space-y-1.5 max-w-sm">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Calibrating</span>
+                  </div>
+                  <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+                    Calibrating Step {step}...
+                  </h3>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                    Evaluating path options for your selected discipline.
+                  </p>
+                </div>
+
+                <div className="w-full max-w-md space-y-2.5 pt-2">
+                  <div className="h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 animate-pulse flex items-center px-4 gap-3">
+                    <div className="w-4 h-4 rounded bg-zinc-200 dark:bg-zinc-700" />
+                    <div className="h-3 w-40 bg-zinc-200 dark:bg-zinc-700 rounded" />
+                  </div>
+                  <div className="h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800/50 animate-pulse flex items-center px-4 gap-3">
+                    <div className="w-4 h-4 rounded bg-zinc-200 dark:bg-zinc-700" />
+                    <div className="h-3 w-48 bg-zinc-200 dark:bg-zinc-700 rounded" />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4 animate-in fade-in duration-200">
+                <div>
+                  <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                    {step === 1 && "Step 1: Focus Area"}
+                    {step === 2 && "Step 2: Mental Models & Analogies"}
+                    {step === 3 && "Step 3: Learning Stage"}
+                    {step === 4 && "Step 4: Target Role"}
+                    {step === 5 && "Step 5: Starting Sprint Skill"}
+                  </span>
+                  <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mt-0.5">
+                    {step === 1
+                      ? "What are your core engineering interests?"
+                      : step === 3
+                        ? "What is your current engineering stage?"
+                        : dynamicQuestion?.question ||
+                        (step === 2
+                          ? "What are your hobbies or outside interests?"
+                          : step === 4
+                            ? "What role are you targeting?"
+                            : "Which skill would you like to practice first?")}
+                  </h1>
+                  <p className="text-xs text-zinc-500 mt-0.5 leading-relaxed">
+                    {step === 1
+                      ? "Select one or more topics. You can also specify custom areas."
+                      : step === 3
+                        ? "Huddle calibrates daily scope and challenge depth to your experience."
+                        : dynamicQuestion?.subtitle ||
+                        "Select the option that best fits your goals."}
+                  </p>
+                </div>
+
+                <div className="space-y-2.5 pt-1">
+                  {step === 3 && (
+                    <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 shadow-xs space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                            <Calendar className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <label
+                              htmlFor="age-birthyear-input"
+                              className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 block"
+                            >
+                              Age or Birth Year
+                            </label>
+                            <p className="text-[11px] text-zinc-500">
+                              Enter your age or birth year (e.g. 24 or 2002)
+                            </p>
+                          </div>
+                        </div>
+                        {calculatedStage.age && (
+                          <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
+                            {calculatedStage.age} years old
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <input
+                          id="age-birthyear-input"
+                          type="number"
+                          min={10}
+                          max={2026}
+                          placeholder="e.g. 24"
+                          value={ageInput}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setAgeInput(val);
+                            const computed = getStageFromInput(val);
+                            if (computed.age) {
+                              setSelectedAge(
+                                `${computed.stage} (${computed.age} yrs old)`,
+                              );
+                              setAgeOtherActive(false);
+                            }
+                          }}
+                          className="w-full px-4 py-2 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-900/50 text-base font-bold text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono transition-all"
+                        />
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-700/60 flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                          <span className="text-zinc-700 dark:text-zinc-300">
+                            Calculated level:{" "}
+                            <strong>{calculatedStage.stage}</strong>
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
+                          {calculatedStage.badge}
+                        </span>
+                      </div>
+
+                      <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider pt-1">
+                        Or select a level directly:
+                      </div>
+                    </div>
+                  )}
+
+                  {step === 1 &&
+                    baseSubjects.map((sub) => {
+                      const isSelected = selectedSubjects.includes(sub.title);
+                      return (
+                        <button
+                          key={sub.id}
+                          onClick={() =>
+                            toggleSelection(
+                              selectedSubjects,
+                              setSelectedSubjects,
+                              sub.title,
+                            )
+                          }
+                          className={`w-full p-3.5 rounded-xl border text-left transition-all flex items-center justify-between group cursor-pointer ${isSelected
+                              ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/30 ring-1 ring-indigo-500/20"
+                              : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] hover:border-zinc-300 dark:hover:border-zinc-700"
+                            }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors shrink-0 ${isSelected
+                                  ? "bg-indigo-600 border-indigo-600 text-white"
+                                  : "border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800"
+                                }`}
+                            >
+                              {isSelected && (
+                                <Check className="w-3 h-3 stroke-[3]" />
+                              )}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-xs sm:text-sm text-zinc-900 dark:text-zinc-100">
+                                  {sub.title}
+                                </span>
+                                <span className="text-[9.5px] font-medium px-1.5 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
+                                  {sub.badge}
+                                </span>
+                              </div>
+                              <p className="text-xs text-zinc-500 mt-0.5">
+                                {sub.desc}
+                              </p>
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+
+                  {step > 1 &&
+                    dynamicQuestion?.options?.map((opt) => {
+                      const isMulti = dynamicQuestion.isMultiple;
+                      const isSelected = isMulti
+                        ? step === 2
+                          ? selectedHobbies.includes(opt.title)
+                          : selectedSkills.includes(opt.title)
+                        : step === 3
+                          ? selectedAge === opt.title
+                          : selectedProfession === opt.title;
+
+                      const handleSelect = () => {
+                        if (step === 2) {
+                          toggleSelection(
+                            selectedHobbies,
+                            setSelectedHobbies,
+                            opt.title,
+                          );
+                        } else if (step === 3) {
+                          setSelectedAge(opt.title);
+                          setAgeOtherActive(false);
+                        } else if (step === 4) {
+                          setSelectedProfession(opt.title);
+                          setProfessionOtherActive(false);
+                        } else if (step === 5) {
+                          toggleSelection(
+                            selectedSkills,
+                            setSelectedSkills,
+                            opt.title,
+                          );
+                        }
+                      };
+
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={handleSelect}
+                          className={`w-full p-3.5 rounded-xl border text-left transition-all flex items-center justify-between group cursor-pointer ${isSelected
+                              ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/30 ring-1 ring-indigo-500/20"
+                              : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] hover:border-zinc-300 dark:hover:border-zinc-700"
+                            }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors shrink-0 ${isSelected
+                                  ? "bg-indigo-600 border-indigo-600 text-white"
+                                  : "border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800"
+                                }`}
+                            >
+                              {isSelected && (
+                                <Check className="w-3 h-3 stroke-[3]" />
+                              )}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-xs sm:text-sm text-zinc-900 dark:text-zinc-100">
+                                  {opt.title}
+                                </span>
+                                {opt.badge && (
+                                  <span className="text-[9.5px] font-medium px-1.5 py-0.2 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                                    {opt.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-zinc-500 mt-0.5">
+                                {opt.desc}
+                              </p>
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+
+                  <div
+                    className={`p-3.5 rounded-xl border transition-all ${(step === 1 && subjectsOtherActive) ||
+                        (step === 2 && hobbiesOtherActive) ||
+                        (step === 3 && ageOtherActive) ||
+                        (step === 4 && professionOtherActive) ||
+                        (step === 5 && skillsOtherActive)
+                        ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/30 ring-1 ring-indigo-500/20"
+                        : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218]"
+                      }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        id={`other-check-step-${step}`}
+                        checked={
+                          step === 1
+                            ? subjectsOtherActive
+                            : step === 2
+                              ? hobbiesOtherActive
+                              : step === 3
+                                ? ageOtherActive
+                                : step === 4
+                                  ? professionOtherActive
+                                  : skillsOtherActive
+                        }
+                        onChange={(e) => {
+                          const checked = e.target.checked;
+                          if (step === 1) setSubjectsOtherActive(checked);
+                          if (step === 2) setHobbiesOtherActive(checked);
+                          if (step === 3) setAgeOtherActive(checked);
+                          if (step === 4) setProfessionOtherActive(checked);
+                          if (step === 5) setSkillsOtherActive(checked);
+                        }}
+                        className="w-4 h-4 rounded text-indigo-600 accent-indigo-600 cursor-pointer"
+                      />
+                      <label
+                        htmlFor={`other-check-step-${step}`}
+                        className="text-xs sm:text-sm font-semibold text-zinc-900 dark:text-zinc-100 cursor-pointer shrink-0"
+                      >
+                        Other:
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Type custom response..."
+                        value={
+                          step === 1
+                            ? subjectsOther
+                            : step === 2
+                              ? hobbiesOther
+                              : step === 3
+                                ? ageOther
+                                : step === 4
+                                  ? professionOther
+                                  : skillsOther
+                        }
+                        onFocus={() => {
+                          if (step === 1) setSubjectsOtherActive(true);
+                          if (step === 2) setHobbiesOtherActive(true);
+                          if (step === 3) setAgeOtherActive(true);
+                          if (step === 4) setProfessionOtherActive(true);
+                          if (step === 5) setSkillsOtherActive(true);
+                        }}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (step === 1) {
+                            setSubjectsOther(val);
+                            setSubjectsOtherActive(true);
+                          }
+                          if (step === 2) {
+                            setHobbiesOther(val);
+                            setHobbiesOtherActive(true);
+                          }
+                          if (step === 3) {
+                            setAgeOther(val);
+                            setAgeOtherActive(true);
+                          }
+                          if (step === 4) {
+                            setProfessionOther(val);
+                            setProfessionOtherActive(true);
+                          }
+                          if (step === 5) {
+                            setSkillsOther(val);
+                            setSkillsOtherActive(true);
+                          }
+                        }}
+                        className="flex-1 bg-transparent border-b border-zinc-300 dark:border-zinc-700 px-2 py-1 text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-indigo-600 transition-colors"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </main>
 
-      <footer className="max-w-xl w-full mx-auto flex items-center justify-between pt-4 border-t border-zinc-200 dark:border-zinc-800">
-        <button
-          onClick={handleBack}
-          disabled={step === 1 || isFinishing || isLoadingDynamic}
-          className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-40 disabled:pointer-events-none transition-colors flex items-center gap-1.5 cursor-pointer"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back</span>
-        </button>
-
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-zinc-400 hidden sm:inline">
-            {isLoadingDynamic
-              ? "Calibrating..."
-              : step === totalSteps
-                ? "Ready to begin sprint"
-                : `Next: Step ${step + 1}`}
-          </span>
+      {!isIntro && (
+        <footer className="max-w-xl w-full mx-auto flex items-center justify-between pt-4 border-t border-zinc-200 dark:border-zinc-800">
           <button
-            onClick={handleNext}
-            disabled={isFinishing || isLoadingDynamic}
-            className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center gap-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+            onClick={handleBack}
+            disabled={step === 1 || isFinishing || isLoadingDynamic}
+            className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-40 disabled:pointer-events-none transition-colors flex items-center gap-1.5 cursor-pointer"
           >
-            {isFinishing ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Preparing Sprint...</span>
-              </>
-            ) : isLoadingDynamic ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Processing...</span>
-              </>
-            ) : step === totalSteps ? (
-              <>
-                <span>Launch Sprint</span>
-                <ArrowRight className="w-4 h-4" />
-              </>
-            ) : (
-              <>
-                <span>Continue</span>
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Back</span>
           </button>
-        </div>
-      </footer>
+
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-zinc-400 hidden sm:inline">
+              {isLoadingDynamic
+                ? "Calibrating..."
+                : step === totalSteps
+                  ? "Ready to begin sprint"
+                  : `Next: Step ${step + 1}`}
+            </span>
+            <button
+              onClick={handleNext}
+              disabled={isFinishing || isLoadingDynamic}
+              className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-xs transition-colors flex items-center gap-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+            >
+              {isFinishing ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Preparing Sprint...</span>
+                </>
+              ) : isLoadingDynamic ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Processing...</span>
+                </>
+              ) : step === totalSteps ? (
+                <>
+                  <span>Launch Sprint</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              ) : (
+                <>
+                  <span>Continue</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          </div>
+        </footer>
+      )}
     </div>
   );
 };
