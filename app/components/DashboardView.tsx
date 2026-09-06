@@ -116,46 +116,64 @@ export const DashboardView: React.FC = () => {
             </p>
           </div>
 
-          {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-3 gap-3 pt-2">
-            <div className="p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/60 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/60 dark:border-indigo-800/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-                <Target className="w-4 h-4" />
+          {/* Quick Metrics Bar - Fully Mobile Optimized */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-2">
+            {/* Delivered Metric */}
+            <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 transition-colors min-w-0">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/60 dark:border-indigo-800/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+                <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
-              <div>
-                <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">
+              <div className="min-w-0 flex-1">
+                <div className="text-[9px] sm:text-[10px] font-semibold text-zinc-400 uppercase tracking-wider truncate">
                   Delivered
                 </div>
-                <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100 tabular-nums">
-                  {completedCount} / {totalTasks} Days
+                <div className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 tabular-nums whitespace-nowrap">
+                  {completedCount} / {totalTasks}{" "}
+                  <span className="text-[10px] sm:text-xs font-normal text-zinc-500">
+                    Days
+                  </span>
                 </div>
               </div>
             </div>
 
-            <div className="p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/60 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200/60 dark:border-amber-800/60 flex items-center justify-center text-amber-600 dark:text-amber-400">
-                <Clock className="w-4 h-4" />
+            {/* Today's Deep Focus Metric */}
+            <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 transition-colors min-w-0">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200/60 dark:border-amber-800/60 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
-              <div>
-                <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">
-                  Today's Deep Focus
+              <div className="min-w-0 flex-1">
+                <div
+                  className="text-[9px] sm:text-[10px] font-semibold text-zinc-400 uppercase tracking-wider truncate"
+                  title="Today's Deep Focus"
+                >
+                  <span className="hidden sm:inline">Today's Deep Focus</span>
+                  <span className="sm:hidden">Deep Focus</span>
                 </div>
-                <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100 tabular-nums">
+                <div className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 tabular-nums whitespace-nowrap">
                   {formatFocusTime(secondsFocusedToday)}
                 </div>
               </div>
             </div>
 
-            <div className="p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/60 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/60 dark:border-emerald-800/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                <Flame className="w-4 h-4" />
+            {/* Sprint Streak Metric */}
+            <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 transition-colors min-w-0">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/60 dark:border-emerald-800/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
-              <div>
-                <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">
-                  Sprint Streak
+              <div className="min-w-0 flex-1">
+                <div
+                  className="text-[9px] sm:text-[10px] font-semibold text-zinc-400 uppercase tracking-wider truncate"
+                  title="Sprint Streak"
+                >
+                  <span className="hidden sm:inline">Sprint Streak</span>
+                  <span className="sm:hidden">Streak</span>
                 </div>
-                <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100 tabular-nums">
-                  {user?.streak || 1} Days Active
+                <div className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 tabular-nums whitespace-nowrap">
+                  {user?.streak || 1}{" "}
+                  <span className="text-[10px] sm:text-xs font-normal text-zinc-500">
+                    <span className="hidden sm:inline">Days Active</span>
+                    <span className="sm:hidden">d Active</span>
+                  </span>
                 </div>
               </div>
             </div>
