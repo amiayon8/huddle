@@ -49,6 +49,7 @@ export const Sidebar: React.FC = () => {
     toggleFocusTimer,
     sprint,
     logout,
+    viewMyProfile,
   } = useHuddle();
 
   const sidebarRef = useRef<HTMLElement>(null);
@@ -127,7 +128,11 @@ export const Sidebar: React.FC = () => {
   const progressPercent = Math.round((completedCount / totalTasks) * 100);
 
   const handleNavClick = (tabId: ActiveTab) => {
-    setActiveTab(tabId);
+    if (tabId === "profile") {
+      viewMyProfile();
+    } else {
+      setActiveTab(tabId);
+    }
     setSidebarOpen(false);
   };
 

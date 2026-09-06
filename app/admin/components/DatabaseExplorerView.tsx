@@ -36,6 +36,7 @@ export const KNOWN_DATABASE_TABLES = [
   
   { id: "sprints", name: "Sprints (4-Day Cadence)", category: "Sprints & Drills" },
   { id: "sprint_tasks", name: "Sprint Tasks & Proofs", category: "Sprints & Drills" },
+  { id: "focus_sessions", name: "Persistent Focus Timer Logs", category: "Sprints & Drills" },
   { id: "task_templates", name: "Curriculum Drill Templates", category: "Sprints & Drills" },
   { id: "practice_curriculum", name: "Practice Curriculum Modules", category: "Sprints & Drills" },
   { id: "practice_session_progress", name: "Session Notes & Code", category: "Sprints & Drills" },

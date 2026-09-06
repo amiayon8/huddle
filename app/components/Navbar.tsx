@@ -54,6 +54,7 @@ export const Navbar: React.FC = () => {
     setSidebarOpen,
     setOnboardingActive,
     sprint,
+    viewMyProfile,
   } = useHuddle();
 
   const [notificationDropdownOpen, setNotificationDropdownOpen] =
@@ -167,7 +168,13 @@ export const Navbar: React.FC = () => {
               return (
                 <button
                   key={item.id}
-                  onClick={() => setActiveTab(item.id)}
+                  onClick={() => {
+                    if (item.id === "profile") {
+                      viewMyProfile();
+                    } else {
+                      setActiveTab(item.id);
+                    }
+                  }}
                   className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${isActive
                       ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-xs"
                       : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
@@ -426,7 +433,7 @@ export const Navbar: React.FC = () => {
 
                       <button
                         onClick={() => {
-                          setActiveTab("profile");
+                          viewMyProfile();
                           setProfileDropdownOpen(false);
                         }}
                         className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-left transition-colors cursor-pointer"
