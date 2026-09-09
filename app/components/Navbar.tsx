@@ -73,12 +73,12 @@ export const Navbar: React.FC = () => {
     label: string;
     icon: React.ElementType;
   }[] = [
-      { id: "dashboard", label: "Learn", icon: Compass },
-      { id: "squad", label: "Squad", icon: Users },
-      { id: "explore", label: "Explore", icon: BookOpen },
-      { id: "community", label: "Discussions", icon: MessageSquare },
-      { id: "profile", label: "Profile", icon: UserIcon },
-    ];
+    { id: "dashboard", label: "Learn", icon: Compass },
+    { id: "squad", label: "Squad", icon: Users },
+    { id: "explore", label: "Explore", icon: BookOpen },
+    { id: "community", label: "Discussions", icon: MessageSquare },
+    { id: "profile", label: "Profile", icon: UserIcon },
+  ];
 
   const formatFocusTime = (totalSeconds: number) => {
     const minutes = Math.floor(totalSeconds / 60);
@@ -125,7 +125,6 @@ export const Navbar: React.FC = () => {
     <header className="sticky top-0 z-40 w-full border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/85 dark:bg-[#090a0f]/85 backdrop-blur-md transition-colors">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 h-14 flex items-center justify-between gap-2 sm:gap-4">
         <div className="flex items-center gap-2 sm:gap-3 md:gap-5 lg:gap-7 shrink-0">
-          {/* Mobile Sidebar Hamburger Trigger */}
           <button
             onClick={() => setSidebarOpen(true)}
             className="md:hidden p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors focus:outline-none cursor-pointer relative shrink-0"
@@ -175,10 +174,11 @@ export const Navbar: React.FC = () => {
                       setActiveTab(item.id);
                     }
                   }}
-                  className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${isActive
+                  className={`flex items-center gap-1.5 px-2.5 lg:px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                    isActive
                       ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-xs"
                       : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
-                    }`}
+                  }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
                   <span>{item.label}</span>
@@ -197,9 +197,11 @@ export const Navbar: React.FC = () => {
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
               <span>
                 {Math.round(
-                  ((sprint?.tasks ? sprint.tasks.filter((t) => t.completed).length : 0) /
+                  ((sprint?.tasks
+                    ? sprint.tasks.filter((t) => t.completed).length
+                    : 0) /
                     Math.max(1, sprint?.tasks?.length || 4)) *
-                  100,
+                    100,
                 )}
                 %
               </span>
@@ -209,10 +211,11 @@ export const Navbar: React.FC = () => {
           {isAuthenticated && (
             <div
               onClick={toggleFocusTimer}
-              className={`hidden lg:flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-xs font-medium cursor-pointer transition-all shrink-0 ${isAppFocused && isTimerRunning
+              className={`hidden lg:flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-xs font-medium cursor-pointer transition-all shrink-0 ${
+                isAppFocused && isTimerRunning
                   ? "bg-emerald-50/70 dark:bg-emerald-950/20 border-emerald-300/80 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-300"
                   : "bg-zinc-50 dark:bg-zinc-900/60 border-zinc-200 dark:border-zinc-800 text-zinc-500"
-                }`}
+              }`}
               title={
                 isTimerRunning
                   ? "Active Focus Timer (Click to pause)"
@@ -264,10 +267,11 @@ export const Navbar: React.FC = () => {
 
           <button
             onClick={() => setMascotOpen(!mascotOpen)}
-            className={`hidden md:flex relative p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg sm:rounded-xl border transition-all items-center gap-1.5 sm:gap-2 group cursor-pointer shrink-0 ${mascotOpen
+            className={`hidden md:flex relative p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg sm:rounded-xl border transition-all items-center gap-1.5 sm:gap-2 group cursor-pointer shrink-0 ${
+              mascotOpen
                 ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 ring-2 ring-indigo-500/20 shadow-xs"
                 : "border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30"
-              }`}
+            }`}
             title="Ask Pip AI"
             aria-label="Ask Pip AI"
           >
@@ -319,10 +323,11 @@ export const Navbar: React.FC = () => {
                         <div
                           key={notification.id}
                           onClick={() => markNotificationRead(notification.id)}
-                          className={`p-2.5 rounded-xl cursor-pointer text-xs transition-colors ${notification.read
+                          className={`p-2.5 rounded-xl cursor-pointer text-xs transition-colors ${
+                            notification.read
                               ? "bg-transparent text-zinc-500 dark:text-zinc-400"
                               : "bg-indigo-50/50 dark:bg-indigo-950/30 text-zinc-900 dark:text-zinc-100 border border-indigo-100/80 dark:border-indigo-900/40"
-                            }`}
+                          }`}
                         >
                           <div className="font-medium text-zinc-900 dark:text-zinc-100">
                             {notification.title}
@@ -469,10 +474,11 @@ export const Navbar: React.FC = () => {
                           </span>
                         </span>
                         <span
-                          className={`text-[9.5px] font-bold px-1.5 py-0.2 rounded ${user.onboardingCompleted
+                          className={`text-[9.5px] font-bold px-1.5 py-0.2 rounded ${
+                            user.onboardingCompleted
                               ? "bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400"
                               : "bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400"
-                            }`}
+                          }`}
                         >
                           {user.onboardingCompleted ? "Done" : "Required"}
                         </span>

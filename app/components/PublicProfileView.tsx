@@ -31,14 +31,8 @@ import { useHuddle } from "../context/HuddleContext";
 import { DuolingoMascot } from "./DuolingoMascot";
 import { CodeBlock } from "./CodeBlock";
 import { ActivityCalendar } from "./ActivityCalendar";
-import {
-  UserProfile,
-  PortfolioItem,
-} from "../types/huddle";
-import {
-  UserActivityDay,
-  fetchPortfolioItems,
-} from "../lib/supabase";
+import { UserProfile, PortfolioItem } from "../types/huddle";
+import { UserActivityDay, fetchPortfolioItems } from "../lib/supabase";
 
 export interface PublicProfileViewProps {
   initialProfile?: UserProfile;
@@ -70,7 +64,6 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
     sendSquadNudge,
   } = useHuddle();
 
-  // Determine active profile to display
   const targetUser: UserProfile =
     initialProfile || viewingUserProfile || currentUser;
   const isOwnProfile = !initialProfile && !viewingUserProfile;
@@ -83,18 +76,19 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
   const [name, setName] = useState(targetUser.name);
   const [handle, setHandle] = useState(targetUser.handle);
   const [bio, setBio] = useState(targetUser.bio);
-  const [careerMilestone, setCareerMilestone] = useState(targetUser.careerMilestone);
+  const [careerMilestone, setCareerMilestone] = useState(
+    targetUser.careerMilestone,
+  );
   const [avatar, setAvatar] = useState(targetUser.avatar);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [nudged, setNudged] = useState(false);
 
-  // Other user's portfolio items if viewing someone else
   const [externalPortfolio, setExternalPortfolio] = useState<PortfolioItem[]>(
-    initialPortfolio || []
+    initialPortfolio || [],
   );
   const [loadingPortfolio, setLoadingPortfolio] = useState<boolean>(
-    !isOwnProfile && !initialPortfolio
+    !isOwnProfile && !initialPortfolio,
   );
 
   useEffect(() => {
@@ -109,7 +103,6 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
     }
   }, [isOwnProfile, initialPortfolio, targetUser?.id]);
 
-  // Sync state when targetUser changes
   useEffect(() => {
     setName(targetUser.name);
     setHandle(targetUser.handle);
@@ -200,13 +193,13 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
     },
   ];
 
-  // Privacy protection: If target profile has publicProfile disabled and is not own profile
   const isPrivateLocked =
-    !isOwnProfile && targetUser.privacy && targetUser.privacy.publicProfile === false;
+    !isOwnProfile &&
+    targetUser.privacy &&
+    targetUser.privacy.publicProfile === false;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-16 animate-in fade-in duration-150">
-      {/* Public Profile Context Header Banner (when viewing someone else) */}
       {!isOwnProfile && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-900/50">
           <div className="flex items-center gap-2.5">
@@ -226,7 +219,8 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                 </span>
               </div>
               <p className="text-[11px] text-indigo-700/80 dark:text-indigo-300/80">
-                You are viewing {targetUser.name}'s verified deliberate practice profile.
+                You are viewing {targetUser.name}'s verified deliberate practice
+                profile.
               </p>
             </div>
           </div>
@@ -236,21 +230,28 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
               onClick={handleCopyPublicLink}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-zinc-700 transition-colors cursor-pointer shadow-2xs"
             >
-              {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+              {copiedLink ? (
+                <Check className="w-3.5 h-3.5 text-emerald-500" />
+              ) : (
+                <Copy className="w-3.5 h-3.5" />
+              )}
               <span>{copiedLink ? "Link Copied!" : "Share Profile"}</span>
             </button>
             <button
               onClick={handleNudge}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
             >
-              {nudged ? <Check className="w-3.5 h-3.5" /> : <Flame className="w-3.5 h-3.5" />}
+              {nudged ? (
+                <Check className="w-3.5 h-3.5" />
+              ) : (
+                <Flame className="w-3.5 h-3.5" />
+              )}
               <span>{nudged ? "Nudged!" : "Nudge Focus"}</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* Main Profile Info Card */}
       <div className="rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] p-6 sm:p-7 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
           <div className="flex items-center gap-4">
@@ -289,7 +290,10 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                   {targetUser.careerMilestone || "Software Engineer"}
                 </strong>
                 {targetUser.joinedDate && (
-                  <span className="text-zinc-400"> • Joined {targetUser.joinedDate}</span>
+                  <span className="text-zinc-400">
+                    {" "}
+                    • Joined {targetUser.joinedDate}
+                  </span>
                 )}
               </div>
               <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1.5 max-w-lg leading-relaxed">
@@ -306,7 +310,11 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-[#111218] text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                   title="Share public profile URL"
                 >
-                  {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Share2 className="w-3.5 h-3.5" />}
+                  {copiedLink ? (
+                    <Check className="w-3.5 h-3.5 text-emerald-500" />
+                  ) : (
+                    <Share2 className="w-3.5 h-3.5" />
+                  )}
                   <span>{copiedLink ? "Link Copied" : "Share"}</span>
                 </button>
                 <button
@@ -329,14 +337,17 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                 onClick={handleCopyPublicLink}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
               >
-                {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Share2 className="w-3.5 h-3.5" />}
+                {copiedLink ? (
+                  <Check className="w-3.5 h-3.5 text-emerald-500" />
+                ) : (
+                  <Share2 className="w-3.5 h-3.5" />
+                )}
                 <span>{copiedLink ? "Link Copied" : "Copy Link"}</span>
               </button>
             )}
           </div>
         </div>
 
-        {/* Highlight Stats Row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-4 border-t border-zinc-100 dark:border-zinc-800">
           <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 flex items-center gap-3">
             <div className="w-7 h-7 rounded-md bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
@@ -346,7 +357,9 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
               <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
                 {targetUser.streak || 0} Days
               </div>
-              <div className="text-[11px] text-zinc-500 font-medium">Practice Streak</div>
+              <div className="text-[11px] text-zinc-500 font-medium">
+                Practice Streak
+              </div>
             </div>
           </div>
 
@@ -358,7 +371,9 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
               <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
                 {targetUser.reputation || 50} XP
               </div>
-              <div className="text-[11px] text-zinc-500 font-medium">Reputation</div>
+              <div className="text-[11px] text-zinc-500 font-medium">
+                Reputation
+              </div>
             </div>
           </div>
 
@@ -370,7 +385,9 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
               <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
                 {displayedPortfolioItems.length}
               </div>
-              <div className="text-[11px] text-zinc-500 font-medium">Projects</div>
+              <div className="text-[11px] text-zinc-500 font-medium">
+                Projects
+              </div>
             </div>
           </div>
 
@@ -384,13 +401,14 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                   ? realWorldProofs.filter((p) => p.completed).length
                   : Math.max(1, displayedPortfolioItems.length)}
               </div>
-              <div className="text-[11px] text-zinc-500 font-medium">Proofs</div>
+              <div className="text-[11px] text-zinc-500 font-medium">
+                Proofs
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Private Profile Locked Notice */}
       {isPrivateLocked ? (
         <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] p-10 text-center space-y-4">
           <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500 mx-auto flex items-center justify-center">
@@ -401,7 +419,8 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
               This Profile is Private
             </h3>
             <p className="text-xs text-zinc-500 max-w-sm mx-auto">
-              {targetUser.name} has configured their deliberate practice calendar and portfolio to be visible to squad members only.
+              {targetUser.name} has configured their deliberate practice
+              calendar and portfolio to be visible to squad members only.
             </p>
           </div>
           <button
@@ -413,21 +432,21 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
         </div>
       ) : (
         <>
-          {/* Mascot Narration */}
           {isOwnProfile && (
             <DuolingoMascot
               emotion="success"
               size="md"
               speechText={`**${Math.round(
-                ((sprint.tasks ? sprint.tasks.filter((t) => t.completed).length : 0) /
+                ((sprint.tasks
+                  ? sprint.tasks.filter((t) => t.completed).length
+                  : 0) /
                   Math.max(1, sprint.tasks?.length || 4)) *
-                  100
+                  100,
               )}% sprint progress**. ${myPortfolioItems.length} portfolio deliverables published and verified.`}
               showQuickActions={true}
             />
           )}
 
-          {/* Activity Calendar Component (Requested Feature) */}
           <ActivityCalendar
             userId={targetUser.id}
             activityDays={initialActivityDays}
@@ -435,7 +454,6 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
             isOwnProfile={isOwnProfile}
           />
 
-          {/* Tab Navigation */}
           <div className="flex items-center gap-1.5 border-b border-zinc-200 dark:border-zinc-800 pb-2">
             <button
               onClick={() => setActiveProfileTab("activity")}
@@ -486,7 +504,6 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
             </button>
           </div>
 
-          {/* Tab 1: Practice Activity Deep Dive */}
           {activeProfileTab === "activity" && (
             <div className="space-y-4 animate-in fade-in duration-150">
               <div className="rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] p-5 space-y-3">
@@ -497,7 +514,8 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                       <span>Sprint Focus & Deliberate Practice Log</span>
                     </h2>
                     <p className="text-xs text-zinc-500 mt-0.5">
-                      Session minutes logged via persistent database telemetry and active practice drills.
+                      Session minutes logged via persistent database telemetry
+                      and active practice drills.
                     </p>
                   </div>
                   <span className="text-xs px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 font-medium text-zinc-600 dark:text-zinc-400">
@@ -507,7 +525,9 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
                   <div className="p-3.5 rounded-xl border border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/30 space-y-1">
-                    <span className="text-[11px] text-zinc-500 font-medium">Today's Focus Status</span>
+                    <span className="text-[11px] text-zinc-500 font-medium">
+                      Today's Focus Status
+                    </span>
                     <div className="text-base font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                       <span>
@@ -524,17 +544,22 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                   </div>
 
                   <div className="p-3.5 rounded-xl border border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/30 space-y-1">
-                    <span className="text-[11px] text-zinc-500 font-medium">Sprint Goal</span>
+                    <span className="text-[11px] text-zinc-500 font-medium">
+                      Sprint Goal
+                    </span>
                     <div className="text-base font-bold text-zinc-900 dark:text-zinc-100">
                       {targetUser.primaryGoal || "System Architecture"}
                     </div>
                     <p className="text-[10.5px] text-zinc-400">
-                      Target: {targetUser.careerMilestone || "Senior Software Engineer"}
+                      Target:{" "}
+                      {targetUser.careerMilestone || "Senior Software Engineer"}
                     </p>
                   </div>
 
                   <div className="p-3.5 rounded-xl border border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/30 space-y-1">
-                    <span className="text-[11px] text-zinc-500 font-medium">Verification Status</span>
+                    <span className="text-[11px] text-zinc-500 font-medium">
+                      Verification Status
+                    </span>
                     <div className="text-base font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                       <ShieldCheck className="w-4 h-4" />
                       <span>Proof-Verified</span>
@@ -548,7 +573,6 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
             </div>
           )}
 
-          {/* Tab 2: Projects */}
           {activeProfileTab === "projects" && (
             <div className="space-y-5 animate-in fade-in duration-150">
               {loadingPortfolio ? (
@@ -561,7 +585,8 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                     No public portfolio deliverables published yet.
                   </p>
                   <p className="text-[11px] text-zinc-500">
-                    Deliverables will appear here once verified during sprint check-ins.
+                    Deliverables will appear here once verified during sprint
+                    check-ins.
                   </p>
                 </div>
               ) : (
@@ -618,7 +643,9 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                             ) : (
                               <EyeOff className="w-3.5 h-3.5" />
                             )}
-                            <span>{item.isPublished ? "Public" : "Private"}</span>
+                            <span>
+                              {item.isPublished ? "Public" : "Private"}
+                            </span>
                           </button>
                         )}
                       </div>
@@ -627,7 +654,6 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                 </div>
               )}
 
-              {/* Verified Engineering Proofs */}
               <div className="rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] p-5 space-y-3">
                 <div>
                   <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
@@ -635,7 +661,8 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                     <span>Verified Engineering Proofs</span>
                   </h2>
                   <p className="text-xs text-zinc-500 mt-0.5">
-                    Proof loops verified through benchmark tests and architecture reviews.
+                    Proof loops verified through benchmark tests and
+                    architecture reviews.
                   </p>
                 </div>
 
@@ -708,7 +735,6 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
             </div>
           )}
 
-          {/* Tab 3: Milestones */}
           {activeProfileTab === "achievements" && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in duration-150">
               {badges.map((b) => (
@@ -740,7 +766,6 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
             </div>
           )}
 
-          {/* Tab 4: Skills Health */}
           {activeProfileTab === "skills" && (
             <div className="space-y-4 animate-in fade-in duration-150">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -800,7 +825,6 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                 ))}
               </div>
 
-              {/* Privacy Controls (Only for own profile) */}
               {isOwnProfile && (
                 <div className="rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] p-5 space-y-3">
                   <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
@@ -815,12 +839,15 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                           Public Engineering Profile
                         </div>
                         <div className="text-zinc-500">
-                          Allow peers and public to view your active times calendar, reputation, and published projects.
+                          Allow peers and public to view your active times
+                          calendar, reputation, and published projects.
                         </div>
                       </div>
                       <input
                         type="checkbox"
-                        defaultChecked={currentUser.privacy?.publicProfile ?? true}
+                        defaultChecked={
+                          currentUser.privacy?.publicProfile ?? true
+                        }
                         className="rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer"
                       />
                     </div>
@@ -831,7 +858,8 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
                           Share Progress with Micro-Squad
                         </div>
                         <div className="text-zinc-500">
-                          Display deliberate practice progress in squad check-in activity.
+                          Display deliberate practice progress in squad check-in
+                          activity.
                         </div>
                       </div>
                       <input
@@ -848,7 +876,6 @@ export const PublicProfileView: React.FC<PublicProfileViewProps> = ({
         </>
       )}
 
-      {/* Edit Profile Modal (Only for own profile) */}
       {editProfileOpen && isOwnProfile && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
           <div className="w-full max-w-lg bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">

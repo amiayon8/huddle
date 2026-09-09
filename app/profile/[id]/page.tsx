@@ -1,12 +1,9 @@
 import React from "react";
 import { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import {
-  fetchPublicProfile,
-} from "../../lib/supabase";
+import { fetchPublicProfile } from "../../lib/supabase";
 import { PublicProfileView } from "../../components/PublicProfileView";
-import { ArrowLeft, Sparkles, LogIn, Compass } from "lucide-react";
+import { Sparkles, Compass } from "lucide-react";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -39,7 +36,8 @@ export default async function PublicProfilePage({ params }: Props) {
   const { id } = await params;
   const decodedId = decodeURIComponent(id);
 
-  const { profile, portfolio, activityDays } = await fetchPublicProfile(decodedId);
+  const { profile, portfolio, activityDays } =
+    await fetchPublicProfile(decodedId);
 
   if (!profile) {
     return (
@@ -52,7 +50,8 @@ export default async function PublicProfilePage({ params }: Props) {
             Engineer Profile Not Found
           </h1>
           <p className="text-xs text-zinc-500">
-            The profile for "{decodedId}" does not exist or has been removed. Check the handle or explore active peers in Huddle.
+            The profile for &quot;{decodedId}&quot; does not exist or has been removed.
+            Check the handle or explore active peers in Huddle.
           </p>
           <div className="pt-2 flex items-center justify-center gap-3">
             <Link
@@ -69,7 +68,6 @@ export default async function PublicProfilePage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-100 font-sans transition-colors">
-      {/* Top Public Header */}
       <header className="sticky top-0 z-40 backdrop-blur-md bg-white/80 dark:bg-[#090a0f]/80 border-b border-zinc-200/80 dark:border-zinc-800/80 px-4 sm:px-6 py-3">
         <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -102,7 +100,6 @@ export default async function PublicProfilePage({ params }: Props) {
         </div>
       </header>
 
-      {/* Main Profile View Content */}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8">
         <PublicProfileView
           initialProfile={profile}

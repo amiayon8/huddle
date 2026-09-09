@@ -43,24 +43,26 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [stageFilter, setStageFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState<"all" | "completed" | "pending">("all");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "completed" | "pending"
+  >("all");
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [copiedJson, setCopiedJson] = useState(false);
 
-  // Derive stats
   const completedUsers = useMemo(
     () => usersList.filter((u) => u.surveyData && u.onboardingCompleted),
-    [usersList]
+    [usersList],
   );
   const pendingUsers = useMemo(
     () => usersList.filter((u) => !u.surveyData || !u.onboardingCompleted),
-    [usersList]
+    [usersList],
   );
 
   const uniqueProfessions = useMemo(() => {
     const set = new Set<string>();
     usersList.forEach((u) => {
-      const prof = u.surveyData?.targetProfession || u.surveyData?.professionOther;
+      const prof =
+        u.surveyData?.targetProfession || u.surveyData?.professionOther;
       if (prof) set.add(prof);
     });
     return Array.from(set);
@@ -74,7 +76,6 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
     return Array.from(set);
   }, [usersList]);
 
-  // Filter users
   const filteredUsers = useMemo(() => {
     return usersList.filter((u) => {
       const survey = u.surveyData;
@@ -95,9 +96,15 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
         const profMatch =
           survey?.targetProfession?.toLowerCase().includes(q) ||
           survey?.professionOther?.toLowerCase().includes(q);
-        const skillsMatch = survey?.startingSkills?.some((s) => s.toLowerCase().includes(q));
-        const hobbiesMatch = survey?.hobbies?.some((h) => h.toLowerCase().includes(q));
-        const subjectsMatch = survey?.subjects?.some((sub) => sub.toLowerCase().includes(q));
+        const skillsMatch = survey?.startingSkills?.some((s) =>
+          s.toLowerCase().includes(q),
+        );
+        const hobbiesMatch = survey?.hobbies?.some((h) =>
+          h.toLowerCase().includes(q),
+        );
+        const subjectsMatch = survey?.subjects?.some((sub) =>
+          sub.toLowerCase().includes(q),
+        );
         return (
           nameMatch ||
           emailMatch ||
@@ -123,7 +130,6 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
-      {/* Top Telemetry Bento: Survey Analytics */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
         <div className="p-4 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] shadow-sm space-y-1.5">
           <div className="flex items-center justify-between">
@@ -137,7 +143,9 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
           <div className="text-2xl font-bold text-zinc-950 dark:text-white tabular-nums">
             {usersList.length}
           </div>
-          <div className="text-[10px] text-zinc-500">Registered in Supabase</div>
+          <div className="text-[10px] text-zinc-500">
+            Registered in Supabase
+          </div>
         </div>
 
         <div className="p-4 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] shadow-sm space-y-1.5">
@@ -153,7 +161,10 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
             {completedUsers.length}
           </div>
           <div className="text-[10px] text-zinc-500">
-            {Math.round((completedUsers.length / Math.max(1, usersList.length)) * 100)}% Intake Completion
+            {Math.round(
+              (completedUsers.length / Math.max(1, usersList.length)) * 100,
+            )}
+            % Intake Completion
           </div>
         </div>
 
@@ -184,11 +195,12 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
           <div className="text-2xl font-bold text-zinc-950 dark:text-white tabular-nums">
             {uniqueProfessions.length}
           </div>
-          <div className="text-[10px] text-zinc-500">Unique career ambitions</div>
+          <div className="text-[10px] text-zinc-500">
+            Unique career ambitions
+          </div>
         </div>
       </div>
 
-      {/* Control Bar: Search & Filtering */}
       <div className="p-4 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] space-y-3 shadow-sm">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="relative flex-1 max-w-md">
@@ -203,7 +215,6 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
-            {/* Status Filter */}
             <div className="flex items-center bg-zinc-100 dark:bg-zinc-800/60 p-1 rounded-xl text-xs">
               <button
                 onClick={() => setStatusFilter("all")}
@@ -237,7 +248,6 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
               </button>
             </div>
 
-            {/* Stage Dropdown */}
             {uniqueStages.length > 0 && (
               <select
                 value={stageFilter}
@@ -256,7 +266,6 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
         </div>
       </div>
 
-      {/* Surveys Data Table */}
       <div className="rounded-2xl border border-zinc-200/70 dark:border-white/[0.07] bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
@@ -275,14 +284,14 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
               {filteredUsers.map((u) => {
                 const s = u.surveyData;
                 const hasCompleted = Boolean(s && u.onboardingCompleted);
-                const prof = s?.targetProfession || s?.professionOther || "Not Specified";
+                const prof =
+                  s?.targetProfession || s?.professionOther || "Not Specified";
 
                 return (
                   <tr
                     key={u.id}
                     className="hover:bg-zinc-50/60 dark:hover:bg-white/[0.02] transition-colors"
                   >
-                    {/* User Profile Cell */}
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2.5">
                         <img
@@ -306,7 +315,6 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
                       </div>
                     </td>
 
-                    {/* Target Profession */}
                     <td className="py-3.5 px-4">
                       {hasCompleted ? (
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-indigo-500/5 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/50 font-bold text-[11px]">
@@ -314,11 +322,12 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
                           <span>{prof}</span>
                         </span>
                       ) : (
-                        <span className="text-zinc-400 italic text-[11px]">Survey pending</span>
+                        <span className="text-zinc-400 italic text-[11px]">
+                          Survey pending
+                        </span>
                       )}
                     </td>
 
-                    {/* Stage & Age */}
                     <td className="py-3.5 px-4">
                       {s?.learningStage ? (
                         <div className="space-y-0.5">
@@ -332,11 +341,12 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
                           )}
                         </div>
                       ) : (
-                        <span className="text-zinc-400 italic text-[11px]">—</span>
+                        <span className="text-zinc-400 italic text-[11px]">
+                          —
+                        </span>
                       )}
                     </td>
 
-                    {/* Starting Skills */}
                     <td className="py-3.5 px-4">
                       {s?.startingSkills && s.startingSkills.length > 0 ? (
                         <div className="flex flex-wrap gap-1 max-w-xs">
@@ -355,11 +365,12 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
                           )}
                         </div>
                       ) : (
-                        <span className="text-zinc-400 italic text-[11px]">—</span>
+                        <span className="text-zinc-400 italic text-[11px]">
+                          —
+                        </span>
                       )}
                     </td>
 
-                    {/* Hobbies & Subjects */}
                     <td className="py-3.5 px-4">
                       {s?.hobbies && s.hobbies.length > 0 ? (
                         <div className="flex flex-wrap gap-1 max-w-xs">
@@ -378,11 +389,12 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
                           )}
                         </div>
                       ) : (
-                        <span className="text-zinc-400 italic text-[11px]">—</span>
+                        <span className="text-zinc-400 italic text-[11px]">
+                          —
+                        </span>
                       )}
                     </td>
 
-                    {/* Status */}
                     <td className="py-3.5 px-4">
                       {hasCompleted ? (
                         <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold text-[11px]">
@@ -397,7 +409,6 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
                       )}
                     </td>
 
-                    {/* Actions */}
                     <td className="py-3.5 px-4 text-right">
                       <button
                         onClick={() => setSelectedUser(u)}
@@ -422,11 +433,9 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
         </div>
       </div>
 
-      {/* DETAILED USER SURVEY MODAL */}
       {selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
           <div className="w-full max-w-2xl max-h-[90vh] bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 overflow-y-auto space-y-5">
-            {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
               <div className="flex items-center gap-3">
                 <img
@@ -454,10 +463,8 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
               </button>
             </div>
 
-            {/* Content: Survey Answers Breakdown */}
             {selectedUser.surveyData ? (
               <div className="space-y-4 text-xs">
-                {/* Profession & Stage Card */}
                 <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-500/5 via-purple-500/5 to-transparent border border-indigo-200/60 dark:border-indigo-900/40 space-y-3">
                   <div className="flex items-center gap-2 text-indigo-700 dark:text-indigo-300 font-bold">
                     <Briefcase className="w-4 h-4" />
@@ -469,7 +476,9 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
                         Target Profession
                       </div>
                       <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100 mt-0.5">
-                        {selectedUser.surveyData.targetProfession || selectedUser.surveyData.professionOther || "Not specified"}
+                        {selectedUser.surveyData.targetProfession ||
+                          selectedUser.surveyData.professionOther ||
+                          "Not specified"}
                       </div>
                     </div>
                     <div>
@@ -477,7 +486,8 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
                         Learning Stage
                       </div>
                       <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100 mt-0.5">
-                        {selectedUser.surveyData.learningStage || "Not specified"}
+                        {selectedUser.surveyData.learningStage ||
+                          "Not specified"}
                       </div>
                     </div>
                     {selectedUser.surveyData.age && (
@@ -496,20 +506,22 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
                           Submitted Timestamp
                         </div>
                         <div className="text-xs font-medium text-zinc-700 dark:text-zinc-300 mt-0.5 font-mono">
-                          {new Date(selectedUser.surveyData.completedAt).toLocaleString()}
+                          {new Date(
+                            selectedUser.surveyData.completedAt,
+                          ).toLocaleString()}
                         </div>
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Starting Skills */}
                 <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 space-y-2">
                   <div className="flex items-center gap-2 text-zinc-800 dark:text-zinc-200 font-bold">
                     <Sparkles className="w-4 h-4 text-amber-500" />
                     <span>Selected Starting Skills & Foundations</span>
                   </div>
-                  {selectedUser.surveyData.startingSkills && selectedUser.surveyData.startingSkills.length > 0 ? (
+                  {selectedUser.surveyData.startingSkills &&
+                  selectedUser.surveyData.startingSkills.length > 0 ? (
                     <div className="flex flex-wrap gap-1.5 pt-1">
                       {selectedUser.surveyData.startingSkills.map((sk, idx) => (
                         <span
@@ -521,17 +533,19 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
                       ))}
                     </div>
                   ) : (
-                    <p className="text-zinc-400 italic">No specific starting skills selected.</p>
+                    <p className="text-zinc-400 italic">
+                      No specific starting skills selected.
+                    </p>
                   )}
                 </div>
 
-                {/* Academic / Technical Subjects */}
                 <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 space-y-2">
                   <div className="flex items-center gap-2 text-zinc-800 dark:text-zinc-200 font-bold">
                     <GraduationCap className="w-4 h-4 text-sky-500" />
                     <span>Academic & Technical Subjects</span>
                   </div>
-                  {selectedUser.surveyData.subjects && selectedUser.surveyData.subjects.length > 0 ? (
+                  {selectedUser.surveyData.subjects &&
+                  selectedUser.surveyData.subjects.length > 0 ? (
                     <div className="flex flex-wrap gap-1.5 pt-1">
                       {selectedUser.surveyData.subjects.map((sub, idx) => (
                         <span
@@ -543,17 +557,19 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
                       ))}
                     </div>
                   ) : (
-                    <p className="text-zinc-400 italic">No subjects selected.</p>
+                    <p className="text-zinc-400 italic">
+                      No subjects selected.
+                    </p>
                   )}
                 </div>
 
-                {/* Hobbies & Creative Interests */}
                 <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 space-y-2">
                   <div className="flex items-center gap-2 text-zinc-800 dark:text-zinc-200 font-bold">
                     <Heart className="w-4 h-4 text-rose-500" />
                     <span>Hobbies & Creative Passions</span>
                   </div>
-                  {selectedUser.surveyData.hobbies && selectedUser.surveyData.hobbies.length > 0 ? (
+                  {selectedUser.surveyData.hobbies &&
+                  selectedUser.surveyData.hobbies.length > 0 ? (
                     <div className="flex flex-wrap gap-1.5 pt-1">
                       {selectedUser.surveyData.hobbies.map((hb, idx) => (
                         <span
@@ -569,7 +585,6 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
                   )}
                 </div>
 
-                {/* Raw JSON Payload */}
                 <div className="p-4 rounded-xl bg-zinc-900 text-zinc-100 border border-zinc-800 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="font-mono text-[11px] text-zinc-400 flex items-center gap-1.5">
@@ -605,8 +620,9 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
                   Survey Not Completed Yet
                 </h4>
                 <p className="text-xs text-zinc-400 max-w-sm mx-auto">
-                  This user has logged in but has not completed the 5-step intake survey.
-                  Their account is currently operating in preview mode.
+                  This user has logged in but has not completed the 5-step
+                  intake survey. Their account is currently operating in preview
+                  mode.
                 </p>
               </div>
             )}

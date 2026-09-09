@@ -106,7 +106,7 @@ export default function AdminDashboardPage() {
   const { user, isAuthenticated, authLoading } = useHuddle();
 
   const [activeTab, setActiveTab] = useState<AdminTab>("overview");
-  // Globally default hidden for sensitive information
+
   const [privacySafeMode, setPrivacySafeMode] = useState<boolean>(true);
   const [revealedItemIds, setRevealedItemIds] = useState<Set<string>>(
     new Set(),
@@ -119,7 +119,6 @@ export default function AdminDashboardPage() {
     text: string;
   } | null>(null);
 
-  // Statistics
   const [stats, setStats] = useState<AdminStats>({
     totalUsers: 0,
     totalSquads: 0,
@@ -130,7 +129,6 @@ export default function AdminDashboardPage() {
     totalDiscussions: 0,
   });
 
-  // Users Management
   const [usersList, setUsersList] = useState<UserProfile[]>([]);
   const [userSearchQuery, setUserSearchQuery] = useState("");
   const [userRoleFilter, setUserRoleFilter] = useState<string>("all");
@@ -148,7 +146,6 @@ export default function AdminDashboardPage() {
     careerMilestone: "Software Engineer",
   });
 
-  // Squads Management
   const [squadsList, setSquadsList] = useState<any[]>([]);
   const [squadSearchQuery, setSquadSearchQuery] = useState("");
   const [editingSquad, setEditingSquad] = useState<any | null>(null);
@@ -162,7 +159,6 @@ export default function AdminDashboardPage() {
     inviteCode: "",
   });
 
-  // Curriculum Management
   const [tasksList, setTasksList] = useState<TaskTemplate[]>([]);
   const [taskCategoryFilter, setTaskCategoryFilter] = useState<string>("all");
   const [editingTask, setEditingTask] = useState<TaskTemplate | null>(null);
@@ -181,7 +177,6 @@ export default function AdminDashboardPage() {
     artifactTitle: "",
   });
 
-  // Discussions Management
   const [discussionsList, setDiscussionsList] = useState<CommunityPost[]>([]);
   const [editingDiscussion, setEditingDiscussion] =
     useState<CommunityPost | null>(null);
@@ -194,16 +189,13 @@ export default function AdminDashboardPage() {
     skillTitle: "System Architecture",
   });
 
-  // Reports Management
   const [reportsList, setReportsList] = useState<AnonymousSquadReport[]>([]);
   const [reportFilter, setReportFilter] = useState<
     "all" | "pending" | "resolved"
   >("pending");
 
-  // Audit Logs
   const [auditLogs, setAuditLogs] = useState<AdminAuditLog[]>([]);
 
-  // Generic Delete Confirmation Modal
   const [deleteConfirmModal, setDeleteConfirmModal] = useState<{
     type: "user" | "squad" | "task" | "discussion" | "report";
     id: string;
@@ -212,7 +204,6 @@ export default function AdminDashboardPage() {
 
   const isAdmin = user?.role === "admin";
 
-  // Masking helpers - Globally default hidden
   const toggleRevealItem = (id: string) => {
     setRevealedItemIds((prev) => {
       const next = new Set(prev);
@@ -222,7 +213,8 @@ export default function AdminDashboardPage() {
     });
   };
 
-  const isRevealed = (id: string) => !privacySafeMode || revealedItemIds.has(id);
+  const isRevealed = (id: string) =>
+    !privacySafeMode || revealedItemIds.has(id);
 
   const maskEmail = (email: string, id?: string) => {
     if (!email) return "u***@***.com";
@@ -287,7 +279,6 @@ export default function AdminDashboardPage() {
     return JSON.stringify(copy);
   };
 
-  // Data loader
   const loadAllAdminData = async () => {
     setLoading(true);
     setStatusMessage(null);
@@ -333,9 +324,6 @@ export default function AdminDashboardPage() {
     }
   }, [isAuthenticated, isAdmin]);
 
-  // --------------------------------------------------------------------------
-  // USER CRUD HANDLERS
-  // --------------------------------------------------------------------------
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!userForm.name.trim() || !userForm.email.trim()) return;
@@ -460,9 +448,6 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // --------------------------------------------------------------------------
-  // SQUAD CRUD HANDLERS
-  // --------------------------------------------------------------------------
   const handleCreateSquad = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!squadForm.name.trim()) return;
@@ -579,9 +564,6 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // --------------------------------------------------------------------------
-  // CURRICULUM (TASK TEMPLATES) CRUD HANDLERS
-  // --------------------------------------------------------------------------
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!taskForm.title.trim() || !taskForm.description.trim()) return;
@@ -675,11 +657,7 @@ export default function AdminDashboardPage() {
     setActionLoading(true);
     setStatusMessage(null);
     try {
-      const success = await deleteTaskTemplateAdmin(
-        user.id,
-        user.name,
-        taskId,
-      );
+      const success = await deleteTaskTemplateAdmin(user.id, user.name, taskId);
       if (success) {
         setStatusMessage({
           type: "success",
@@ -707,9 +685,6 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // --------------------------------------------------------------------------
-  // DISCUSSIONS CRUD HANDLERS
-  // --------------------------------------------------------------------------
   const handleCreateDiscussion = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!discussionForm.title.trim() || !discussionForm.content.trim()) return;
@@ -842,9 +817,6 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // --------------------------------------------------------------------------
-  // SAFETY REPORTS HANDLERS
-  // --------------------------------------------------------------------------
   const handleResolveReport = async (
     reportId: string,
     resolution: "reviewed" | "dismissed",
@@ -925,7 +897,6 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // Confirm generic delete execution
   const executeDelete = () => {
     if (!deleteConfirmModal) return;
     const { type, id } = deleteConfirmModal;
@@ -936,7 +907,6 @@ export default function AdminDashboardPage() {
     else if (type === "report") handleDeleteReport(id);
   };
 
-  // Auth/Admin guard
   if (authLoading) {
     return (
       <div className="min-h-screen bg-[#07080c] flex items-center justify-center p-4">
@@ -990,7 +960,6 @@ export default function AdminDashboardPage() {
     );
   }
 
-  // Filtered datasets
   const filteredUsers = usersList.filter((u) => {
     const matchesSearch =
       u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
@@ -1029,13 +998,11 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#f8fafd] dark:bg-[#07080c] text-zinc-900 dark:text-zinc-100 selection:bg-indigo-600 selection:text-white font-sans antialiased relative">
-      {/* Subtle Ambient Background Gradients */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute -top-40 left-1/4 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-600/10 rounded-full blur-3xl" />
         <div className="absolute top-80 -right-40 w-96 h-96 bg-purple-500/10 dark:bg-purple-600/10 rounded-full blur-3xl" />
       </div>
 
-      {/* Top Header - Glassmorphic Cockpit Bar */}
       <header className="sticky top-0 z-40 border-b border-zinc-200/80 dark:border-white/[0.07] bg-white/80 dark:bg-[#07080c]/85 backdrop-blur-2xl px-4 sm:px-6 py-3 transition-colors">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -1072,7 +1039,6 @@ export default function AdminDashboardPage() {
           </div>
 
           <div className="flex items-center gap-2.5 flex-wrap">
-            {/* Master Sensitive Info Pill - Default Hidden */}
             <button
               onClick={() => {
                 setPrivacySafeMode(!privacySafeMode);
@@ -1095,7 +1061,9 @@ export default function AdminDashboardPage() {
                     <EyeOff className="w-3 h-3" />
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-xs">Privacy Shield</span>
+                    <span className="font-semibold text-xs">
+                      Privacy Shield
+                    </span>
                     <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                       Masked
                     </span>
@@ -1119,7 +1087,6 @@ export default function AdminDashboardPage() {
               )}
             </button>
 
-            {/* Reload Data Button */}
             <button
               onClick={loadAllAdminData}
               disabled={loading}
@@ -1131,7 +1098,6 @@ export default function AdminDashboardPage() {
               />
             </button>
 
-            {/* Admin identity chip */}
             <div
               className="hidden md:flex items-center gap-2.5 pl-2 border-l border-zinc-200 dark:border-zinc-800"
               title={`Logged in as ${user?.name || "Admin"} (${user?.email || "admin@huddle.team"})\nUser ID: ${user?.id || ""}`}
@@ -1162,7 +1128,6 @@ export default function AdminDashboardPage() {
         </div>
       </header>
 
-      {/* Global Notification Banner */}
       {statusMessage && (
         <div
           className={`border-b text-xs px-4 sm:px-6 py-2.5 flex items-center justify-between animate-in fade-in duration-200 z-30 relative ${
@@ -1191,7 +1156,6 @@ export default function AdminDashboardPage() {
       )}
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6 relative z-10">
-        {/* Navigation Tabs - Modern Segmented Rail */}
         <nav className="flex items-center gap-1.5 p-1 rounded-2xl bg-zinc-100/80 dark:bg-[#0f111a]/80 border border-zinc-200/70 dark:border-white/[0.06] overflow-x-auto backdrop-blur-md">
           {[
             { id: "overview", label: "Overview", icon: Activity, count: null },
@@ -1205,7 +1169,9 @@ export default function AdminDashboardPage() {
               id: "surveys",
               label: "Intake Surveys",
               icon: ClipboardList,
-              count: usersList.filter((u) => u.surveyData && u.onboardingCompleted).length,
+              count: usersList.filter(
+                (u) => u.surveyData && u.onboardingCompleted,
+              ).length,
             },
             {
               id: "squads",
@@ -1257,7 +1223,9 @@ export default function AdminDashboardPage() {
                     : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-white/[0.04]"
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? "text-indigo-600 dark:text-indigo-400" : ""}`} />
+                <Icon
+                  className={`w-3.5 h-3.5 ${isActive ? "text-indigo-600 dark:text-indigo-400" : ""}`}
+                />
                 <span>{tab.label}</span>
                 {tab.count !== null && (
                   <span
@@ -1277,12 +1245,8 @@ export default function AdminDashboardPage() {
           })}
         </nav>
 
-        {/* ==================================================================== */}
-        {/* TAB 1: OVERVIEW & TELEMETRY BENTO */}
-        {/* ==================================================================== */}
         {activeTab === "overview" && (
           <div className="space-y-6 animate-in fade-in duration-200">
-            {/* Top 6 KPI Metric Bento Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
               <div className="p-4 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] space-y-2 shadow-sm hover:border-indigo-500/40 transition-all">
                 <div className="flex items-center justify-between">
@@ -1375,28 +1339,37 @@ export default function AdminDashboardPage() {
                   <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
                     Pending Reports
                   </span>
-                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${
-                    stats.pendingReports > 0
-                      ? "bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400"
-                      : "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
-                  }`}>
+                  <div
+                    className={`w-6 h-6 rounded-lg flex items-center justify-center ${
+                      stats.pendingReports > 0
+                        ? "bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400"
+                        : "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
+                    }`}
+                  >
                     <AlertTriangle className="w-3.5 h-3.5" />
                   </div>
                 </div>
-                <div className={`text-2xl font-bold tracking-tight tabular-nums ${
-                  stats.pendingReports > 0 ? "text-amber-600 dark:text-amber-400" : "text-zinc-950 dark:text-white"
-                }`}>
+                <div
+                  className={`text-2xl font-bold tracking-tight tabular-nums ${
+                    stats.pendingReports > 0
+                      ? "text-amber-600 dark:text-amber-400"
+                      : "text-zinc-950 dark:text-white"
+                  }`}
+                >
                   {stats.pendingReports}
                 </div>
-                <div className={`text-[10px] font-semibold ${
-                  stats.pendingReports > 0 ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400"
-                }`}>
+                <div
+                  className={`text-[10px] font-semibold ${
+                    stats.pendingReports > 0
+                      ? "text-amber-600 dark:text-amber-400"
+                      : "text-emerald-600 dark:text-emerald-400"
+                  }`}
+                >
                   {stats.pendingReports > 0 ? "Action Required" : "All Clear"}
                 </div>
               </div>
             </div>
 
-            {/* Quick Action Launchpad */}
             <div className="rounded-2xl border border-zinc-200/70 dark:border-white/[0.07] bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl p-5 space-y-3 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -1481,59 +1454,55 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {/* Recent Activity Stream */}
             <div className="p-6 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] space-y-4 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <History className="w-4 h-4 text-indigo-500" />
-                    <h2 className="text-sm font-bold text-zinc-950 dark:text-white">
-                      Recent Administrative Events
-                    </h2>
-                  </div>
-                  <button
-                    onClick={() => setActiveTab("audit")}
-                    className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 font-medium cursor-pointer"
-                  >
-                    <span>View all events</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </button>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <History className="w-4 h-4 text-indigo-500" />
+                  <h2 className="text-sm font-bold text-zinc-950 dark:text-white">
+                    Recent Administrative Events
+                  </h2>
                 </div>
+                <button
+                  onClick={() => setActiveTab("audit")}
+                  className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 font-medium cursor-pointer"
+                >
+                  <span>View all events</span>
+                  <ArrowUpRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
 
-                <div className="space-y-2.5">
-                  {auditLogs.slice(0, 4).map((log) => (
-                    <div
-                      key={log.id}
-                      className="p-3 rounded-xl bg-zinc-50/70 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 flex items-center justify-between text-xs"
-                    >
-                      <div className="space-y-0.5">
-                        <div className="font-semibold text-zinc-950 dark:text-zinc-100 flex items-center gap-2">
-                          <span className="font-mono text-[11px] px-1.5 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
-                            {log.action}
-                          </span>
-                        </div>
-                        <div className="text-[11px] text-zinc-500">
-                          Target: {log.targetType}{" "}
-                          {log.targetId ? `(${maskId(log.targetId)})` : ""}
-                        </div>
+              <div className="space-y-2.5">
+                {auditLogs.slice(0, 4).map((log) => (
+                  <div
+                    key={log.id}
+                    className="p-3 rounded-xl bg-zinc-50/70 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 flex items-center justify-between text-xs"
+                  >
+                    <div className="space-y-0.5">
+                      <div className="font-semibold text-zinc-950 dark:text-zinc-100 flex items-center gap-2">
+                        <span className="font-mono text-[11px] px-1.5 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
+                          {log.action}
+                        </span>
                       </div>
-                      <div className="text-[10px] text-zinc-400 font-mono">
-                        {new Date(log.createdAt).toLocaleTimeString()}
+                      <div className="text-[11px] text-zinc-500">
+                        Target: {log.targetType}{" "}
+                        {log.targetId ? `(${maskId(log.targetId)})` : ""}
                       </div>
                     </div>
-                  ))}
-                  {auditLogs.length === 0 && (
-                    <div className="py-8 text-center text-xs text-zinc-400">
-                      No administrative transactions logged yet.
+                    <div className="text-[10px] text-zinc-400 font-mono">
+                      {new Date(log.createdAt).toLocaleTimeString()}
                     </div>
-                  )}
-                </div>
+                  </div>
+                ))}
+                {auditLogs.length === 0 && (
+                  <div className="py-8 text-center text-xs text-zinc-400">
+                    No administrative transactions logged yet.
+                  </div>
+                )}
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-        {/* ==================================================================== */}
-        {/* TAB 2: USERS CRUD */}
-        {/* ==================================================================== */}
         {activeTab === "users" && (
           <div className="space-y-4 animate-in fade-in duration-200">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -1629,12 +1598,19 @@ export default function AdminDashboardPage() {
                           </td>
 
                           <td className="py-3 px-4 font-mono text-zinc-500 text-[11px]">
-                            <div className="flex items-center gap-1.5" title={`User ID: ${u.id}`}>
-                              <span className="tabular-nums font-mono">{maskId(u.id, u.id)}</span>
+                            <div
+                              className="flex items-center gap-1.5"
+                              title={`User ID: ${u.id}`}
+                            >
+                              <span className="tabular-nums font-mono">
+                                {maskId(u.id, u.id)}
+                              </span>
                               <button
                                 onClick={() => toggleRevealItem(u.id)}
                                 className="p-1 rounded text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-                                title={revealed ? "Hide ID" : "Reveal Truncated ID"}
+                                title={
+                                  revealed ? "Hide ID" : "Reveal Truncated ID"
+                                }
                               >
                                 {revealed ? (
                                   <EyeOff className="w-3.5 h-3.5 text-amber-500" />
@@ -1693,7 +1669,9 @@ export default function AdminDashboardPage() {
                                       : "bg-emerald-500"
                                 }`}
                               />
-                              <span className="capitalize">{u.status || "active"}</span>
+                              <span className="capitalize">
+                                {u.status || "active"}
+                              </span>
                             </span>
                           </td>
 
@@ -1713,7 +1691,8 @@ export default function AdminDashboardPage() {
                                     role: (u.role as any) || "user",
                                     status: (u.status as any) || "active",
                                     primaryGoal:
-                                      u.primaryGoal || "Master System Architecture",
+                                      u.primaryGoal ||
+                                      "Master System Architecture",
                                     careerMilestone:
                                       u.careerMilestone || "Software Engineer",
                                   });
@@ -1748,9 +1727,6 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* ==================================================================== */}
-        {/* TAB: INTAKE SURVEYS */}
-        {/* ==================================================================== */}
         {activeTab === "surveys" && (
           <SurveysView
             usersList={usersList}
@@ -1763,9 +1739,6 @@ export default function AdminDashboardPage() {
           />
         )}
 
-        {/* ==================================================================== */}
-        {/* TAB 3: SQUADS CRUD */}
-        {/* ==================================================================== */}
         {activeTab === "squads" && (
           <div className="space-y-4 animate-in fade-in duration-200">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -1849,7 +1822,8 @@ export default function AdminDashboardPage() {
                       <div className="flex items-center justify-between text-[11px] text-zinc-500">
                         <span>Weekly Target</span>
                         <span className="font-semibold text-zinc-900 dark:text-zinc-100">
-                          {sq.currentProgress || 0} / {sq.targetProgress} Milestones
+                          {sq.currentProgress || 0} / {sq.targetProgress}{" "}
+                          Milestones
                         </span>
                       </div>
 
@@ -1880,9 +1854,6 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* ==================================================================== */}
-        {/* TAB 4: CURRICULUM CRUD */}
-        {/* ==================================================================== */}
         {activeTab === "curriculum" && (
           <div className="space-y-4 animate-in fade-in duration-200">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -1893,10 +1864,18 @@ export default function AdminDashboardPage() {
                   className="p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#0e1019] text-xs text-zinc-700 dark:text-zinc-300 focus:outline-none"
                 >
                   <option value="all">All Curriculum Tracks</option>
-                  <option value="System Architecture">System Architecture</option>
-                  <option value="Next.js 15 & React 19">Next.js 15 & React 19</option>
-                  <option value="Advanced TypeScript Patterns">Advanced TypeScript</option>
-                  <option value="API Design & Performance">API Design & Performance</option>
+                  <option value="System Architecture">
+                    System Architecture
+                  </option>
+                  <option value="Next.js 15 & React 19">
+                    Next.js 15 & React 19
+                  </option>
+                  <option value="Advanced TypeScript Patterns">
+                    Advanced TypeScript
+                  </option>
+                  <option value="API Design & Performance">
+                    API Design & Performance
+                  </option>
                 </select>
                 <span className="text-xs text-zinc-500 font-medium">
                   {filteredTasks.length} task templates
@@ -1991,14 +1970,12 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* ==================================================================== */}
-        {/* TAB 5: DISCUSSIONS CRUD */}
-        {/* ==================================================================== */}
         {activeTab === "discussions" && (
           <div className="space-y-4 animate-in fade-in duration-200">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <div className="text-xs text-zinc-500">
-                Manage community posts, technical announcements, and code reviews.
+                Manage community posts, technical announcements, and code
+                reviews.
               </div>
 
               <button
@@ -2034,7 +2011,8 @@ export default function AdminDashboardPage() {
                       <span>By {post.authorName}</span>
                       <span>•</span>
                       <span className="flex items-center gap-1">
-                        <ThumbsUp className="w-3 h-3 text-indigo-500" /> {post.upvotes || 0}
+                        <ThumbsUp className="w-3 h-3 text-indigo-500" />{" "}
+                        {post.upvotes || 0}
                       </span>
                       <span className="flex items-center gap-1">
                         <MessageCircle className="w-3 h-3 text-sky-500" />{" "}
@@ -2085,13 +2063,12 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* ==================================================================== */}
-        {/* TAB 6: SAFETY REPORTS */}
-        {/* ==================================================================== */}
         {activeTab === "reports" && (
           <div className="space-y-4 animate-in fade-in duration-200">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-zinc-500">Filter status:</span>
+              <span className="text-xs font-semibold text-zinc-500">
+                Filter status:
+              </span>
               <div className="flex items-center gap-1.5">
                 {(["pending", "resolved", "all"] as const).map((st) => (
                   <button
@@ -2142,13 +2119,17 @@ export default function AdminDashboardPage() {
                         {rep.status === "pending" && repId && (
                           <>
                             <button
-                              onClick={() => handleResolveReport(repId, "reviewed")}
+                              onClick={() =>
+                                handleResolveReport(repId, "reviewed")
+                              }
                               className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors cursor-pointer"
                             >
                               Mark Reviewed
                             </button>
                             <button
-                              onClick={() => handleResolveReport(repId, "dismissed")}
+                              onClick={() =>
+                                handleResolveReport(repId, "dismissed")
+                              }
                               className="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold transition-colors cursor-pointer"
                             >
                               Dismiss
@@ -2190,9 +2171,6 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* ==================================================================== */}
-        {/* TAB: DATABASE EXPLORER (ALL 26 TABLES) */}
-        {/* ==================================================================== */}
         {activeTab === "database" && (
           <DatabaseExplorerView
             privacySafeMode={privacySafeMode}
@@ -2204,14 +2182,12 @@ export default function AdminDashboardPage() {
           />
         )}
 
-        {/* ==================================================================== */}
-        {/* TAB 7: SECURITY AUDIT LOG */}
-        {/* ==================================================================== */}
         {activeTab === "audit" && (
           <div className="space-y-4 animate-in fade-in duration-200">
             <div className="flex items-center justify-between">
               <div className="text-xs text-zinc-500">
-                Immutable record of administrative actions and schema alterations.
+                Immutable record of administrative actions and schema
+                alterations.
               </div>
               <span className="text-xs font-mono text-zinc-400">
                 {auditLogs.length} events recorded
@@ -2267,11 +2243,6 @@ export default function AdminDashboardPage() {
         )}
       </main>
 
-      {/* ==================================================================== */}
-      {/* MODALS: CREATE / EDIT / CONFIRM DELETE */}
-      {/* ==================================================================== */}
-
-      {/* CREATE USER MODAL */}
       {showCreateUserModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
           <div className="w-full max-w-md bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5">
@@ -2407,7 +2378,6 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* EDIT USER MODAL */}
       {selectedUserForEdit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
           <div className="w-full max-w-md bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5">
@@ -2529,7 +2499,6 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* CREATE SQUAD MODAL */}
       {showCreateSquadModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
           <div className="w-full max-w-md bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5">
@@ -2622,7 +2591,6 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* EDIT SQUAD MODAL */}
       {editingSquad && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
           <div className="w-full max-w-md bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5">
@@ -2713,7 +2681,6 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* CREATE TASK TEMPLATE MODAL */}
       {showCreateTaskModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
           <div className="w-full max-w-lg bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5">
@@ -2743,14 +2710,25 @@ export default function AdminDashboardPage() {
                   <select
                     value={taskForm.skillCategory}
                     onChange={(e) =>
-                      setTaskForm({ ...taskForm, skillCategory: e.target.value })
+                      setTaskForm({
+                        ...taskForm,
+                        skillCategory: e.target.value,
+                      })
                     }
                     className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
                   >
-                    <option value="System Architecture">System Architecture</option>
-                    <option value="Next.js 15 & React 19">Next.js 15 & React 19</option>
-                    <option value="Advanced TypeScript Patterns">Advanced TypeScript</option>
-                    <option value="API Design & Performance">API Design & Performance</option>
+                    <option value="System Architecture">
+                      System Architecture
+                    </option>
+                    <option value="Next.js 15 & React 19">
+                      Next.js 15 & React 19
+                    </option>
+                    <option value="Advanced TypeScript Patterns">
+                      Advanced TypeScript
+                    </option>
+                    <option value="API Design & Performance">
+                      API Design & Performance
+                    </option>
                   </select>
                 </div>
 
@@ -2869,7 +2847,6 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* EDIT TASK TEMPLATE MODAL */}
       {editingTask && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
           <div className="w-full max-w-lg bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5">
@@ -2985,7 +2962,6 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* CREATE DISCUSSION MODAL */}
       {showCreateDiscussionModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
           <div className="w-full max-w-md bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5">
@@ -3006,7 +2982,10 @@ export default function AdminDashboardPage() {
               </button>
             </div>
 
-            <form onSubmit={handleCreateDiscussion} className="space-y-3.5 text-xs">
+            <form
+              onSubmit={handleCreateDiscussion}
+              className="space-y-3.5 text-xs"
+            >
               <div className="space-y-1">
                 <label className="font-semibold text-zinc-700 dark:text-zinc-300">
                   Title
@@ -3016,7 +2995,10 @@ export default function AdminDashboardPage() {
                   required
                   value={discussionForm.title}
                   onChange={(e) =>
-                    setDiscussionForm({ ...discussionForm, title: e.target.value })
+                    setDiscussionForm({
+                      ...discussionForm,
+                      title: e.target.value,
+                    })
                   }
                   placeholder="RFC: Architectural Sprint Updates"
                   className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
@@ -3052,7 +3034,10 @@ export default function AdminDashboardPage() {
                   required
                   value={discussionForm.content}
                   onChange={(e) =>
-                    setDiscussionForm({ ...discussionForm, content: e.target.value })
+                    setDiscussionForm({
+                      ...discussionForm,
+                      content: e.target.value,
+                    })
                   }
                   className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white min-h-[96px]"
                 />
@@ -3084,7 +3069,6 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* EDIT DISCUSSION MODAL */}
       {editingDiscussion && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
           <div className="w-full max-w-md bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5">
@@ -3105,7 +3089,10 @@ export default function AdminDashboardPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSaveDiscussion} className="space-y-3.5 text-xs">
+            <form
+              onSubmit={handleSaveDiscussion}
+              className="space-y-3.5 text-xs"
+            >
               <div className="space-y-1">
                 <label className="font-semibold text-zinc-700 dark:text-zinc-300">
                   Title
@@ -3115,7 +3102,10 @@ export default function AdminDashboardPage() {
                   required
                   value={discussionForm.title}
                   onChange={(e) =>
-                    setDiscussionForm({ ...discussionForm, title: e.target.value })
+                    setDiscussionForm({
+                      ...discussionForm,
+                      title: e.target.value,
+                    })
                   }
                   className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
                 />
@@ -3150,7 +3140,10 @@ export default function AdminDashboardPage() {
                   required
                   value={discussionForm.content}
                   onChange={(e) =>
-                    setDiscussionForm({ ...discussionForm, content: e.target.value })
+                    setDiscussionForm({
+                      ...discussionForm,
+                      content: e.target.value,
+                    })
                   }
                   className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white min-h-[96px]"
                 />
@@ -3182,7 +3175,6 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* GENERIC CONFIRM DELETE MODAL */}
       {deleteConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
           <div className="w-full max-w-sm bg-white dark:bg-[#11131e] border border-rose-200 dark:border-rose-900/60 rounded-2xl shadow-2xl p-6 space-y-4 text-center">
@@ -3199,7 +3191,8 @@ export default function AdminDashboardPage() {
                 <span className="font-semibold text-zinc-950 dark:text-white">
                   "{deleteConfirmModal.name}"
                 </span>
-                ? This action will be permanently recorded in the admin audit log.
+                ? This action will be permanently recorded in the admin audit
+                log.
               </p>
             </div>
 

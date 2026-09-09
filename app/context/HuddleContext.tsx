@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import {
   UserProfile,
   SkillHealth,
@@ -81,6 +81,9 @@ import {
   updateSquadSettingsInDb,
   submitSquadReportToDb,
   fetchAvailableSquads,
+  saveFocusTimerToDb,
+  logFocusSessionToDb,
+  fetchPublicProfile,
 } from "../lib/supabase";
 
 interface HuddleContextType {
@@ -100,6 +103,7 @@ interface HuddleContextType {
   realWorldProofs: RealWorldProofItem[];
   careerTimeline: CareerTimelineEntry[];
 
+  // Auth state & actions
   isAuthenticated: boolean;
   authLoading: boolean;
   isDemo: boolean;
@@ -121,11 +125,14 @@ interface HuddleContextType {
   activeTab: ActiveTab;
   theme: "dark" | "light";
 
+  // Focus Timer with Blur / Exit detection
   secondsFocusedToday: number;
   isTimerRunning: boolean;
   isAppFocused: boolean;
   showBingeQuizModal: boolean;
 
+  // UI states
+  sidebarOpen: boolean;
   searchOpen: boolean;
   settingsOpen: boolean;
   mascotOpen: boolean;
@@ -143,10 +150,12 @@ interface HuddleContextType {
   isPracticeSessionOpen: boolean;
   isPracticeReviewMode: boolean;
 
+  // State setters
   setActiveTab: (tab: ActiveTab) => void;
   setTheme: (theme: "dark" | "light") => void;
   toggleTheme: () => void;
   setSearchOpen: (open: boolean) => void;
+  setSidebarOpen: (open: boolean) => void;
   setSettingsOpen: (open: boolean) => void;
   setResetDemoModalOpen: (open: boolean) => void;
   setMascotOpen: (open: boolean) => void;
@@ -161,6 +170,7 @@ interface HuddleContextType {
   setCreatorUploadModalOpen: (open: boolean) => void;
   setShowBingeQuizModal: (show: boolean) => void;
 
+  // Focus Timer actions
   toggleFocusTimer: () => void;
   resetFocusTimer: () => void;
 
@@ -250,6 +260,11 @@ interface HuddleContextType {
     targetMilestone?: string,
     surveyPayload?: UserSurveyData,
   ) => void;
+
+  // Public Profile Viewing
+  viewingUserProfile: UserProfile | null;
+  viewProfile: (identifierOrUser: string | UserProfile) => Promise<void>;
+  viewMyProfile: () => void;
 }
 
 const HuddleContext = createContext<HuddleContextType | undefined>(undefined);
@@ -345,11 +360,26 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
   const [activeTab, setActiveTab] = useState<ActiveTab>("dashboard");
   const [theme, setThemeState] = useState<"dark" | "light">("dark");
 
+  // Focus Timer state (persisted to Supabase)
   const [secondsFocusedToday, setSecondsFocusedToday] = useState(1080);
   const [isTimerRunning, setIsTimerRunning] = useState(true);
   const [isAppFocused, setIsAppFocused] = useState(true);
   const [showBingeQuizModal, setShowBingeQuizModal] = useState(false);
 
+  // Synchronization refs for reliable background & visibility persistence
+  const secondsFocusedRef = useRef(1080);
+  const isTimerRunningRef = useRef(true);
+
+  useEffect(() => {
+    secondsFocusedRef.current = secondsFocusedToday;
+  }, [secondsFocusedToday]);
+
+  useEffect(() => {
+    isTimerRunningRef.current = isTimerRunning;
+  }, [isTimerRunning]);
+
+  // UI modal toggles
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mascotOpen, setMascotOpen] = useState(false);
@@ -382,6 +412,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     return false;
   });
   const [resetDemoModalOpen, setResetDemoModalOpen] = useState(false);
+  const [viewingUserProfile, setViewingUserProfile] = useState<UserProfile | null>(null);
 
   const isDemo =
     isDemoState ||
@@ -426,7 +457,29 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
         fetchAvailableSquads(),
       ]);
 
-      if (dbProfile) setUser(dbProfile);
+      if (dbProfile) {
+        setUser(dbProfile);
+        const today = new Date().toISOString().split("T")[0];
+        if (dbProfile.lastFocusDate === today) {
+          if (typeof dbProfile.focusSecondsToday === "number") {
+            setSecondsFocusedToday(dbProfile.focusSecondsToday);
+            secondsFocusedRef.current = dbProfile.focusSecondsToday;
+          }
+        } else if (dbProfile.lastFocusDate && dbProfile.lastFocusDate !== today) {
+          // New day rollover: reset daily counter and persist
+          setSecondsFocusedToday(0);
+          secondsFocusedRef.current = 0;
+          saveFocusTimerToDb(activeUserId, 0, dbProfile.isTimerRunning ?? true);
+        } else if (typeof dbProfile.focusSecondsToday === "number") {
+          setSecondsFocusedToday(dbProfile.focusSecondsToday);
+          secondsFocusedRef.current = dbProfile.focusSecondsToday;
+        }
+
+        if (typeof dbProfile.isTimerRunning === "boolean") {
+          setIsTimerRunning(dbProfile.isTimerRunning);
+          isTimerRunningRef.current = dbProfile.isTimerRunning;
+        }
+      }
       if (dbSprint) setSprint(dbSprint);
       if (dbPortfolio) setPortfolioItems(dbPortfolio);
       if (dbProofs) setRealWorldProofs(dbProofs);
@@ -465,6 +518,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  // Load from Supabase on mount & subscribe to Realtime updates
   useEffect(() => {
     async function loadSupabaseData() {
       try {
@@ -480,7 +534,9 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
             typeof window !== "undefined" &&
             localStorage.getItem("huddle_is_demo") === "true";
           if (isDemoStored) {
+            setIsAuthenticated(true);
             setIsDemoState(true);
+            setAuthModalOpen(false);
             await loadAllSupabaseData("user-1");
           } else {
             setIsAuthenticated(false);
@@ -498,6 +554,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
 
     loadSupabaseData();
 
+    // 1. Auth listener
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (session?.user) {
@@ -518,6 +575,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
       },
     );
 
+    // 2. Realtime subscription for squad activity pings
     const squadChannel = supabase
       .channel("realtime:squad_activity_pings")
       .on(
@@ -552,6 +610,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
       )
       .subscribe();
 
+    // 3. Realtime subscription for creator posts
     const creatorChannel = supabase
       .channel("realtime:creator_posts")
       .on(
@@ -594,6 +653,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, []);
 
+  // Theme synchronization and persistence
   useEffect(() => {
     const storedTheme =
       typeof window !== "undefined"
@@ -618,37 +678,84 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (e) {}
   }, [theme]);
 
+  // Window Focus / Blur, Visibility, and BeforeUnload listeners for reliable DB persistence
   useEffect(() => {
     const handleFocus = () => setIsAppFocused(true);
-    const handleBlur = () => setIsAppFocused(false);
+    const handleBlur = () => {
+      setIsAppFocused(false);
+      const activeUid = user?.id || "user-1";
+      saveFocusTimerToDb(
+        activeUid,
+        secondsFocusedRef.current,
+        isTimerRunningRef.current,
+      );
+    };
     const handleVisibilityChange = () => {
-      setIsAppFocused(!document.hidden);
+      const isVisible = !document.hidden;
+      setIsAppFocused(isVisible);
+      if (!isVisible) {
+        const activeUid = user?.id || "user-1";
+        saveFocusTimerToDb(
+          activeUid,
+          secondsFocusedRef.current,
+          isTimerRunningRef.current,
+        );
+      }
+    };
+    const handleBeforeUnload = () => {
+      const activeUid = user?.id || "user-1";
+      saveFocusTimerToDb(
+        activeUid,
+        secondsFocusedRef.current,
+        isTimerRunningRef.current,
+      );
     };
 
     window.addEventListener("focus", handleFocus);
     window.addEventListener("blur", handleBlur);
+    window.addEventListener("beforeunload", handleBeforeUnload);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       window.removeEventListener("focus", handleFocus);
       window.removeEventListener("blur", handleBlur);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, []);
+  }, [user?.id]);
 
+  // Focus Timer interval (ticks 1s in memory, auto-persists to Supabase every 10s)
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
+    let autoSyncInterval: NodeJS.Timeout | null = null;
 
     if (isTimerRunning && isAppFocused) {
       interval = setInterval(() => {
-        setSecondsFocusedToday((prev) => prev + 1);
+        setSecondsFocusedToday((prev) => {
+          const next = prev + 1;
+          secondsFocusedRef.current = next;
+          return next;
+        });
       }, 1000);
+
+      // Auto-persist to Supabase every 10 seconds while timer is active
+      autoSyncInterval = setInterval(() => {
+        const activeUid = user?.id || "user-1";
+        saveFocusTimerToDb(
+          activeUid,
+          secondsFocusedRef.current,
+          true,
+        );
+      }, 10000);
     }
+
     return () => {
       if (interval) clearInterval(interval);
+      if (autoSyncInterval) clearInterval(autoSyncInterval);
     };
-  }, [isTimerRunning, isAppFocused]);
+  }, [isTimerRunning, isAppFocused, user?.id]);
 
+  // Auth Methods
   const login = async (email: string, password: string) => {
     const { user: authUser, error } = await signInUser(email, password);
     if (error) return { success: false, error };
@@ -658,8 +765,24 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
         localStorage.removeItem("huddle_is_demo");
       }
       setIsAuthenticated(true);
+      setAuthModalOpen(false);
       const profile = await fetchUserProfile(authUser.id);
-      if (profile) setUser(profile);
+      if (profile) {
+        setUser(profile);
+        const today = new Date().toISOString().split("T")[0];
+        if (profile.lastFocusDate === today && typeof profile.focusSecondsToday === "number") {
+          setSecondsFocusedToday(profile.focusSecondsToday);
+          secondsFocusedRef.current = profile.focusSecondsToday;
+        } else {
+          setSecondsFocusedToday(0);
+          secondsFocusedRef.current = 0;
+          saveFocusTimerToDb(authUser.id, 0, profile.isTimerRunning ?? true);
+        }
+        if (typeof profile.isTimerRunning === "boolean") {
+          setIsTimerRunning(profile.isTimerRunning);
+          isTimerRunningRef.current = profile.isTimerRunning;
+        }
+      }
       return { success: true };
     }
     return { success: false, error: "User not found" };
@@ -678,6 +801,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
         localStorage.removeItem("huddle_is_demo");
       }
       setIsAuthenticated(true);
+      setAuthModalOpen(false);
       const profile = await fetchUserProfile(authUser.id);
       if (profile) setUser(profile);
       return { success: true };
@@ -687,6 +811,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = async () => {
     setIsDemoState(false);
+    setAuthModalOpen(false);
     if (typeof window !== "undefined") {
       localStorage.removeItem("huddle_is_demo");
       sessionStorage.removeItem("redirected_from_auth");
@@ -699,6 +824,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
   const loginDemo = async () => {
     setIsAuthenticated(true);
     setIsDemoState(true);
+    setAuthModalOpen(false);
     if (typeof window !== "undefined") {
       localStorage.setItem("huddle_is_demo", "true");
     }
@@ -709,6 +835,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     shouldLogout: boolean = false,
   ): Promise<{ success: boolean; error?: string }> => {
     try {
+      setAuthModalOpen(false);
       const res = await resetDemoAccountInDb();
       if (!res.success) {
         return res;
@@ -731,6 +858,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
 
       await loadAllSupabaseData("user-1");
 
+
       return { success: true };
     } catch (err: any) {
       console.error("Error in resetDemoAccount:", err);
@@ -742,11 +870,20 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const toggleFocusTimer = () => {
-    setIsTimerRunning((prev) => !prev);
+    setIsTimerRunning((prev) => {
+      const next = !prev;
+      isTimerRunningRef.current = next;
+      const activeUid = user?.id || "user-1";
+      saveFocusTimerToDb(activeUid, secondsFocusedRef.current, next);
+      return next;
+    });
   };
 
   const resetFocusTimer = () => {
     setSecondsFocusedToday(0);
+    secondsFocusedRef.current = 0;
+    const activeUid = user?.id || "user-1";
+    saveFocusTimerToDb(activeUid, 0, isTimerRunningRef.current);
   };
 
   const setTheme = (newTheme: "dark" | "light") => {
@@ -904,7 +1041,14 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     videoCompleted?: boolean,
   ) => {
     if (sessionSecondsElapsed > 0) {
-      setSecondsFocusedToday((prev) => prev + sessionSecondsElapsed);
+      setSecondsFocusedToday((prev) => {
+        const next = prev + sessionSecondsElapsed;
+        secondsFocusedRef.current = next;
+        const activeUid = user?.id || "user-1";
+        saveFocusTimerToDb(activeUid, next, isTimerRunningRef.current);
+        return next;
+      });
+      logFocusSessionToDb(user?.id || "user-1", sessionSecondsElapsed, taskId);
     }
     const existing = practiceProgressMap[taskId] || {
       userId: user.id,
@@ -1116,6 +1260,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  // Zero-penalty Sprint Reshuffle
   const reshuffleSprint = (customPrompt?: string) => {
     if (!ensureSurveyDone("reshuffle your sprint")) return;
     setSprint((prev) => ({
@@ -1222,6 +1367,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     };
     setNotifications((prev) => [notif, ...prev]);
     addNotificationToDb(notif, user.id);
+
 
     addSquadActivityPingToDb(
       squad.id,
@@ -1364,6 +1510,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
       updateProfileInDb(user.id, { reputation: nextRep });
       return { ...prev, reputation: nextRep };
     });
+
 
     const notif: NotificationItem = {
       id: `n-${Date.now()}`,
@@ -1508,15 +1655,17 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
           recent_encouragement: "Founded this squad",
           role: "lead",
         });
-        supabase.from("squad_projects").insert({
-          id: `proj-${newSquad.id}`,
-          squad_id: newSquad.id,
-          title: `Team Blueprint: ${payload.skillFocus}`,
-          description: payload.sharedGoal,
-          deadline: "Sunday, 11:59 PM",
-          deliverables: [],
-          submissions: [],
-        });
+        supabase
+          .from("squad_projects")
+          .insert({
+            id: `proj-${newSquad.id}`,
+            squad_id: newSquad.id,
+            title: `Team Blueprint: ${payload.skillFocus}`,
+            description: payload.sharedGoal,
+            deadline: "Sunday, 11:59 PM",
+            deliverables: [],
+            submissions: [],
+          });
         supabase
           .from("profiles")
           .update({ squad_id: newSquad.id })
@@ -2019,6 +2168,78 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     setOnboardingActive(false);
   };
 
+  const viewProfile = async (identifierOrUser: string | UserProfile) => {
+    if (!identifierOrUser) return;
+
+    if (typeof identifierOrUser === "object") {
+      if (identifierOrUser.id === user.id) {
+        setViewingUserProfile(null);
+      } else {
+        setViewingUserProfile(identifierOrUser);
+      }
+      setActiveTab("profile");
+      return;
+    }
+
+    if (identifierOrUser === user.id || identifierOrUser === user.handle) {
+      setViewingUserProfile(null);
+      setActiveTab("profile");
+      return;
+    }
+
+    try {
+      const { profile } = await fetchPublicProfile(identifierOrUser);
+      if (profile) {
+        setViewingUserProfile(profile);
+      } else {
+        const squadMember = squad.members.find(
+          (m) => m.id === identifierOrUser || m.handle === identifierOrUser,
+        );
+        if (squadMember) {
+          setViewingUserProfile({
+            id: squadMember.id,
+            name: squadMember.name,
+            handle: squadMember.handle,
+            email: "",
+            avatar: squadMember.avatar,
+            bio: "Practicing deliberate software engineering craft in squad.",
+            streak: squadMember.streak || 5,
+            maxStreak: (squadMember.streak || 5) + 3,
+            reputation: 150,
+            squadId: squad.id,
+            macroSquadId: "macro-squad-1",
+            primaryGoal: squad.skillFocus,
+            careerMilestone: "Senior Software Engineer",
+            onboardingCompleted: true,
+            joinedDate: "July 2026",
+            role: "user",
+            status: "active",
+            focusSecondsToday: squadMember.checkedInToday ? 2400 : 0,
+            lastFocusDate: new Date().toISOString().split("T")[0],
+            isTimerRunning: false,
+            totalFocusSeconds: 18000,
+            privacy: {
+              showStreak: true,
+              showSquad: true,
+              showReputation: true,
+              publicProfile: true,
+              hideRawRoadmaps: false,
+            },
+          });
+        }
+      }
+      setActiveTab("profile");
+    } catch (err) {
+      console.error("Error viewing profile:", err);
+      setActiveTab("profile");
+    }
+  };
+
+  const viewMyProfile = () => {
+    setViewingUserProfile(null);
+    setActiveTab("profile");
+  };
+
   return (
     <HuddleContext.Provider
       value={{
@@ -2071,10 +2292,16 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
         isPracticeSessionOpen,
         isPracticeReviewMode,
 
+        viewingUserProfile,
+        viewProfile,
+        viewMyProfile,
+
         setActiveTab,
         setTheme,
         toggleTheme,
         setSearchOpen,
+        sidebarOpen,
+        setSidebarOpen,
         setSettingsOpen,
         setResetDemoModalOpen,
         setMascotOpen,

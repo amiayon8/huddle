@@ -18,13 +18,13 @@ interface DynamicQuestionData {
   question: string;
   subtitle: string;
   mascotEmotion:
-  | "idle"
-  | "encouragement"
-  | "thinking"
-  | "deep_thinking"
-  | "planning"
-  | "success"
-  | "error";
+    | "idle"
+    | "encouragement"
+    | "thinking"
+    | "deep_thinking"
+    | "planning"
+    | "success"
+    | "error";
   mascotNote: string;
   isMultiple: boolean;
   options: Array<{
@@ -39,7 +39,6 @@ export const LandingQuestionnaire: React.FC = () => {
   const { finishOnboarding, setHasSkippedToPreview, setOnboardingActive } =
     useHuddle();
 
-  // Intro typewriter sequence before Step 1
   const fullIntroText =
     "Hey, glad you’re here. However you found your way to Huddle. Let’s figure out one small thing worthy building today";
 
@@ -49,7 +48,6 @@ export const LandingQuestionnaire: React.FC = () => {
   const [isExitingIntro, setIsExitingIntro] = useState(false);
   const [introFadedIn, setIntroFadedIn] = useState(false);
 
-  // Fade in container
   useEffect(() => {
     const fadeTimer = setTimeout(() => {
       setIntroFadedIn(true);
@@ -57,7 +55,6 @@ export const LandingQuestionnaire: React.FC = () => {
     return () => clearTimeout(fadeTimer);
   }, []);
 
-  // Typewriter animation
   useEffect(() => {
     if (!introFadedIn || !isIntro) return;
 
@@ -383,15 +380,15 @@ export const LandingQuestionnaire: React.FC = () => {
   const currentMascotEmotion = isLoadingDynamic
     ? "deep_thinking"
     : dynamicQuestion?.mascotEmotion ||
-    (step === 1
-      ? "planning"
-      : step === 2
-        ? "encouragement"
-        : step === 3
-          ? "thinking"
-          : step === 4
-            ? "deep_thinking"
-            : "success");
+      (step === 1
+        ? "planning"
+        : step === 2
+          ? "encouragement"
+          : step === 3
+            ? "thinking"
+            : step === 4
+              ? "deep_thinking"
+              : "success");
 
   const currentMascotNote =
     dynamicQuestion?.mascotNote ||
@@ -442,15 +439,15 @@ export const LandingQuestionnaire: React.FC = () => {
         {isIntro ? (
           <div
             onClick={handleFastForwardOrStart}
-            className={`transition-all duration-700 ease-out ${!introFadedIn
+            className={`transition-all duration-700 ease-out ${
+              !introFadedIn
                 ? "opacity-0 translate-y-6 scale-95"
                 : isExitingIntro
                   ? "opacity-0 -translate-y-8 scale-95 transition-all duration-400 ease-in"
                   : "opacity-100 translate-y-0 scale-100"
-              }`}
+            }`}
           >
             <div className="max-w-lg mx-auto text-center space-y-6">
-              {/* Pip Mascot with glow */}
               <div className="relative inline-block">
                 <div className="absolute inset-0 bg-indigo-500/25 dark:bg-indigo-500/35 blur-2xl rounded-full scale-150 animate-pulse" />
                 <div className="relative w-20 h-20 sm:w-24 sm:h-24 p-3 rounded-2xl bg-white dark:bg-[#11131e] border border-indigo-200 dark:border-indigo-800/80 shadow-2xl shadow-indigo-500/10 flex items-center justify-center transition-transform hover:scale-105 duration-300">
@@ -463,14 +460,12 @@ export const LandingQuestionnaire: React.FC = () => {
                 </div>
               </div>
 
-              {/* Pip Badge */}
               <div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/50 text-xs font-semibold shadow-2xs">
                   <span>Pip • Your Deliberate Practice Companion</span>
                 </div>
               </div>
 
-              {/* Speech Card with Faded + Typewriter */}
               <div className="relative p-6 sm:p-8 rounded-3xl bg-white/85 dark:bg-[#11131e]/85 backdrop-blur-xl border border-zinc-200/80 dark:border-white/[0.08] shadow-2xl text-left space-y-5">
                 <p className="text-base sm:text-lg md:text-xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100 leading-relaxed font-sans min-h-[5.5rem]">
                   {typedText}
@@ -594,11 +589,11 @@ export const LandingQuestionnaire: React.FC = () => {
                       : step === 3
                         ? "What is your current engineering stage?"
                         : dynamicQuestion?.question ||
-                        (step === 2
-                          ? "What are your hobbies or outside interests?"
-                          : step === 4
-                            ? "What role are you targeting?"
-                            : "Which skill would you like to practice first?")}
+                          (step === 2
+                            ? "What are your hobbies or outside interests?"
+                            : step === 4
+                              ? "What role are you targeting?"
+                              : "Which skill would you like to practice first?")}
                   </h1>
                   <p className="text-xs text-zinc-500 mt-0.5 leading-relaxed">
                     {step === 1
@@ -606,7 +601,7 @@ export const LandingQuestionnaire: React.FC = () => {
                       : step === 3
                         ? "Huddle calibrates daily scope and challenge depth to your experience."
                         : dynamicQuestion?.subtitle ||
-                        "Select the option that best fits your goals."}
+                          "Select the option that best fits your goals."}
                   </p>
                 </div>
 
@@ -692,17 +687,19 @@ export const LandingQuestionnaire: React.FC = () => {
                               sub.title,
                             )
                           }
-                          className={`w-full p-3.5 rounded-xl border text-left transition-all flex items-center justify-between group cursor-pointer ${isSelected
+                          className={`w-full p-3.5 rounded-xl border text-left transition-all flex items-center justify-between group cursor-pointer ${
+                            isSelected
                               ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/30 ring-1 ring-indigo-500/20"
                               : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] hover:border-zinc-300 dark:hover:border-zinc-700"
-                            }`}
+                          }`}
                         >
                           <div className="flex items-center gap-3">
                             <div
-                              className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors shrink-0 ${isSelected
+                              className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors shrink-0 ${
+                                isSelected
                                   ? "bg-indigo-600 border-indigo-600 text-white"
                                   : "border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800"
-                                }`}
+                              }`}
                             >
                               {isSelected && (
                                 <Check className="w-3 h-3 stroke-[3]" />
@@ -763,17 +760,19 @@ export const LandingQuestionnaire: React.FC = () => {
                         <button
                           key={opt.id}
                           onClick={handleSelect}
-                          className={`w-full p-3.5 rounded-xl border text-left transition-all flex items-center justify-between group cursor-pointer ${isSelected
+                          className={`w-full p-3.5 rounded-xl border text-left transition-all flex items-center justify-between group cursor-pointer ${
+                            isSelected
                               ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/30 ring-1 ring-indigo-500/20"
                               : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] hover:border-zinc-300 dark:hover:border-zinc-700"
-                            }`}
+                          }`}
                         >
                           <div className="flex items-center gap-3">
                             <div
-                              className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors shrink-0 ${isSelected
+                              className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors shrink-0 ${
+                                isSelected
                                   ? "bg-indigo-600 border-indigo-600 text-white"
                                   : "border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800"
-                                }`}
+                              }`}
                             >
                               {isSelected && (
                                 <Check className="w-3 h-3 stroke-[3]" />
@@ -800,14 +799,15 @@ export const LandingQuestionnaire: React.FC = () => {
                     })}
 
                   <div
-                    className={`p-3.5 rounded-xl border transition-all ${(step === 1 && subjectsOtherActive) ||
-                        (step === 2 && hobbiesOtherActive) ||
-                        (step === 3 && ageOtherActive) ||
-                        (step === 4 && professionOtherActive) ||
-                        (step === 5 && skillsOtherActive)
+                    className={`p-3.5 rounded-xl border transition-all ${
+                      (step === 1 && subjectsOtherActive) ||
+                      (step === 2 && hobbiesOtherActive) ||
+                      (step === 3 && ageOtherActive) ||
+                      (step === 4 && professionOtherActive) ||
+                      (step === 5 && skillsOtherActive)
                         ? "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/30 ring-1 ring-indigo-500/20"
                         : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218]"
-                      }`}
+                    }`}
                   >
                     <div className="flex items-center gap-3">
                       <input

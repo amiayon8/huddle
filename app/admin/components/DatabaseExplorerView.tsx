@@ -31,37 +31,129 @@ interface DatabaseExplorerViewProps {
 
 export const KNOWN_DATABASE_TABLES = [
   { id: "profiles", name: "User Profiles & Surveys", category: "Core & Auth" },
-  { id: "questionnaire_config", name: "Survey Questions Config", category: "Core & Auth" },
-  { id: "admin_audit_logs", name: "Admin Audit Trail", category: "Core & Auth" },
-  
-  { id: "sprints", name: "Sprints (4-Day Cadence)", category: "Sprints & Drills" },
-  { id: "sprint_tasks", name: "Sprint Tasks & Proofs", category: "Sprints & Drills" },
-  { id: "focus_sessions", name: "Persistent Focus Timer Logs", category: "Sprints & Drills" },
-  { id: "task_templates", name: "Curriculum Drill Templates", category: "Sprints & Drills" },
-  { id: "practice_curriculum", name: "Practice Curriculum Modules", category: "Sprints & Drills" },
-  { id: "practice_session_progress", name: "Session Notes & Code", category: "Sprints & Drills" },
-  
+  {
+    id: "questionnaire_config",
+    name: "Survey Questions Config",
+    category: "Core & Auth",
+  },
+  {
+    id: "admin_audit_logs",
+    name: "Admin Audit Trail",
+    category: "Core & Auth",
+  },
+
+  {
+    id: "sprints",
+    name: "Sprints (4-Day Cadence)",
+    category: "Sprints & Drills",
+  },
+  {
+    id: "sprint_tasks",
+    name: "Sprint Tasks & Proofs",
+    category: "Sprints & Drills",
+  },
+  {
+    id: "focus_sessions",
+    name: "Persistent Focus Timer Logs",
+    category: "Sprints & Drills",
+  },
+  {
+    id: "task_templates",
+    name: "Curriculum Drill Templates",
+    category: "Sprints & Drills",
+  },
+  {
+    id: "practice_curriculum",
+    name: "Practice Curriculum Modules",
+    category: "Sprints & Drills",
+  },
+  {
+    id: "practice_session_progress",
+    name: "Session Notes & Code",
+    category: "Sprints & Drills",
+  },
+
   { id: "squads", name: "Micro-Squads", category: "Squads & Cohorts" },
-  { id: "squad_members", name: "Squad Memberships", category: "Squads & Cohorts" },
-  { id: "squad_activity_pings", name: "Daily Standup Pings", category: "Squads & Cohorts" },
-  { id: "squad_projects", name: "Squad Projects & Repos", category: "Squads & Cohorts" },
-  { id: "squad_reports", name: "Squad Safety Reports", category: "Squads & Cohorts" },
-  { id: "macro_squad_updates", name: "Macro Circle Broadcasts", category: "Squads & Cohorts" },
-  
-  { id: "community_posts", name: "Community Discussions", category: "Community" },
-  { id: "creators", name: "Curriculum Mentors & Creators", category: "Community" },
+  {
+    id: "squad_members",
+    name: "Squad Memberships",
+    category: "Squads & Cohorts",
+  },
+  {
+    id: "squad_activity_pings",
+    name: "Daily Standup Pings",
+    category: "Squads & Cohorts",
+  },
+  {
+    id: "squad_projects",
+    name: "Squad Projects & Repos",
+    category: "Squads & Cohorts",
+  },
+  {
+    id: "squad_reports",
+    name: "Squad Safety Reports",
+    category: "Squads & Cohorts",
+  },
+  {
+    id: "macro_squad_updates",
+    name: "Macro Circle Broadcasts",
+    category: "Squads & Cohorts",
+  },
+
+  {
+    id: "community_posts",
+    name: "Community Discussions",
+    category: "Community",
+  },
+  {
+    id: "creators",
+    name: "Curriculum Mentors & Creators",
+    category: "Community",
+  },
   { id: "creator_posts", name: "Creator Walkthroughs", category: "Community" },
-  
-  { id: "portfolio_items", name: "Verified Portfolio Proofs", category: "Career & Reputation" },
-  { id: "real_world_proofs", name: "Production Proof Deliverables", category: "Career & Reputation" },
-  { id: "career_timeline", name: "Career Milestones", category: "Career & Reputation" },
-  { id: "skills_health", name: "Skill Decay & Health", category: "Career & Reputation" },
-  
+
+  {
+    id: "portfolio_items",
+    name: "Verified Portfolio Proofs",
+    category: "Career & Reputation",
+  },
+  {
+    id: "real_world_proofs",
+    name: "Production Proof Deliverables",
+    category: "Career & Reputation",
+  },
+  {
+    id: "career_timeline",
+    name: "Career Milestones",
+    category: "Career & Reputation",
+  },
+  {
+    id: "skills_health",
+    name: "Skill Decay & Health",
+    category: "Career & Reputation",
+  },
+
   { id: "roadmaps", name: "Skill Roadmaps", category: "Interactive & Systems" },
-  { id: "binge_quizzes", name: "Anti-Doomscroll Quizzes", category: "Interactive & Systems" },
-  { id: "notifications", name: "User Notifications", category: "Interactive & Systems" },
-  { id: "mascot_messages", name: "Pip Mascot Guidance Feed", category: "Interactive & Systems" },
-  { id: "search_suggestions", name: "Global Search Suggestions", category: "Interactive & Systems" },
+  {
+    id: "binge_quizzes",
+    name: "Anti-Doomscroll Quizzes",
+    category: "Interactive & Systems",
+  },
+  {
+    id: "notifications",
+    name: "User Notifications",
+    category: "Interactive & Systems",
+  },
+  {
+    id: "mascot_messages",
+    name: "Pip Mascot Guidance Feed",
+    category: "Interactive & Systems",
+  },
+  {
+    id: "search_suggestions",
+    name: "Global Search Suggestions",
+    category: "Interactive & Systems",
+  },
 ];
 
 export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
@@ -101,12 +193,11 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
 
   const [copiedJson, setCopiedJson] = useState(false);
 
-  // Fetch table data
   const fetchTableData = async (tableName: string, limit = rowLimit) => {
     setLoading(true);
     try {
       const res = await fetch(
-        `/api/admin/database?table=${encodeURIComponent(tableName)}&limit=${limit}`
+        `/api/admin/database?table=${encodeURIComponent(tableName)}&limit=${limit}`,
       );
       const json = await res.json();
       if (json.success) {
@@ -133,7 +224,6 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
     }
   };
 
-  // Fetch catalog with counts
   const fetchCatalog = async () => {
     try {
       const res = await fetch("/api/admin/database?action=catalog");
@@ -164,19 +254,20 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
 
   const filteredCatalog = useMemo(() => {
     return catalog.filter((t) => {
-      if (categoryFilter !== "all" && t.category !== categoryFilter) return false;
+      if (categoryFilter !== "all" && t.category !== categoryFilter)
+        return false;
       return true;
     });
   }, [catalog, categoryFilter]);
 
-  // Search filter across loaded rows
   const filteredRows = useMemo(() => {
     if (!searchQuery.trim()) return tableData.rows;
     const q = searchQuery.toLowerCase();
     return tableData.rows.filter((row) => {
       return Object.values(row).some((val) => {
         if (val === null || val === undefined) return false;
-        if (typeof val === "object") return JSON.stringify(val).toLowerCase().includes(q);
+        if (typeof val === "object")
+          return JSON.stringify(val).toLowerCase().includes(q);
         return String(val).toLowerCase().includes(q);
       });
     });
@@ -202,10 +293,13 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
     }
   };
 
-  // Render dynamic cell value
   const renderCellValue = (colName: string, val: any, rowId?: string) => {
     if (val === null || val === undefined) {
-      return <span className="text-zinc-400 dark:text-zinc-600 italic font-mono text-[11px]">null</span>;
+      return (
+        <span className="text-zinc-400 dark:text-zinc-600 italic font-mono text-[11px]">
+          null
+        </span>
+      );
     }
 
     const lowerCol = colName.toLowerCase();
@@ -227,11 +321,16 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
 
     if (typeof val === "object") {
       const isArr = Array.isArray(val);
-      const label = isArr ? `[${val.length} items]` : `{${Object.keys(val).length} keys}`;
+      const label = isArr
+        ? `[${val.length} items]`
+        : `{${Object.keys(val).length} keys}`;
       return (
         <button
           onClick={() =>
-            setInspectingJson({ title: `${tableData.table}.${colName}`, data: val })
+            setInspectingJson({
+              title: `${tableData.table}.${colName}`,
+              data: val,
+            })
           }
           className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 font-mono text-[10px] font-medium transition-colors cursor-pointer"
         >
@@ -249,16 +348,26 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
       );
     }
 
-    if (lowerCol === "id" || lowerCol.endsWith("_id") || lowerCol.includes("token")) {
+    if (
+      lowerCol === "id" ||
+      lowerCol.endsWith("_id") ||
+      lowerCol.includes("token")
+    ) {
       return (
-        <span className="font-mono text-zinc-600 dark:text-zinc-400" title={strVal}>
+        <span
+          className="font-mono text-zinc-600 dark:text-zinc-400"
+          title={strVal}
+        >
           {maskId(strVal, rowId)}
         </span>
       );
     }
 
-    // Timestamps
-    if (lowerCol.includes("_at") || lowerCol.includes("date") || lowerCol.includes("time")) {
+    if (
+      lowerCol.includes("_at") ||
+      lowerCol.includes("date") ||
+      lowerCol.includes("time")
+    ) {
       const parsedDate = new Date(strVal);
       if (!isNaN(parsedDate.getTime())) {
         return (
@@ -269,12 +378,15 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
       }
     }
 
-    return <span className="truncate max-w-xs block text-zinc-800 dark:text-zinc-200">{strVal}</span>;
+    return (
+      <span className="truncate max-w-xs block text-zinc-800 dark:text-zinc-200">
+        {strVal}
+      </span>
+    );
   };
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
-      {/* Top Banner: Database Architecture */}
       <div className="p-5 rounded-2xl bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-indigo-500/5 border border-indigo-200/70 dark:border-indigo-800/60 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
@@ -289,7 +401,8 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
             </span>
           </div>
           <p className="text-xs text-zinc-600 dark:text-zinc-400">
-            Real-time table viewer for all production PostgreSQL entities, survey payloads, and curriculum models.
+            Real-time table viewer for all production PostgreSQL entities,
+            survey payloads, and curriculum models.
           </p>
         </div>
 
@@ -299,7 +412,9 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
             disabled={loading}
             className="px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#181a26] text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-indigo-500" : ""}`} />
+            <RefreshCw
+              className={`w-3.5 h-3.5 ${loading ? "animate-spin text-indigo-500" : ""}`}
+            />
             <span>Refresh</span>
           </button>
           <button
@@ -313,7 +428,6 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
         </div>
       </div>
 
-      {/* Table Category Rail */}
       <div className="space-y-2.5">
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
@@ -346,7 +460,6 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
           </div>
         </div>
 
-        {/* Table Selector Pills */}
         <div className="flex flex-wrap gap-2">
           {filteredCatalog.map((t) => {
             const isSelected = selectedTable === t.id;
@@ -360,7 +473,9 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
                     : "bg-white/60 dark:bg-[#0e1019]/60 border-zinc-200/80 dark:border-white/[0.06] text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:border-zinc-300 dark:hover:border-zinc-700"
                 }`}
               >
-                <Table className={`w-3.5 h-3.5 ${isSelected ? "text-indigo-500" : "text-zinc-400"}`} />
+                <Table
+                  className={`w-3.5 h-3.5 ${isSelected ? "text-indigo-500" : "text-zinc-400"}`}
+                />
                 <span>{t.id}</span>
                 {t.rowCount !== undefined && (
                   <span
@@ -379,21 +494,19 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
         </div>
       </div>
 
-      {/* Table Data Viewport */}
       <div className="p-4 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] shadow-sm space-y-4">
-        {/* Table Controls Header */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
           <div className="flex items-center gap-3">
             <span className="font-mono text-sm font-bold text-zinc-950 dark:text-white">
               public.{tableData.table}
             </span>
             <span className="text-[11px] text-zinc-500 font-medium">
-              Showing {filteredRows.length} of {tableData.totalRows} rows • {tableData.columns.length} columns
+              Showing {filteredRows.length} of {tableData.totalRows} rows •{" "}
+              {tableData.columns.length} columns
             </span>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Search Input */}
             <div className="relative flex-1 sm:w-64">
               <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
               <input
@@ -405,7 +518,6 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
               />
             </div>
 
-            {/* Limit Selector */}
             <select
               value={rowLimit}
               onChange={(e) => {
@@ -423,11 +535,12 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
           </div>
         </div>
 
-        {/* Data Grid */}
         {loading ? (
           <div className="py-16 text-center space-y-2">
             <RefreshCw className="w-6 h-6 text-indigo-500 animate-spin mx-auto" />
-            <p className="text-xs text-zinc-500">Querying Supabase table data...</p>
+            <p className="text-xs text-zinc-500">
+              Querying Supabase table data...
+            </p>
           </div>
         ) : tableData.error ? (
           <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-700 dark:text-rose-400 text-xs flex items-center gap-2">
@@ -443,7 +556,9 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
             <table className="w-full text-left text-xs divide-y divide-zinc-200/60 dark:divide-zinc-800/60">
               <thead className="bg-zinc-100/80 dark:bg-white/[0.04] sticky top-0 z-10 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
                 <tr>
-                  <th className="py-2.5 px-3 w-10 text-center text-zinc-400">#</th>
+                  <th className="py-2.5 px-3 w-10 text-center text-zinc-400">
+                    #
+                  </th>
                   {tableData.columns.map((col) => (
                     <th key={col} className="py-2.5 px-3 whitespace-nowrap">
                       {col}
@@ -476,7 +591,6 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
         )}
       </div>
 
-      {/* RAW JSON INSPECTOR MODAL */}
       {inspectingJson && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
           <div className="w-full max-w-xl max-h-[85vh] bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 overflow-hidden flex flex-col space-y-4">

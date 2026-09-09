@@ -73,9 +73,7 @@ export const DashboardView: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-20 animate-in fade-in duration-200">
-      {/* Top Hero Sprint Card with Glassmorphic Accent */}
       <div className="relative overflow-hidden rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#11131d]/90 backdrop-blur-xl p-6 sm:p-7 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.4)]">
-        {/* Subtle Ambient Radial Glow */}
         <div className="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent blur-3xl pointer-events-none" />
 
         <div className="relative space-y-5">
@@ -116,9 +114,7 @@ export const DashboardView: React.FC = () => {
             </p>
           </div>
 
-          {/* Quick Metrics Bar - Fully Mobile Optimized */}
           <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-2">
-            {/* Delivered Metric */}
             <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 transition-colors min-w-0">
               <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/60 dark:border-indigo-800/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
                 <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -136,7 +132,6 @@ export const DashboardView: React.FC = () => {
               </div>
             </div>
 
-            {/* Today's Deep Focus Metric */}
             <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 transition-colors min-w-0">
               <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200/60 dark:border-amber-800/60 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
                 <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -155,7 +150,6 @@ export const DashboardView: React.FC = () => {
               </div>
             </div>
 
-            {/* Sprint Streak Metric */}
             <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 transition-colors min-w-0">
               <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/60 dark:border-emerald-800/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
                 <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -179,7 +173,6 @@ export const DashboardView: React.FC = () => {
             </div>
           </div>
 
-          {/* Primary Action Button or Success Banner */}
           <div className="pt-2">
             {!isSprintComplete ? (
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-r from-indigo-500/10 via-purple-500/5 to-transparent border border-indigo-200/60 dark:border-indigo-900/40">
@@ -221,7 +214,6 @@ export const DashboardView: React.FC = () => {
             )}
           </div>
 
-          {/* Progress Bar with Glow */}
           <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-white/[0.06]">
             <div className="flex justify-between text-xs text-zinc-500 dark:text-zinc-400">
               <span className="font-medium">Curriculum Completion</span>
@@ -239,14 +231,12 @@ export const DashboardView: React.FC = () => {
         </div>
       </div>
 
-      {/* Pip Mascot Companion */}
       <DuolingoMascot
         emotion={isSprintComplete ? "success" : "encouragement"}
         size="md"
         showQuickActions={true}
       />
 
-      {/* 4-Day Sprint Schedule Timeline */}
       <div className="rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#11131d]/90 backdrop-blur-xl p-6 sm:p-7 space-y-6 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.4)]">
         <div className="flex items-center justify-between border-b border-zinc-100 dark:border-white/[0.06] pb-4">
           <div>
@@ -405,7 +395,6 @@ export const DashboardView: React.FC = () => {
             );
           })}
 
-          {/* Capstone Deliverable Card */}
           <div className="rounded-xl border border-dashed border-indigo-200 dark:border-indigo-900/50 bg-indigo-50/20 dark:bg-indigo-950/10 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div
@@ -439,7 +428,6 @@ export const DashboardView: React.FC = () => {
         </div>
       </div>
 
-      {/* Micro-Squad Peer Sync */}
       <div className="rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#11131d]/90 backdrop-blur-xl p-6 space-y-4 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.4)]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -492,4 +480,3 @@ export const DashboardView: React.FC = () => {
     </div>
   );
 };
-

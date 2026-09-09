@@ -54,7 +54,6 @@ export const Sidebar: React.FC = () => {
 
   const sidebarRef = useRef<HTMLElement>(null);
 
-  // Close sidebar on ESC key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && sidebarOpen) {
@@ -65,7 +64,6 @@ export const Sidebar: React.FC = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [sidebarOpen, setSidebarOpen]);
 
-  // Lock body scroll on mobile when sidebar is open
   useEffect(() => {
     if (sidebarOpen) {
       document.body.style.overflow = "hidden";
@@ -138,7 +136,6 @@ export const Sidebar: React.FC = () => {
 
   return (
     <>
-      {/* Backdrop overlay */}
       <div
         className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-xs transition-opacity duration-300 md:hidden ${
           sidebarOpen
@@ -149,7 +146,6 @@ export const Sidebar: React.FC = () => {
         aria-hidden="true"
       />
 
-      {/* Slide-out Sidebar Drawer */}
       <aside
         ref={sidebarRef}
         className={`fixed inset-y-0 left-0 z-50 w-[86vw] max-w-[340px] bg-white/95 dark:bg-[#0b0c12]/95 backdrop-blur-2xl border-r border-zinc-200/80 dark:border-zinc-800/80 shadow-2xl flex flex-col transition-transform duration-300 ease-out md:hidden ${
@@ -157,10 +153,8 @@ export const Sidebar: React.FC = () => {
         }`}
         aria-label="Navigation Sidebar"
       >
-        {/* Ambient Top Glow */}
         <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-indigo-500/10 via-purple-500/5 to-transparent pointer-events-none" />
 
-        {/* Header: Brand & Close */}
         <div className="relative px-4 pt-4 pb-3 border-b border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 p-0.5 shadow-sm flex items-center justify-center shrink-0">
@@ -199,9 +193,7 @@ export const Sidebar: React.FC = () => {
           </button>
         </div>
 
-        {/* Scrollable Body */}
         <div className="flex-1 overflow-y-auto px-3.5 py-3 space-y-4">
-          {/* User Profile Card */}
           {isAuthenticated && (
             <div className="p-3 rounded-xl bg-zinc-50/90 dark:bg-zinc-900/60 border border-zinc-200/70 dark:border-zinc-800/70 relative overflow-hidden">
               <div className="flex items-center gap-3">
@@ -241,16 +233,17 @@ export const Sidebar: React.FC = () => {
                   {user.streak || 1} Day Streak
                 </span>
                 <span className="text-zinc-500 dark:text-zinc-400">
-                  Rep: <strong className="text-zinc-800 dark:text-zinc-200">{user.reputation || 120}</strong>
+                  Rep:{" "}
+                  <strong className="text-zinc-800 dark:text-zinc-200">
+                    {user.reputation || 120}
+                  </strong>
                 </span>
               </div>
             </div>
           )}
 
-          {/* Quick Metrics Row (Moved from Navbar to save space) */}
           {isAuthenticated && (
             <div className="grid grid-cols-2 gap-2">
-              {/* Focus Timer Card */}
               <div
                 onClick={toggleFocusTimer}
                 className="p-2.5 rounded-xl bg-zinc-50/70 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 cursor-pointer hover:border-emerald-500/40 transition-all group"
@@ -281,7 +274,6 @@ export const Sidebar: React.FC = () => {
                 </div>
               </div>
 
-              {/* Sprint Progress Card */}
               <div
                 onClick={() => handleNavClick("dashboard")}
                 className="p-2.5 rounded-xl bg-zinc-50/70 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 cursor-pointer hover:border-indigo-500/40 transition-all group"
@@ -308,7 +300,6 @@ export const Sidebar: React.FC = () => {
             </div>
           )}
 
-          {/* Survey Warning Prompt Card (Moved from Navbar to save space) */}
           {!user.onboardingCompleted && (
             <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2">
               <div className="flex items-start gap-2">
@@ -318,7 +309,8 @@ export const Sidebar: React.FC = () => {
                     Intake Survey Required
                   </div>
                   <p className="text-[10.5px] text-amber-800 dark:text-amber-300 leading-tight mt-0.5">
-                    Drill actions are locked until your 5-step intake survey is completed.
+                    Drill actions are locked until your 5-step intake survey is
+                    completed.
                   </p>
                 </div>
               </div>
@@ -335,7 +327,6 @@ export const Sidebar: React.FC = () => {
             </div>
           )}
 
-          {/* Primary Navigation Rail */}
           <div className="space-y-1">
             <div className="px-1 text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
               Navigation
@@ -391,7 +382,6 @@ export const Sidebar: React.FC = () => {
               );
             })}
 
-            {/* Admin Console Shortcut (Moved from Navbar to save space) */}
             {user.role === "admin" && (
               <Link
                 href="/admin"
@@ -417,7 +407,6 @@ export const Sidebar: React.FC = () => {
             )}
           </div>
 
-          {/* Ask Pip AI Assistant Card (Moved from Navbar to save space) */}
           <div className="p-3 rounded-xl bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-indigo-500/5 border border-indigo-200/70 dark:border-indigo-800/60 relative overflow-hidden">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-indigo-100 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center relative shrink-0">
@@ -451,9 +440,7 @@ export const Sidebar: React.FC = () => {
           </div>
         </div>
 
-        {/* Footer: Preferences & Actions */}
         <div className="p-3.5 border-t border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/30 space-y-2 shrink-0">
-          {/* Theme Toggle Button */}
           <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-zinc-100/80 dark:bg-zinc-800/60 text-xs">
             <span className="font-medium text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
               {theme === "dark" ? (

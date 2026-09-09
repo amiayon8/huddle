@@ -34,9 +34,8 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
   const [loading, setLoading] = useState<boolean>(!initialDays);
   const [selectedDay, setSelectedDay] = useState<UserActivityDay | null>(null);
   const [viewMode, setViewMode] = useState<"heatmap" | "monthly">("heatmap");
-  const [monthOffset, setMonthOffset] = useState<number>(0); // 0 = current month, -1 = last month, etc.
+  const [monthOffset, setMonthOffset] = useState<number>(0);
 
-  // Fetch days if not provided
   useEffect(() => {
     if (initialDays && initialDays.length > 0) {
       setDays(initialDays);
@@ -66,7 +65,6 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
     };
   }, [userId, user.id, initialDays]);
 
-  // If viewing own profile, reflect live today's seconds
   const processedDays = useMemo(() => {
     if (!days || days.length === 0) return [];
     if (!isOwnProfile) return days;
@@ -94,7 +92,6 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
     });
   }, [days, isOwnProfile, secondsFocusedToday]);
 
-  // Aggregate stats
   const stats = useMemo(() => {
     if (!processedDays || processedDays.length === 0) {
       return {
@@ -125,19 +122,19 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
       totalDrills += d.drillsCount;
     });
 
-    // Calculate active streak from latest day backwards
     let streak = 0;
     for (let i = processedDays.length - 1; i >= 0; i--) {
       if (processedDays[i].activeMinutes > 0) {
         streak++;
       } else {
-        // If today has 0 mins yet, check yesterday before breaking
         if (i === processedDays.length - 1) continue;
         break;
       }
     }
 
-    const ratio = Math.round((activeCount / Math.max(1, processedDays.length)) * 100);
+    const ratio = Math.round(
+      (activeCount / Math.max(1, processedDays.length)) * 100,
+    );
 
     return {
       totalMinutes: totalMins,
@@ -151,24 +148,23 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
     };
   }, [processedDays]);
 
-  // Auto-select latest day or hovered day
-  const activeSelected = selectedDay || (processedDays.length > 0 ? processedDays[processedDays.length - 1] : null);
+  const activeSelected =
+    selectedDay ||
+    (processedDays.length > 0 ? processedDays[processedDays.length - 1] : null);
 
-  // Group days into 7-day columns for heatmap (12 weeks)
   const heatmapWeeks = useMemo(() => {
     if (!processedDays || processedDays.length === 0) return [];
 
     const weeks: UserActivityDay[][] = [];
     let currentWeek: UserActivityDay[] = [];
 
-    // Pad beginning so first column aligns with its day of week (0 = Sunday, 1 = Monday...)
     const firstDate = new Date(processedDays[0].date);
-    const startDayOfWeek = (firstDate.getDay() + 6) % 7; // Monday = 0, Sunday = 6
+    const startDayOfWeek = (firstDate.getDay() + 6) % 7;
 
     for (let i = 0; i < startDayOfWeek; i++) {
       currentWeek.push({
         date: `pad-${i}`,
-        activeMinutes: -1, // padding
+        activeMinutes: -1,
         drillsCount: 0,
         intensity: 0,
       });
@@ -189,7 +185,6 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
     return weeks;
   }, [processedDays]);
 
-  // Compute month headers for the heatmap
   const monthLabels = useMemo(() => {
     if (heatmapWeeks.length === 0) return [];
     const labels: { label: string; weekIndex: number }[] = [];
@@ -210,7 +205,6 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
     return labels;
   }, [heatmapWeeks]);
 
-  // Monthly View calculations
   const targetMonthDate = useMemo(() => {
     const d = new Date();
     d.setDate(1);
@@ -225,12 +219,15 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
     const lastDay = new Date(year, month + 1, 0);
     const daysInMonth = lastDay.getDate();
 
-    // Map existing days by date
     const dayMap = new Map<string, UserActivityDay>();
     processedDays.forEach((d) => dayMap.set(d.date, d));
 
-    const leadingBlanks = (firstDay.getDay() + 6) % 7; // Monday = 0
-    const cells: { dateStr: string; dayNum: number | null; data?: UserActivityDay }[] = [];
+    const leadingBlanks = (firstDay.getDay() + 6) % 7;
+    const cells: {
+      dateStr: string;
+      dayNum: number | null;
+      data?: UserActivityDay;
+    }[] = [];
 
     for (let i = 0; i < leadingBlanks; i++) {
       cells.push({ dateStr: `blank-start-${i}`, dayNum: null });
@@ -248,7 +245,10 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
     }
 
     return {
-      monthLabel: firstDay.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
+      monthLabel: firstDay.toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      }),
       cells,
     };
   }, [targetMonthDate, processedDays]);
@@ -305,7 +305,6 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
 
   return (
     <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] p-5 sm:p-6 space-y-5 shadow-xs">
-      {/* Header & Mode Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800/80">
         <div>
           <div className="flex items-center gap-2">
@@ -317,7 +316,8 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
             </h2>
           </div>
           <p className="text-xs text-zinc-500 mt-1">
-            Verified deliberate engineering focus and drills logged over the last 12 weeks.
+            Verified deliberate engineering focus and drills logged over the
+            last 12 weeks.
           </p>
         </div>
 
@@ -347,7 +347,6 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
         </div>
       </div>
 
-      {/* KPI Stats Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
@@ -357,7 +356,9 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
             <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
               {stats.totalHours} hrs
             </div>
-            <div className="text-[11px] text-zinc-500 font-medium">Total Focus</div>
+            <div className="text-[11px] text-zinc-500 font-medium">
+              Total Focus
+            </div>
           </div>
         </div>
 
@@ -369,7 +370,9 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
             <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
               {stats.activeDaysCount} Days ({stats.activeDaysRatio})
             </div>
-            <div className="text-[11px] text-zinc-500 font-medium">Active Consistency</div>
+            <div className="text-[11px] text-zinc-500 font-medium">
+              Active Consistency
+            </div>
           </div>
         </div>
 
@@ -381,7 +384,9 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
             <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
               {stats.currentStreak} Days
             </div>
-            <div className="text-[11px] text-zinc-500 font-medium">Current Streak</div>
+            <div className="text-[11px] text-zinc-500 font-medium">
+              Current Streak
+            </div>
           </div>
         </div>
 
@@ -393,17 +398,17 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
             <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">
               {formatMinutes(stats.bestDayMinutes)}
             </div>
-            <div className="text-[11px] text-zinc-500 font-medium">Best Day Record</div>
+            <div className="text-[11px] text-zinc-500 font-medium">
+              Best Day Record
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Primary Calendar View (Heatmap) */}
       {viewMode === "heatmap" ? (
         <div className="space-y-3">
           <div className="overflow-x-auto pb-2 pt-1 hide-scrollbar">
             <div className="min-w-[640px] space-y-1.5">
-              {/* Month Labels */}
               <div className="flex text-[11px] text-zinc-400 font-medium pl-8 relative h-4">
                 {monthLabels.map((m, idx) => (
                   <span
@@ -417,7 +422,6 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
               </div>
 
               <div className="flex gap-2 items-start">
-                {/* Day of week labels */}
                 <div className="flex flex-col justify-between text-[10px] text-zinc-400 font-medium h-[105px] pr-1 py-0.5 select-none shrink-0">
                   <span>Mon</span>
                   <span>Wed</span>
@@ -425,7 +429,6 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
                   <span>Sun</span>
                 </div>
 
-                {/* Heatmap Grid */}
                 <div className="flex gap-1.5">
                   {heatmapWeeks.map((week, wIdx) => (
                     <div key={wIdx} className="flex flex-col gap-1.5">
@@ -441,7 +444,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
                             onMouseEnter={() => !isPad && setSelectedDay(day)}
                             className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-[4px] transition-all cursor-pointer ${getCellColorClass(
                               day.intensity,
-                              isPad
+                              isPad,
                             )} ${
                               isSelected
                                 ? "ring-2 ring-indigo-500 dark:ring-indigo-400 scale-125 z-10"
@@ -462,9 +465,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
             </div>
           </div>
 
-          {/* Legend & Day Inspector Banner */}
           <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            {/* Inspector Pill */}
             {activeSelected ? (
               <div className="flex items-center gap-2.5 text-xs text-zinc-700 dark:text-zinc-300 animate-in fade-in">
                 <span className="font-semibold text-zinc-900 dark:text-zinc-100">
@@ -475,15 +476,17 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
                 </span>
                 {activeSelected.drillsCount > 0 && (
                   <span className="text-zinc-500">
-                    • {activeSelected.drillsCount} drill{activeSelected.drillsCount > 1 ? "s" : ""} completed
+                    • {activeSelected.drillsCount} drill
+                    {activeSelected.drillsCount > 1 ? "s" : ""} completed
                   </span>
                 )}
               </div>
             ) : (
-              <div className="text-xs text-zinc-400">Hover over any day cell to inspect active time.</div>
+              <div className="text-xs text-zinc-400">
+                Hover over any day cell to inspect active time.
+              </div>
             )}
 
-            {/* Legend */}
             <div className="flex items-center gap-1.5 text-[11px] text-zinc-400 self-end sm:self-auto">
               <span>Less</span>
               <span className="w-3 h-3 rounded-[3px] bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-800" />
@@ -496,7 +499,6 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
           </div>
         </div>
       ) : (
-        /* Monthly Calendar Mode */
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">
@@ -538,14 +540,22 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
 
           <div className="grid grid-cols-7 gap-1.5 text-center">
             {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
-              <span key={d} className="text-[11px] font-semibold text-zinc-400 py-1">
+              <span
+                key={d}
+                className="text-[11px] font-semibold text-zinc-400 py-1"
+              >
                 {d}
               </span>
             ))}
 
             {monthlyCalendarData.cells.map((cell, idx) => {
               if (cell.dayNum === null) {
-                return <div key={idx} className="h-14 rounded-lg bg-zinc-50/40 dark:bg-zinc-900/20" />;
+                return (
+                  <div
+                    key={idx}
+                    className="h-14 rounded-lg bg-zinc-50/40 dark:bg-zinc-900/20"
+                  />
+                );
               }
 
               const data = cell.data;
@@ -577,7 +587,9 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
                       {formatMinutes(data.activeMinutes)}
                     </span>
                   ) : (
-                    <span className="text-[9.5px] text-zinc-300 dark:text-zinc-600">Rest</span>
+                    <span className="text-[9.5px] text-zinc-300 dark:text-zinc-600">
+                      Rest
+                    </span>
                   )}
                 </button>
               );
@@ -592,11 +604,13 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
                   {formatFullDate(activeSelected.date)}:
                 </span>
                 <span className="text-zinc-600 dark:text-zinc-300">
-                  {formatMinutes(activeSelected.activeMinutes)} active focus time logged
+                  {formatMinutes(activeSelected.activeMinutes)} active focus
+                  time logged
                 </span>
               </div>
               <span className="px-2 py-0.5 rounded bg-white dark:bg-zinc-800 text-[11px] font-medium text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
-                {activeSelected.drillsCount} deliberate drill{activeSelected.drillsCount !== 1 ? "s" : ""}
+                {activeSelected.drillsCount} deliberate drill
+                {activeSelected.drillsCount !== 1 ? "s" : ""}
               </span>
             </div>
           )}
