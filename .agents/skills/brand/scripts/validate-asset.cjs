@@ -16,12 +16,10 @@
 const fs = require("fs");
 const path = require("path");
 
-// Validation rules
 const RULES = {
   naming: {
     pattern: /^[a-z]+_[a-z0-9-]+_[a-z0-9-]+_\d{8}(_[a-z0-9-]+)?\.[a-z]+$/,
-    description:
-      "{type}_{campaign}_{description}_{timestamp}_{variant}.{ext}",
+    description: "{type}_{campaign}_{description}_{timestamp}_{variant}.{ext}",
     examples: [
       "banner_claude-launch_hero-image_20251209.png",
       "logo_brand-refresh_horizontal_20251209_dark.svg",
@@ -74,22 +72,18 @@ function validateFilename(filename) {
   const issues = [];
   const suggestions = [];
 
-  // Check pattern match
   if (!RULES.naming.pattern.test(filename)) {
     issues.push("Filename does not match naming convention");
     suggestions.push(`Expected format: ${RULES.naming.description}`);
     suggestions.push(`Examples: ${RULES.naming.examples.join(", ")}`);
   }
 
-  // Parse and check components
   const parsed = parseFilename(filename);
   if (parsed) {
-    // Check timestamp format
     if (!/^\d{8}$/.test(parsed.timestamp)) {
       issues.push("Timestamp should be YYYYMMDD format");
     }
 
-    // Check kebab-case for campaign and description
     if (parsed.campaign && !/^[a-z0-9-]+$/.test(parsed.campaign)) {
       issues.push("Campaign name should be kebab-case");
     }
@@ -98,7 +92,6 @@ function validateFilename(filename) {
       issues.push("Description should be kebab-case");
     }
 
-    // Check valid type
     const validTypes = [
       "banner",
       "logo",
@@ -138,14 +131,14 @@ function validateFileSize(filepath, extension) {
   if (size > limits.max) {
     issues.push(
       `File size (${formatBytes(size)}) exceeds maximum (${formatBytes(
-        limits.max
-      )})`
+        limits.max,
+      )})`,
     );
   } else if (size > limits.recommended) {
     warnings.push(
       `File size (${formatBytes(size)}) exceeds recommended (${formatBytes(
-        limits.recommended
-      )})`
+        limits.recommended,
+      )})`,
     );
   }
 
@@ -171,7 +164,6 @@ function validateFormat(extension) {
     return { valid: false, issues, info };
   }
 
-  // Determine category
   if (RULES.formats.image.includes(extension)) info.category = "image";
   else if (RULES.formats.vector.includes(extension)) info.category = "vector";
   else if (RULES.formats.video.includes(extension)) info.category = "video";
@@ -195,7 +187,7 @@ function checkManifest(filepath) {
     const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
     const relativePath = path.relative(process.cwd(), filepath);
     const found = manifest.assets?.find(
-      (a) => a.path === relativePath || a.path === filepath
+      (a) => a.path === relativePath || a.path === filepath,
     );
 
     return {
@@ -248,7 +240,6 @@ function validateAsset(assetPath) {
     checks: {},
   };
 
-  // Check file exists
   if (!fs.existsSync(assetPath)) {
     results.valid = false;
     results.issues.push(`File not found: ${assetPath}`);
@@ -258,7 +249,6 @@ function validateAsset(assetPath) {
   const filename = path.basename(assetPath);
   const extension = path.extname(filename).slice(1).toLowerCase();
 
-  // 1. Validate filename
   const filenameResult = validateFilename(filename);
   results.checks.filename = filenameResult;
   if (!filenameResult.valid) {
@@ -266,14 +256,12 @@ function validateAsset(assetPath) {
     results.suggestions.push(...filenameResult.suggestions);
   }
 
-  // 2. Validate format
   const formatResult = validateFormat(extension);
   results.checks.format = formatResult;
   if (!formatResult.valid) {
     results.issues.push(...formatResult.issues);
   }
 
-  // 3. Validate file size
   const sizeResult = validateFileSize(assetPath, extension);
   results.checks.fileSize = sizeResult;
   if (!sizeResult.valid) {
@@ -281,17 +269,15 @@ function validateAsset(assetPath) {
   }
   results.warnings.push(...sizeResult.warnings);
 
-  // 4. Check manifest registration
   const manifestResult = checkManifest(assetPath);
   results.checks.manifest = manifestResult;
   if (!manifestResult.registered) {
     results.warnings.push("Asset not registered in manifest.json");
     results.suggestions.push(
-      "Register asset in .assets/manifest.json for tracking"
+      "Register asset in .assets/manifest.json for tracking",
     );
   }
 
-  // 5. Suggest corrected filename if needed
   if (!filenameResult.valid && filenameResult.parsed) {
     const suggested = suggestFilename(filename, filenameResult.parsed);
     if (suggested) {
@@ -299,7 +285,6 @@ function validateAsset(assetPath) {
     }
   }
 
-  // Overall validity
   results.valid = results.issues.length === 0;
 
   return results;
@@ -331,11 +316,10 @@ function formatOutput(results) {
   if (results.suggestions.length > 0) {
     lines.push("\nSUGGESTIONS:");
     results.suggestions.forEach((suggestion) =>
-      lines.push(`  - ${suggestion}`)
+      lines.push(`  - ${suggestion}`),
     );
   }
 
-  // File size info
   if (results.checks.fileSize?.size) {
     lines.push(`\nFile Size: ${formatBytes(results.checks.fileSize.size)}`);
   }
@@ -357,30 +341,26 @@ function main() {
     console.error("Usage: node validate-asset.cjs <asset-path> [--json]");
     console.error("\nExamples:");
     console.error(
-      "  node validate-asset.cjs assets/banners/social-media/banner_launch_hero_20251209.png"
+      "  node validate-asset.cjs assets/banners/social-media/banner_launch_hero_20251209.png",
     );
     console.error(
-      "  node validate-asset.cjs assets/logos/icon-only/logo-icon.svg --json"
+      "  node validate-asset.cjs assets/logos/icon-only/logo-icon.svg --json",
     );
     process.exit(1);
   }
 
-  // Resolve path
   const resolvedPath = path.isAbsolute(assetPath)
     ? assetPath
     : path.join(process.cwd(), assetPath);
 
-  // Validate
   const results = validateAsset(resolvedPath);
 
-  // Output
   if (jsonOutput) {
     console.log(JSON.stringify(results, null, 2));
   } else {
     console.log(formatOutput(results));
   }
 
-  // Exit with appropriate code
   process.exit(results.valid ? 0 : 1);
 }
 

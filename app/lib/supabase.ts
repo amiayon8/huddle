@@ -50,7 +50,6 @@ export async function signUpUser(
     if (error) throw error;
 
     if (data.user) {
-      // Create user profile in profiles table
       const newProfile: any = {
         id: data.user.id,
         name: fullName || "New Engineer",
@@ -77,7 +76,6 @@ export async function signUpUser(
 
       await supabase.from("profiles").insert(newProfile);
 
-      // Create default sprint for new user
       await supabase.from("sprints").insert({
         id: `sprint-${Date.now()}`,
         user_id: data.user.id,
@@ -410,7 +408,6 @@ export async function reshuffleSprintInDb(
       })
       .eq("id", sprintId);
 
-    // Reset task completed statuses
     await supabase
       .from("sprint_tasks")
       .update({ completed: false, completed_at: null })
@@ -657,7 +654,6 @@ export async function addSquadActivityPingToDb(
       ping_type: pingType,
     });
 
-    // Increment squad progress
     const { data: squad } = await supabase
       .from("squads")
       .select("current_progress")
@@ -1799,7 +1795,6 @@ export async function resetDemoAccountInDb(): Promise<{
   error?: string;
 }> {
   try {
-    // 1. Reset user profile
     await supabase
       .from("profiles")
       .update({
@@ -1839,7 +1834,6 @@ export async function resetDemoAccountInDb(): Promise<{
       })
       .eq("id", "user-1");
 
-    // 2. Reset sprint
     await supabase
       .from("sprints")
       .update({
@@ -1854,7 +1848,6 @@ export async function resetDemoAccountInDb(): Promise<{
       })
       .eq("user_id", "user-1");
 
-    // 3. Reset sprint tasks
     await supabase
       .from("sprint_tasks")
       .update({
@@ -1863,7 +1856,6 @@ export async function resetDemoAccountInDb(): Promise<{
       })
       .eq("sprint_id", "sprint-1");
 
-    // 4. Reset portfolio items - delete dynamically generated ones
     const { data: userPortItems } = await supabase
       .from("portfolio_items")
       .select("id")
@@ -1877,7 +1869,6 @@ export async function resetDemoAccountInDb(): Promise<{
       await supabase.from("portfolio_items").delete().in("id", toDeletePortIds);
     }
 
-    // Ensure baseline portfolio items exist & are published
     await supabase.from("portfolio_items").upsert([
       {
         id: "port-1",
@@ -1911,7 +1902,6 @@ export async function resetDemoAccountInDb(): Promise<{
       },
     ]);
 
-    // 5. Reset real world proofs
     await supabase
       .from("real_world_proofs")
       .update({ completed: true })
@@ -1925,7 +1915,6 @@ export async function resetDemoAccountInDb(): Promise<{
       .update({ completed: false })
       .eq("id", "proof-3");
 
-    // 6. Reset squad progress & pings
     await supabase
       .from("squads")
       .update({ current_progress: 7 })
@@ -2090,7 +2079,9 @@ export async function fetchTaskTemplates(
     if (skillCategory) {
       query = query.ilike("skill_category", `%${skillCategory}%`);
     }
-    const { data, error } = await query.order("day_number", { ascending: true });
+    const { data, error } = await query.order("day_number", {
+      ascending: true,
+    });
     if (error || !data || data.length === 0) return [];
 
     return data.map((t: any) => ({
@@ -2211,13 +2202,19 @@ export async function fetchAdminStats(): Promise<AdminStats> {
       supabase.from("profiles").select("id", { count: "exact", head: true }),
       supabase.from("squads").select("id", { count: "exact", head: true }),
       supabase.from("sprints").select("id", { count: "exact", head: true }),
-      supabase.from("squad_reports").select("id", { count: "exact", head: true }),
+      supabase
+        .from("squad_reports")
+        .select("id", { count: "exact", head: true }),
       supabase
         .from("squad_reports")
         .select("id", { count: "exact", head: true })
         .eq("status", "pending"),
-      supabase.from("task_templates").select("id", { count: "exact", head: true }),
-      supabase.from("community_posts").select("id", { count: "exact", head: true }),
+      supabase
+        .from("task_templates")
+        .select("id", { count: "exact", head: true }),
+      supabase
+        .from("community_posts")
+        .select("id", { count: "exact", head: true }),
     ]);
 
     return {
@@ -2267,7 +2264,9 @@ export async function fetchAllUsersAdmin(): Promise<UserProfile[]> {
       careerMilestone: d.career_milestone,
       onboardingCompleted: d.onboarding_completed,
       surveyData: d.survey_data || undefined,
-      joinedDate: d.created_at ? new Date(d.created_at).toLocaleDateString() : "August 2026",
+      joinedDate: d.created_at
+        ? new Date(d.created_at).toLocaleDateString()
+        : "August 2026",
       role: d.role || "user",
       status: d.status || "active",
       privacy: d.privacy || {
@@ -2367,8 +2366,10 @@ export async function updateSquadAdmin(
   try {
     const dbUpdates: any = {};
     if (updates.name !== undefined) dbUpdates.name = updates.name;
-    if (updates.skillFocus !== undefined) dbUpdates.skill_focus = updates.skillFocus;
-    if (updates.sharedGoal !== undefined) dbUpdates.shared_goal = updates.sharedGoal;
+    if (updates.skillFocus !== undefined)
+      dbUpdates.skill_focus = updates.skillFocus;
+    if (updates.sharedGoal !== undefined)
+      dbUpdates.shared_goal = updates.sharedGoal;
     if (updates.targetProgress !== undefined)
       dbUpdates.target_progress = updates.targetProgress;
 
@@ -2379,7 +2380,14 @@ export async function updateSquadAdmin(
 
     if (error) throw error;
 
-    await logAdminAction(adminId, adminName, "UPDATE_SQUAD", "squad", squadId, updates);
+    await logAdminAction(
+      adminId,
+      adminName,
+      "UPDATE_SQUAD",
+      "squad",
+      squadId,
+      updates,
+    );
     return true;
   } catch (err) {
     console.error("Error updating squad:", err);
@@ -2387,7 +2395,9 @@ export async function updateSquadAdmin(
   }
 }
 
-export async function fetchAllSquadReportsAdmin(): Promise<AnonymousSquadReport[]> {
+export async function fetchAllSquadReportsAdmin(): Promise<
+  AnonymousSquadReport[]
+> {
   try {
     const { data, error } = await supabase
       .from("squad_reports")
@@ -2480,7 +2490,8 @@ export async function updateTaskTemplateAdmin(
   try {
     const dbUpdates: any = {};
     if (updates.title !== undefined) dbUpdates.title = updates.title;
-    if (updates.description !== undefined) dbUpdates.description = updates.description;
+    if (updates.description !== undefined)
+      dbUpdates.description = updates.description;
     if (updates.estimatedMinutes !== undefined)
       dbUpdates.estimated_minutes = updates.estimatedMinutes;
     if (updates.taskType !== undefined) dbUpdates.task_type = updates.taskType;
@@ -2566,4 +2577,3 @@ export async function deleteDiscussionAdmin(
     return false;
   }
 }
-

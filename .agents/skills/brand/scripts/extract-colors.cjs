@@ -21,7 +21,6 @@
 const fs = require("fs");
 const path = require("path");
 
-// Default brand guidelines path
 const DEFAULT_GUIDELINES_PATH = "docs/brand-guidelines.md";
 
 /**
@@ -54,7 +53,6 @@ function parseBrandColors(guidelinesPath) {
     all: [],
   };
 
-  // Extract colors from different sections
   const sections = [
     { name: "primary", regex: /### Primary[\s\S]*?(?=###|##|$)/i },
     { name: "secondary", regex: /### Secondary[\s\S]*?(?=###|##|$)/i },
@@ -71,7 +69,6 @@ function parseBrandColors(guidelinesPath) {
     }
   });
 
-  // Dedupe all
   palette.all = [...new Set(palette.all)];
 
   return palette;
@@ -119,7 +116,7 @@ function colorDistance(color1, color2) {
   return Math.sqrt(
     Math.pow(rgb1.r - rgb2.r, 2) +
       Math.pow(rgb1.g - rgb2.g, 2) +
-      Math.pow(rgb1.b - rgb2.b, 2)
+      Math.pow(rgb1.b - rgb2.b, 2),
   );
 }
 
@@ -176,7 +173,6 @@ function parseImageMagickOutput(output) {
   const lines = output.trim().split("\n");
 
   lines.forEach((line) => {
-    // Match pattern like: 12345: (255,128,64) #FF8040 srgb(255,128,64)
     const hexMatch = line.match(/#([0-9A-Fa-f]{6})/);
     const countMatch = line.match(/^\s*(\d+):/);
 
@@ -188,7 +184,6 @@ function parseImageMagickOutput(output) {
     }
   });
 
-  // Sort by count (most common first)
   colors.sort((a, b) => b.count - a.count);
 
   return colors;
@@ -239,10 +234,9 @@ function main() {
     brandFileIdx !== -1 ? args[brandFileIdx + 1] : DEFAULT_GUIDELINES_PATH;
   const brandFileValue = brandFileIdx !== -1 ? args[brandFileIdx + 1] : null;
   const imagePath = args.find(
-    (a) => !a.startsWith("--") && a !== brandFileValue
+    (a) => !a.startsWith("--") && a !== brandFileValue,
   );
 
-  // Load brand palette
   const brandPalette = parseBrandColors(brandFile);
 
   if (!brandPalette) {
@@ -251,7 +245,6 @@ function main() {
     process.exit(1);
   }
 
-  // Show palette mode
   if (showPalette || !imagePath) {
     if (jsonOutput) {
       console.log(JSON.stringify(brandPalette, null, 2));
@@ -262,13 +255,14 @@ function main() {
         console.log("To extract colors from an image:");
         console.log("  node extract-colors.cjs <image-path>");
         console.log("\nOr use ImageMagick directly:");
-        console.log('  magick image.png -colors 10 -depth 8 -format "%c" histogram:info:');
+        console.log(
+          '  magick image.png -colors 10 -depth 8 -format "%c" histogram:info:',
+        );
       }
     }
     return;
   }
 
-  // Resolve image path
   const resolvedPath = path.isAbsolute(imagePath)
     ? imagePath
     : path.join(process.cwd(), imagePath);
@@ -278,7 +272,6 @@ function main() {
     process.exit(1);
   }
 
-  // Generate extraction instructions
   const result = {
     image: resolvedPath,
     brandPalette: brandPalette,
@@ -315,7 +308,6 @@ function main() {
     result.instructions.forEach((line) => console.log(line));
     console.log("\n" + "=".repeat(60));
 
-    // Show brand palette for reference
     console.log("\nBrand Palette Reference:");
     console.log(`  Primary: ${brandPalette.primary.join(", ") || "none"}`);
     console.log(`  Secondary: ${brandPalette.secondary.join(", ") || "none"}`);
@@ -324,7 +316,6 @@ function main() {
   }
 }
 
-// Export functions for use as module
 module.exports = {
   parseBrandColors,
   hexToRgb,
@@ -335,7 +326,6 @@ module.exports = {
   parseImageMagickOutput,
 };
 
-// Run if called directly
 if (require.main === module) {
   main();
 }

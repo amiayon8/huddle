@@ -239,8 +239,8 @@ def generate_css_for_background(result: dict, slide_class: str = '.slide-with-bg
     """Generate CSS for a background slide."""
     if not result.get('url'):
         search_url = result.get('search_url', '')
-        return f"""/* No image scraped. Search manually: {search_url} */
-/* Overlay ready: {result.get('overlay', 'gradient-dark')} */
+        return f"""
+
 """
 
     return f"""{slide_class} {{
@@ -262,7 +262,7 @@ def generate_css_for_background(result: dict, slide_class: str = '.slide-with-bg
     z-index: 1;
 }}
 
-/* {result.get('attribution', 'Pexels')} - {result.get('search_url', '')} */
+
 """
 
 

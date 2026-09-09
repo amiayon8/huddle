@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/app/lib/supabase";
 
 interface QuestionnairePayload {
-  step: number; // 2 (hobby), 3 (age), 4 (profession), 5 (skills)
+  step: number;
   answers: {
     subjects?: string[];
     subjectsOther?: string;
@@ -64,7 +64,6 @@ export async function POST(req: NextRequest) {
     const apiKey = process.env.OPENROUTER_API_KEY;
     const model = process.env.OPENROUTER_MODEL || "minimax/minimax-m3:free";
 
-    // Sanitize collected answers
     const cleanSubjects = (answers.subjects || []).map((s) =>
       sanitizeInput(s, 60),
     );
@@ -81,7 +80,6 @@ export async function POST(req: NextRequest) {
       80,
     );
 
-    // Run safety check on custom user entries
     const customTextToTest = `${cleanSubjectsOther} ${cleanHobbiesOther} ${cleanAge} ${cleanProfession}`;
     if (checkInappropriateContent(customTextToTest)) {
       const fallbackData = generateSmartFallback(step, answers);
@@ -92,7 +90,6 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Format collected answers for context
     const selectedSubjects =
       [
         ...cleanSubjects,
@@ -111,7 +108,6 @@ export async function POST(req: NextRequest) {
     let prompt = "";
 
     if (step === 2) {
-      // Question 2: Hobbies
       prompt = `The user selected favourite subject(s): "${selectedSubjects}".
 Generate Question 2 asking about their hobbies.
 Provide 5-6 relevant hobby options with short descriptions that connect with their subjects.
@@ -128,7 +124,6 @@ Return strictly valid JSON with this schema:
   ]
 }`;
     } else if (step === 3) {
-      // Question 3: Age & Stage
       prompt = `The user selected subjects: "${selectedSubjects}", hobbies: "${selectedHobbies}".
 Generate Question 3:
 Question title: "How would you describe your current learning stage?"
@@ -147,7 +142,6 @@ Return strictly valid JSON with this schema:
   ]
 }`;
     } else if (step === 4) {
-      // Question 4: Profession / Dream Role
       prompt = `The user has:
 - Favourite Subject(s): "${selectedSubjects}"
 - Hobbies: "${selectedHobbies}"
@@ -167,7 +161,6 @@ Return strictly valid JSON with this schema:
   ]
 }`;
     } else if (step === 5) {
-      // Question 5: Skills
       prompt = `The user has:
 - Favourite Subject(s): "${selectedSubjects}"
 - Hobbies: "${selectedHobbies}"
@@ -224,13 +217,11 @@ Return strictly valid JSON with this schema:
           const data = await response.json();
           let rawContent = data.choices?.[0]?.message?.content || "";
 
-          // Strip markdown code block if wrapped
           rawContent = rawContent
             .replace(/```json/gi, "")
             .replace(/```/g, "")
             .trim();
 
-          // Guard against prompt leak signature
           if (checkInappropriateContent(rawContent)) {
             const fallbackData = generateSmartFallback(step, answers);
             return NextResponse.json({
@@ -278,31 +269,39 @@ async function generateSmartFallback(
 ) {
   let category = "hobbies";
   let question = "What is your hobby?";
-  let subtitle = "Hobbies reveal how you naturally learn, explore, and stay in flow.";
+  let subtitle =
+    "Hobbies reveal how you naturally learn, explore, and stay in flow.";
   let mascotEmotion = "encouragement";
-  let mascotNote = "Pip loves combining analytical subjects with playful hobbies. Tell me what energizes you!";
+  let mascotNote =
+    "Pip loves combining analytical subjects with playful hobbies. Tell me what energizes you!";
   let isMultiple = true;
 
   if (step === 3) {
     category = "stages";
     question = "Which best describes your current stage?";
-    subtitle = "This helps calibrate the pace, foundational depth, and challenge level of your sprint.";
+    subtitle =
+      "This helps calibrate the pace, foundational depth, and challenge level of your sprint.";
     mascotEmotion = "thinking";
-    mascotNote = "Whether you are just starting out or leading teams, the journey is customized for you.";
+    mascotNote =
+      "Whether you are just starting out or leading teams, the journey is customized for you.";
     isMultiple = false;
   } else if (step === 4) {
     category = "professions";
     question = "Which target profession or milestone excites you most?";
-    subtitle = "We will design deliberate practice sprints to build real-world evidence for this exact role.";
+    subtitle =
+      "We will design deliberate practice sprints to build real-world evidence for this exact role.";
     mascotEmotion = "planning";
-    mascotNote = "Every craft milestone comes with concrete artifacts and community-verified proofs.";
+    mascotNote =
+      "Every craft milestone comes with concrete artifacts and community-verified proofs.";
     isMultiple = false;
   } else if (step === 5) {
     category = "skills";
     question = "Which starting skills would you like to level up first?";
-    subtitle = "Select 1 to 3 core skills. You can expand your tech tree at any time.";
+    subtitle =
+      "Select 1 to 3 core skills. You can expand your tech tree at any time.";
     mascotEmotion = "deep_thinking";
-    mascotNote = "Pick the skills that excite you right now. We will craft a focused 4-day sprint around your top choice.";
+    mascotNote =
+      "Pick the skills that excite you right now. We will craft a focused 4-day sprint around your top choice.";
     isMultiple = true;
   }
 

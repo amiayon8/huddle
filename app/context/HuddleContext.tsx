@@ -100,7 +100,6 @@ interface HuddleContextType {
   realWorldProofs: RealWorldProofItem[];
   careerTimeline: CareerTimelineEntry[];
 
-  // Auth state & actions
   isAuthenticated: boolean;
   authLoading: boolean;
   isDemo: boolean;
@@ -122,13 +121,11 @@ interface HuddleContextType {
   activeTab: ActiveTab;
   theme: "dark" | "light";
 
-  // Focus Timer with Blur / Exit detection
   secondsFocusedToday: number;
   isTimerRunning: boolean;
   isAppFocused: boolean;
   showBingeQuizModal: boolean;
 
-  // UI states
   searchOpen: boolean;
   settingsOpen: boolean;
   mascotOpen: boolean;
@@ -146,7 +143,6 @@ interface HuddleContextType {
   isPracticeSessionOpen: boolean;
   isPracticeReviewMode: boolean;
 
-  // State setters
   setActiveTab: (tab: ActiveTab) => void;
   setTheme: (theme: "dark" | "light") => void;
   toggleTheme: () => void;
@@ -165,7 +161,6 @@ interface HuddleContextType {
   setCreatorUploadModalOpen: (open: boolean) => void;
   setShowBingeQuizModal: (show: boolean) => void;
 
-  // Focus Timer actions
   toggleFocusTimer: () => void;
   resetFocusTimer: () => void;
 
@@ -350,13 +345,11 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
   const [activeTab, setActiveTab] = useState<ActiveTab>("dashboard");
   const [theme, setThemeState] = useState<"dark" | "light">("dark");
 
-  // Focus Timer state (starts at 18 mins / 1080 secs today)
   const [secondsFocusedToday, setSecondsFocusedToday] = useState(1080);
   const [isTimerRunning, setIsTimerRunning] = useState(true);
   const [isAppFocused, setIsAppFocused] = useState(true);
   const [showBingeQuizModal, setShowBingeQuizModal] = useState(false);
 
-  // UI modal toggles
   const [searchOpen, setSearchOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mascotOpen, setMascotOpen] = useState(false);
@@ -472,7 +465,6 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  // Load from Supabase on mount & subscribe to Realtime updates
   useEffect(() => {
     async function loadSupabaseData() {
       try {
@@ -506,7 +498,6 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
 
     loadSupabaseData();
 
-    // 1. Auth listener
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (session?.user) {
@@ -527,7 +518,6 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
       },
     );
 
-    // 2. Realtime subscription for squad activity pings
     const squadChannel = supabase
       .channel("realtime:squad_activity_pings")
       .on(
@@ -562,7 +552,6 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
       )
       .subscribe();
 
-    // 3. Realtime subscription for creator posts
     const creatorChannel = supabase
       .channel("realtime:creator_posts")
       .on(
@@ -605,7 +594,6 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, []);
 
-  // Theme synchronization and persistence
   useEffect(() => {
     const storedTheme =
       typeof window !== "undefined"
@@ -630,7 +618,6 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (e) {}
   }, [theme]);
 
-  // Window Focus / Blur & Visibility listeners
   useEffect(() => {
     const handleFocus = () => setIsAppFocused(true);
     const handleBlur = () => setIsAppFocused(false);
@@ -649,7 +636,6 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, []);
 
-  // Focus Timer interval
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
@@ -663,7 +649,6 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, [isTimerRunning, isAppFocused]);
 
-  // Auth Methods
   const login = async (email: string, password: string) => {
     const { user: authUser, error } = await signInUser(email, password);
     if (error) return { success: false, error };
@@ -745,7 +730,6 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       await loadAllSupabaseData("user-1");
-
 
       return { success: true };
     } catch (err: any) {
@@ -1132,7 +1116,6 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  // Zero-penalty Sprint Reshuffle
   const reshuffleSprint = (customPrompt?: string) => {
     if (!ensureSurveyDone("reshuffle your sprint")) return;
     setSprint((prev) => ({
@@ -1239,7 +1222,6 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     };
     setNotifications((prev) => [notif, ...prev]);
     addNotificationToDb(notif, user.id);
-
 
     addSquadActivityPingToDb(
       squad.id,
@@ -1382,7 +1364,6 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
       updateProfileInDb(user.id, { reputation: nextRep });
       return { ...prev, reputation: nextRep };
     });
-
 
     const notif: NotificationItem = {
       id: `n-${Date.now()}`,
@@ -1527,17 +1508,15 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
           recent_encouragement: "Founded this squad",
           role: "lead",
         });
-        supabase
-          .from("squad_projects")
-          .insert({
-            id: `proj-${newSquad.id}`,
-            squad_id: newSquad.id,
-            title: `Team Blueprint: ${payload.skillFocus}`,
-            description: payload.sharedGoal,
-            deadline: "Sunday, 11:59 PM",
-            deliverables: [],
-            submissions: [],
-          });
+        supabase.from("squad_projects").insert({
+          id: `proj-${newSquad.id}`,
+          squad_id: newSquad.id,
+          title: `Team Blueprint: ${payload.skillFocus}`,
+          description: payload.sharedGoal,
+          deadline: "Sunday, 11:59 PM",
+          deliverables: [],
+          submissions: [],
+        });
         supabase
           .from("profiles")
           .update({ squad_id: newSquad.id })

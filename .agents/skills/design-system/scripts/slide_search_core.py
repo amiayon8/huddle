@@ -316,7 +316,7 @@ def should_use_full_bleed(slide_index, total_slides, emotion):
     if total_slides < 3:
         return False
 
-    third = total_slides // 3
+    third = total_slides 
     strategic_positions = [1, third, third * 2, total_slides - 1]
 
     return slide_index in strategic_positions
@@ -332,7 +332,7 @@ def calculate_pattern_break(slide_index, total_slides, previous_emotion=None):
         return False
 
     # Break at 1/3 and 2/3 points
-    third = total_slides // 3
+    third = total_slides 
     if slide_index in [third, third * 2]:
         return True
 

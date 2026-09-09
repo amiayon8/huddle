@@ -76,7 +76,7 @@ SLIDE_TEMPLATE = '''<!DOCTYPE html>
             line-height: var(--primitive-lineHeight-relaxed);
         }}
 
-        /* Slide Container - 16:9 aspect ratio */
+        
         .slide-deck {{
             width: 100%;
             max-width: 1920px;
@@ -98,7 +98,7 @@ SLIDE_TEMPLATE = '''<!DOCTYPE html>
             margin-top: var(--primitive-spacing-8);
         }}
 
-        /* Background Variants */
+        
         .slide--surface {{
             background: var(--slide-bg-surface);
         }}
@@ -119,7 +119,7 @@ SLIDE_TEMPLATE = '''<!DOCTYPE html>
             pointer-events: none;
         }}
 
-        /* Typography - MUST use token fonts and sizes */
+        
         h1, h2, h3, h4, h5, h6 {{
             font-family: var(--typography-font-heading);
             font-weight: var(--primitive-fontWeight-bold);
@@ -151,7 +151,7 @@ SLIDE_TEMPLATE = '''<!DOCTYPE html>
             max-width: 80ch;
         }}
 
-        /* Brand Colors - Primary/Secondary/Accent */
+        
         .text-primary {{ color: var(--color-primary); }}
         .text-secondary {{ color: var(--color-secondary); }}
         .text-accent {{ color: var(--color-accent); }}
@@ -162,7 +162,7 @@ SLIDE_TEMPLATE = '''<!DOCTYPE html>
         .bg-accent {{ background: var(--color-accent); }}
         .bg-surface {{ background: var(--color-surface); }}
 
-        /* Cards - Using component tokens */
+        
         .card {{
             background: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -176,7 +176,7 @@ SLIDE_TEMPLATE = '''<!DOCTYPE html>
             border-color: var(--card-border-hover);
         }}
 
-        /* Buttons - Using component tokens */
+        
         .btn {{
             display: inline-flex;
             align-items: center;
@@ -208,7 +208,7 @@ SLIDE_TEMPLATE = '''<!DOCTYPE html>
             border: 2px solid var(--color-primary);
         }}
 
-        /* Layout Utilities */
+        
         .flex {{ display: flex; }}
         .flex-col {{ flex-direction: column; }}
         .items-center {{ align-items: center; }}
@@ -229,7 +229,7 @@ SLIDE_TEMPLATE = '''<!DOCTYPE html>
         .mb-6 {{ margin-bottom: var(--primitive-spacing-6); }}
         .mb-8 {{ margin-bottom: var(--primitive-spacing-8); }}
 
-        /* Metric Cards */
+        
         .metric {{
             text-align: center;
             padding: var(--primitive-spacing-6);
@@ -251,7 +251,7 @@ SLIDE_TEMPLATE = '''<!DOCTYPE html>
             margin-top: var(--primitive-spacing-2);
         }}
 
-        /* Feature List */
+        
         .feature-item {{
             display: flex;
             align-items: flex-start;
@@ -283,7 +283,7 @@ SLIDE_TEMPLATE = '''<!DOCTYPE html>
             font-size: var(--primitive-fontSize-base);
         }}
 
-        /* Testimonial */
+        
         .testimonial {{
             background: var(--color-surface);
             border-radius: var(--primitive-radius-xl);
@@ -309,7 +309,7 @@ SLIDE_TEMPLATE = '''<!DOCTYPE html>
             color: var(--color-foreground-muted);
         }}
 
-        /* Badge/Tag */
+        
         .badge {{
             display: inline-block;
             padding: var(--primitive-spacing-2) var(--primitive-spacing-4);
@@ -320,7 +320,7 @@ SLIDE_TEMPLATE = '''<!DOCTYPE html>
             font-weight: var(--primitive-fontWeight-medium);
         }}
 
-        /* Chart Container */
+        
         .chart-container {{
             background: var(--color-surface);
             border-radius: var(--primitive-radius-xl);
@@ -337,7 +337,7 @@ SLIDE_TEMPLATE = '''<!DOCTYPE html>
             margin-bottom: var(--primitive-spacing-4);
         }}
 
-        /* CSS-only Bar Chart */
+        
         .bar-chart {{
             display: flex;
             align-items: flex-end;
@@ -374,7 +374,7 @@ SLIDE_TEMPLATE = '''<!DOCTYPE html>
             font-weight: var(--primitive-fontWeight-semibold);
         }}
 
-        /* Progress Bar */
+        
         .progress {{
             height: 12px;
             background: var(--color-surface-elevated);
@@ -388,7 +388,7 @@ SLIDE_TEMPLATE = '''<!DOCTYPE html>
             border-radius: var(--primitive-radius-full);
         }}
 
-        /* Footer */
+        
         .slide-footer {{
             margin-top: auto;
             display: flex;
@@ -400,7 +400,7 @@ SLIDE_TEMPLATE = '''<!DOCTYPE html>
             font-size: var(--primitive-fontSize-sm);
         }}
 
-        /* Glow Effects */
+        
         .glow-coral {{
             box-shadow: var(--primitive-shadow-glow-coral);
         }}

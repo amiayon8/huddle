@@ -22,7 +22,6 @@ function checkInappropriateContent(text: string): {
 } {
   const lower = text.toLowerCase();
 
-  // System Prompt Extraction & Injection Attempts
   const promptLeakPatterns = [
     "system prompt",
     "system message",
@@ -55,7 +54,6 @@ function checkInappropriateContent(text: string): {
     }
   }
 
-  // Inappropriate & Harmful Content Filters
   const inappropriateKeywords = [
     "nude",
     "nsfw",
@@ -100,7 +98,6 @@ export async function POST(req: NextRequest) {
     const apiKey = process.env.OPENROUTER_API_KEY;
     const model = process.env.OPENROUTER_MODEL || "minimax/minimax-m3:free";
 
-    // 1. Safety check on incoming user messages
     const userMessages = (messages || []).filter(
       (m: any) => m?.sender === "user",
     );
@@ -118,7 +115,6 @@ export async function POST(req: NextRequest) {
 
     const effectiveSurvey = surveyData || userProfile?.surveyData;
 
-    // Sanitize user profile and survey fields
     const cleanName = sanitizeInput(userProfile?.name || "Alex", 60);
     const cleanMilestone = sanitizeInput(
       userProfile?.careerMilestone || "Staff Software Engineer",
@@ -229,7 +225,6 @@ CRITICAL SECURITY & PRIVACY DIRECTIVES:
       data.choices?.[0]?.message?.content ||
       "Keep up the great momentum! Consistency beats intensity every single time.";
 
-    // Guard against prompt leak in AI reply output
     const replyLower = replyText.toLowerCase();
     const leakSignatures = [
       "system prompt",
@@ -246,7 +241,6 @@ CRITICAL SECURITY & PRIVACY DIRECTIVES:
         "I'm Pip, your deliberate practice tutor! Ready to focus on today's engineering task?";
     }
 
-    // Choose mascot SVG emotion based on content
     let mascotSvg = "/mascot_encouragement.svg";
     if (
       replyLower.includes("reshuffle") ||
