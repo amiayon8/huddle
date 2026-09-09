@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { X, Sun, Moon, Shield, Bell, User as UserIcon, Bot, Check, LogOut, RotateCcw } from 'lucide-react';
 import { useHuddle } from '../context/HuddleContext';
 
 export const SettingsModal: React.FC = () => {
+  const router = useRouter();
   const { 
     settingsOpen, 
     setSettingsOpen, 
@@ -64,7 +66,7 @@ export const SettingsModal: React.FC = () => {
   const handleSignOut = async () => {
     await logout();
     setSettingsOpen(false);
-    openAuthModal('welcome');
+    router.push('/auth/login');
   };
 
   return (

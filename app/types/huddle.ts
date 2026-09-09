@@ -43,6 +43,10 @@ export interface UserProfile {
   careerMilestone: string;
   role?: 'admin' | 'user' | 'moderator';
   status?: 'active' | 'suspended' | 'flagged';
+  focusSecondsToday?: number;
+  lastFocusDate?: string;
+  isTimerRunning?: boolean;
+  totalFocusSeconds?: number;
   privacy: {
     showStreak: boolean;
     showSquad: boolean;
@@ -50,6 +54,16 @@ export interface UserProfile {
     publicProfile: boolean;
     hideRawRoadmaps: boolean;
   };
+}
+
+export interface FocusSessionRecord {
+  id: string;
+  userId: string;
+  durationSeconds: number;
+  date: string;
+  taskId?: string;
+  completed: boolean;
+  createdAt?: string;
 }
 
 export interface SkillHealth {

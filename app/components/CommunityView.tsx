@@ -19,7 +19,7 @@ import { DuolingoMascot } from "./DuolingoMascot";
 import { FormattedContent } from "./CodeBlock";
 
 export const CommunityView: React.FC = () => {
-  const { posts, createCommunityPost, toggleUpvotePost, addReplyToPost } =
+  const { posts, createCommunityPost, toggleUpvotePost, addReplyToPost, viewProfile } =
     useHuddle();
   const [selectedFilter, setSelectedFilter] = useState<
     "all" | "question" | "discussion" | "code-review" | "tip"
@@ -172,15 +172,19 @@ export const CommunityView: React.FC = () => {
                 className="rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] p-5 space-y-3.5 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
+                  <div
+                    onClick={() => viewProfile(post.authorHandle || post.authorName)}
+                    className="flex items-center gap-3 cursor-pointer group/author hover:opacity-90 transition-opacity"
+                    title={`View ${post.authorName}'s Public Profile`}
+                  >
                     <img
                       src={post.authorAvatar}
                       alt={post.authorName}
-                      className="w-9 h-9 rounded-lg object-cover"
+                      className="w-9 h-9 rounded-lg object-cover group-hover/author:ring-2 group-hover/author:ring-indigo-500 transition-all"
                     />
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <span className="font-semibold text-xs text-zinc-900 dark:text-zinc-100">
+                        <span className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 group-hover/author:text-indigo-600 dark:group-hover/author:text-indigo-400 transition-colors">
                           {post.authorName}
                         </span>
                         <span className="text-xs text-zinc-400">
@@ -264,13 +268,17 @@ export const CommunityView: React.FC = () => {
                             }`}
                           >
                             <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
+                              <div
+                                onClick={() => viewProfile(rep.authorName)}
+                                className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                                title={`View ${rep.authorName}'s Public Profile`}
+                              >
                                 <img
                                   src={rep.authorAvatar}
                                   alt={rep.authorName}
                                   className="w-5 h-5 rounded-full object-cover"
                                 />
-                                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                                <span className="font-semibold text-zinc-900 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                                   {rep.authorName}
                                 </span>
                                 <span className="text-[10px] text-zinc-400">

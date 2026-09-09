@@ -96,7 +96,7 @@ export const FloatingMascotBadge: React.FC = () => {
   return (
     <aside
       aria-label="Pip AI Assistant"
-      className="fixed bottom-16 md:bottom-6 right-4 z-40 flex items-end gap-2.5 pointer-events-none select-none animate-in slide-in-from-bottom-4 duration-200"
+      className="fixed bottom-6 right-4 z-40 flex items-end gap-2.5 pointer-events-none select-none animate-in slide-in-from-bottom-4 duration-200"
     >
       {showSpeech && (
         <div className="pointer-events-auto relative max-w-[220px] sm:max-w-[260px] p-3 rounded-lg bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 shadow-lg text-zinc-800 dark:text-zinc-200 text-xs font-medium leading-snug animate-in fade-in duration-150">
