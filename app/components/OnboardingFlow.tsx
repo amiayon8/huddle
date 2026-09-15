@@ -328,7 +328,7 @@ export const OnboardingFlow: React.FC = () => {
                   Preferred learning pace
                 </h3>
                 <p className="text-xs text-zinc-500">
-                  Select how frequently Pip sends session reminders.
+                  Select how frequently Spark sends session reminders.
                 </p>
               </div>
               <div className="space-y-3">

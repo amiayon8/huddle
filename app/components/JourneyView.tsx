@@ -75,7 +75,7 @@ export const JourneyView: React.FC = () => {
       <DuolingoMascot
         emotion="planning"
         size="md"
-        speechText={`Pip here. Every node in this **${roadmap.skillTitle}** journey is vetted by Staff Engineers. You've cleared **${completedCount}/${roadmap.totalSteps}** steps. Keep momentum going.`}
+        speechText={`Spark here. Every node in this **${roadmap.skillTitle}** journey is vetted by Staff Engineers. You've cleared **${completedCount}/${roadmap.totalSteps}** steps. Keep momentum going.`}
         showQuickActions={true}
       />
 

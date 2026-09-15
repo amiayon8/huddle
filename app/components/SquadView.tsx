@@ -849,7 +849,7 @@ export const SquadView: React.FC = () => {
                     onClick={() => setMascotOpen(true)}
                     className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer"
                   >
-                    Draft with Pip AI
+                    Draft with Spark AI
                   </button>
 
                   <button

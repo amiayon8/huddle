@@ -19,9 +19,16 @@ import {
   Trophy,
   ShieldCheck,
   BookOpen,
+  Zap,
+  Bell,
+  Gauge,
+  Sliders,
+  Share2,
 } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
 import { DuolingoMascot } from "./DuolingoMascot";
+import { ProgressBarOfHealth } from "./ProgressBarOfHealth";
+import { SprinterFriendsView } from "./SprinterFriendsView";
 
 export const DashboardView: React.FC = () => {
   const {
@@ -36,6 +43,14 @@ export const DashboardView: React.FC = () => {
     practiceProgressMap,
     reshuffleSprint,
     setActiveTab,
+    adaptiveDifficulty,
+    setAdaptiveDifficulty,
+    activeNudge,
+    dismissActiveNudge,
+    setDailyNudgeModalOpen,
+    openProjectMission,
+    projectMissions,
+    openShareModal,
   } = useHuddle();
 
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
@@ -57,6 +72,8 @@ export const DashboardView: React.FC = () => {
     (tasks.length > 0 ? tasks[tasks.length - 1] : null);
   const isSprintComplete = totalTasks > 0 && completedCount === totalTasks;
 
+  const currentMission = projectMissions?.[0];
+
   if (!activeTask) {
     return (
       <div className="max-w-4xl mx-auto py-24 flex flex-col items-center justify-center gap-4 text-zinc-500">
@@ -73,13 +90,56 @@ export const DashboardView: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-20 animate-in fade-in duration-200">
+      {/* Feature 7: Visual Progress Bar of Health */}
+      <ProgressBarOfHealth />
+
+      {/* Feature 4: Daily Learning Nudge Banner */}
+      {activeNudge && (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-indigo-500/10 to-purple-500/10 border border-amber-200/70 dark:border-amber-900/50 text-xs animate-in slide-in-from-top-2 duration-200">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <Bell className="w-4 h-4 animate-bounce" />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">
+                  Daily Learning Nudge
+                </span>
+                <span className="text-zinc-400">•</span>
+                <span className="text-[10px] text-zinc-500">{activeNudge.timeText}</span>
+              </div>
+              <p className="text-zinc-800 dark:text-zinc-200 font-medium text-xs truncate sm:whitespace-normal">
+                {activeNudge.text}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+            <button
+              onClick={() => setDailyNudgeModalOpen(true)}
+              className="px-2.5 py-1 rounded-lg border border-amber-300 dark:border-amber-800/80 bg-white/60 dark:bg-zinc-900/60 text-amber-900 dark:text-amber-200 font-semibold text-[11px] hover:bg-white dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+            >
+              Adjust Nudge
+            </button>
+            <button
+              onClick={dismissActiveNudge}
+              className="px-2 py-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 text-[11px] font-medium cursor-pointer"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Feature 3: AI Skill Sprinter Main Card */}
       <div className="relative overflow-hidden rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#11131d]/90 backdrop-blur-xl p-6 sm:p-7 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.4)]">
         <div className="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent blur-3xl pointer-events-none" />
 
         <div className="relative space-y-5">
+          {/* Header Row */}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 font-semibold text-[11px] tracking-wide uppercase">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 font-bold text-[11px] tracking-wide uppercase">
                 <span className="relative flex h-1.5 w-1.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-600 dark:bg-indigo-400"></span>
@@ -87,7 +147,7 @@ export const DashboardView: React.FC = () => {
                 Day {activeTask.dayNumber} of {sprint.durationDays}
               </span>
               <span className="text-zinc-300 dark:text-zinc-700">•</span>
-              <span className="text-zinc-500 dark:text-zinc-400 font-medium text-xs">
+              <span className="text-zinc-500 dark:text-zinc-400 font-semibold text-xs">
                 {sprint.skillTitle}
               </span>
             </div>
@@ -102,19 +162,58 @@ export const DashboardView: React.FC = () => {
             </button>
           </div>
 
+          {/* Title & Career Milestone */}
           <div className="space-y-1.5">
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-950 dark:text-white">
               {sprint.skillTitle}
             </h1>
             <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
               <span>Target Milestone:</span>
-              <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 font-semibold text-xs">
+              <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 font-bold text-xs">
                 {sprint.careerMilestone}
               </span>
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-2">
+          {/* Feature 13: Adaptive Difficulty Flow Control */}
+          <div className="p-3.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs">
+            <div className="flex items-center gap-2">
+              <Gauge className="w-4 h-4 text-indigo-500 shrink-0" />
+              <div>
+                <span className="font-bold text-zinc-900 dark:text-zinc-100">
+                  Adaptive Difficulty:
+                </span>{" "}
+                <span className="text-zinc-500 dark:text-zinc-400 text-[11px]">
+                  Spark adjusts practice depth to preserve flow.
+                </span>
+              </div>
+            </div>
+
+            <div className="inline-flex items-center p-1 rounded-xl bg-white dark:bg-[#0c0d12] border border-zinc-200 dark:border-zinc-800 shadow-xs">
+              {(
+                [
+                  { id: "gentle", label: "🧘 Gentle / Reinforced" },
+                  { id: "balanced", label: "⚖️ Balanced (15m)" },
+                  { id: "accelerated", label: "⚡ Accelerated / Hardcore" },
+                ] as const
+              ).map((mode) => (
+                <button
+                  key={mode.id}
+                  onClick={() => setAdaptiveDifficulty(mode.id)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                    adaptiveDifficulty === mode.id
+                      ? "bg-indigo-600 text-white shadow-xs"
+                      : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+                  }`}
+                >
+                  {mode.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Three Key Metrics */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-1">
             <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 transition-colors min-w-0">
               <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/60 dark:border-indigo-800/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
                 <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -137,12 +236,8 @@ export const DashboardView: React.FC = () => {
                 <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
               <div className="min-w-0 flex-1">
-                <div
-                  className="text-[9px] sm:text-[10px] font-semibold text-zinc-400 uppercase tracking-wider truncate"
-                  title="Today's Deep Focus"
-                >
-                  <span className="hidden sm:inline">Today's Deep Focus</span>
-                  <span className="sm:hidden">Deep Focus</span>
+                <div className="text-[9px] sm:text-[10px] font-semibold text-zinc-400 uppercase tracking-wider truncate">
+                  Focus Time
                 </div>
                 <div className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 tabular-nums whitespace-nowrap">
                   {formatFocusTime(secondsFocusedToday)}
@@ -155,30 +250,27 @@ export const DashboardView: React.FC = () => {
                 <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </div>
               <div className="min-w-0 flex-1">
-                <div
-                  className="text-[9px] sm:text-[10px] font-semibold text-zinc-400 uppercase tracking-wider truncate"
-                  title="Sprint Streak"
-                >
-                  <span className="hidden sm:inline">Sprint Streak</span>
-                  <span className="sm:hidden">Streak</span>
+                <div className="text-[9px] sm:text-[10px] font-semibold text-zinc-400 uppercase tracking-wider truncate">
+                  Sprint Streak
                 </div>
                 <div className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 tabular-nums whitespace-nowrap">
                   {user?.streak || 1}{" "}
                   <span className="text-[10px] sm:text-xs font-normal text-zinc-500">
-                    <span className="hidden sm:inline">Days Active</span>
-                    <span className="sm:hidden">d Active</span>
+                    Days Active
                   </span>
                 </div>
               </div>
             </div>
           </div>
 
+          {/* Next Drill or Completion Status */}
           <div className="pt-2">
             {!isSprintComplete ? (
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-r from-indigo-500/10 via-purple-500/5 to-transparent border border-indigo-200/60 dark:border-indigo-900/40">
                 <div className="space-y-0.5">
-                  <div className="text-[11px] font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                    Next Recommended Drill
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                    <Zap className="w-3 h-3" />
+                    <span>Next Recommended Drill</span>
                   </div>
                   <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
                     {activeTask.title}
@@ -197,27 +289,37 @@ export const DashboardView: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-semibold">
-                <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white shrink-0 shadow-xs">
-                  <CheckCircle2 className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-sm font-bold">
-                    Sprint Completed Successfully!
+              <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-semibold">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white shrink-0 shadow-xs">
+                    <CheckCircle2 className="w-5 h-5" />
                   </div>
-                  <div className="text-emerald-700/80 dark:text-emerald-300/80 font-normal">
-                    All {totalTasks} deliverables verified and added to your
-                    career portfolio.
+                  <div>
+                    <div className="text-sm font-bold">
+                      Sprint Completed Successfully!
+                    </div>
+                    <div className="text-emerald-700/80 dark:text-emerald-300/80 font-normal">
+                      All {totalTasks} deliverables verified and ready for capstone project mission.
+                    </div>
                   </div>
                 </div>
+
+                <button
+                  onClick={() => openShareModal()}
+                  className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>Share Progress</span>
+                </button>
               </div>
             )}
           </div>
 
+          {/* Curriculum Completion Bar */}
           <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-white/[0.06]">
             <div className="flex justify-between text-xs text-zinc-500 dark:text-zinc-400">
-              <span className="font-medium">Curriculum Completion</span>
-              <span className="font-semibold text-zinc-900 dark:text-zinc-100 tabular-nums">
+              <span className="font-semibold">Curriculum Completion</span>
+              <span className="font-bold text-zinc-900 dark:text-zinc-100 tabular-nums">
                 {sprintProgressPercent}% Complete
               </span>
             </div>
@@ -231,25 +333,27 @@ export const DashboardView: React.FC = () => {
         </div>
       </div>
 
+      {/* Mascot Card */}
       <DuolingoMascot
         emotion={isSprintComplete ? "success" : "encouragement"}
         size="md"
         showQuickActions={true}
       />
 
+      {/* Feature 6: Finishing System (Deliberate Practice Schedule) */}
       <div className="rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#11131d]/90 backdrop-blur-xl p-6 sm:p-7 space-y-6 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.4)]">
         <div className="flex items-center justify-between border-b border-zinc-100 dark:border-white/[0.06] pb-4">
           <div>
             <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-indigo-500" />
-              <span>4-Day Deliberate Practice Schedule</span>
+              <span>4-Day Finishing System</span>
             </h2>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              Daily structured modules with verified engineering deliverables.
+              Clear marks of completion for each step with instant visual proof stamps.
             </p>
           </div>
-          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 tabular-nums">
-            {completedCount}/{totalTasks} Complete
+          <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 tabular-nums">
+            {completedCount}/{totalTasks} Cleared
           </span>
         </div>
 
@@ -268,7 +372,7 @@ export const DashboardView: React.FC = () => {
                   isCurrent
                     ? "border-indigo-500/80 bg-indigo-50/30 dark:bg-indigo-950/20 shadow-sm"
                     : isCompleted
-                      ? "border-zinc-200/70 dark:border-zinc-800/70 bg-zinc-50/50 dark:bg-zinc-900/30 opacity-85 hover:opacity-100"
+                      ? "border-emerald-500/30 bg-emerald-50/10 dark:bg-emerald-950/10"
                       : "border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-[#111218] hover:border-zinc-300 dark:hover:border-zinc-700"
                 }`}
               >
@@ -278,7 +382,7 @@ export const DashboardView: React.FC = () => {
                       onClick={() => openPracticeSession(task, isCompleted)}
                       className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all cursor-pointer ${
                         isCompleted
-                          ? "bg-emerald-600 text-white shadow-xs"
+                          ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/25 ring-2 ring-emerald-500/30"
                           : isCurrent
                             ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25 ring-2 ring-indigo-500/30"
                             : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 border border-zinc-200 dark:border-zinc-700"
@@ -290,7 +394,7 @@ export const DashboardView: React.FC = () => {
                       }
                     >
                       {isCompleted ? (
-                        <Check className="w-4 h-4 stroke-[2.5]" />
+                        <Check className="w-5 h-5 stroke-[2.5]" />
                       ) : (
                         <span className="text-xs font-bold font-mono">
                           0{task.dayNumber}
@@ -309,14 +413,15 @@ export const DashboardView: React.FC = () => {
                             <span>Artifact</span>
                           </span>
                         )}
-                        {progress?.videoCompleted && (
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
-                            Watched
+                        {isCompleted && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300/40">
+                            <ShieldCheck className="w-3 h-3" />
+                            <span>CLEARED</span>
                           </span>
                         )}
                         {isCurrent && (
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-600 text-white uppercase tracking-wider">
-                            Active
+                            Active Drill
                           </span>
                         )}
                       </div>
@@ -324,7 +429,7 @@ export const DashboardView: React.FC = () => {
                       <h3
                         className={`text-sm font-semibold truncate ${
                           isCompleted
-                            ? "text-zinc-400 dark:text-zinc-500 line-through"
+                            ? "text-zinc-500 dark:text-zinc-400"
                             : "text-zinc-950 dark:text-zinc-100"
                         }`}
                       >
@@ -395,39 +500,47 @@ export const DashboardView: React.FC = () => {
             );
           })}
 
-          <div className="rounded-xl border border-dashed border-indigo-200 dark:border-indigo-900/50 bg-indigo-50/20 dark:bg-indigo-950/10 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                  isSprintComplete
-                    ? "bg-emerald-600 text-white shadow-xs"
-                    : "bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/60"
-                }`}
-              >
-                <Trophy className="w-5 h-5" />
+          {/* Feature 12: Project Mission Capstone Launcher */}
+          {currentMission && (
+            <div className="rounded-2xl border-2 border-dashed border-amber-300 dark:border-amber-800/60 bg-gradient-to-r from-amber-500/10 via-indigo-500/5 to-transparent p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-500/20">
+                  <Trophy className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-[10px] font-bold uppercase tracking-wider">
+                      Real-World Project Mission
+                    </span>
+                    <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                      +8% Skill Health
+                    </span>
+                  </div>
+                  <h4 className="text-sm font-bold text-zinc-950 dark:text-white mt-0.5">
+                    {currentMission.title}
+                  </h4>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                    Complete this real-world mini-project to unlock verified portfolio proof.
+                  </p>
+                </div>
               </div>
-              <div>
-                <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 block">
-                  Capstone Sprint Deliverable
-                </span>
-                <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                  Verified proof artifact automatically showcased on your public
-                  engineering portfolio.
-                </span>
-              </div>
-            </div>
 
-            <button
-              onClick={() => setActiveTab("profile")}
-              className="px-3.5 py-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors cursor-pointer flex items-center gap-1.5 shrink-0"
-            >
-              <span>View Portfolio</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
+              <button
+                onClick={() => openProjectMission(currentMission)}
+                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-md shadow-amber-500/20 transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
+              >
+                <span>Launch Project Mission</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
+      {/* Feature 5: Sprinter Friends Activity View */}
+      <SprinterFriendsView />
+
+      {/* Feature 10 & 11: Micro-Squad Sync Room */}
       <div className="rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#11131d]/90 backdrop-blur-xl p-6 space-y-4 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.4)]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">

@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
 import { MarkdownRenderer } from "./MarkdownRenderer";
-import { PipChatMessage, PipChatSession } from "../types/huddle";
+import { SparkChatMessage, SparkChatSession } from "../types/huddle";
 import { addMascotMessageToDb } from "../lib/supabase";
 
 export const MascotDrawer: React.FC = () => {
@@ -33,7 +33,7 @@ export const MascotDrawer: React.FC = () => {
     useState<string>("idle");
   const [isThinking, setIsThinking] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
-  const [sessions, setSessions] = useState<PipChatSession[]>([]);
+  const [sessions, setSessions] = useState<SparkChatSession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string>("");
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -47,9 +47,9 @@ export const MascotDrawer: React.FC = () => {
     error: "/mascot_error.svg",
   };
 
-  const getStorageKey = () => `huddle_pip_sessions_${user.id || "user-1"}`;
+  const getStorageKey = () => `huddle_spark_sessions_${user.id || "user-1"}`;
 
-  const createDefaultMessages = (): PipChatMessage[] => {
+  const createDefaultMessages = (): SparkChatMessage[] => {
     const milestone =
       user.surveyData?.targetProfession ||
       user.careerMilestone ||
@@ -73,15 +73,15 @@ export const MascotDrawer: React.FC = () => {
     return [
       {
         id: `msg-${Date.now()}-1`,
-        sender: "pip",
-        text: `I'm Pip, your engineering mentor for this sprint on **${skill}**.\n\nWe focus on short, deliberate technical practice. You're building towards **${milestone}** with analogies drawn from **${hobbies}** and **${subjects}** when helpful.`,
+        sender: "spark",
+        text: `I'm Spark, your engineering mentor for this sprint on **${skill}**.\n\nWe focus on short, deliberate technical practice. You're building towards **${milestone}** with analogies drawn from **${hobbies}** and **${subjects}** when helpful.`,
         mascotSvg: "/mascot_idle.svg",
         timestamp: currentTime,
       },
       {
         id: `msg-${Date.now()}-2`,
-        sender: "pip",
-        text: `Day ${sprint.currentDay} of ${sprint.durationDays || 4}. ${completedTasks} of ${totalTasks} tasks complete.\n\nAsk me technical questions about today's practice, review code, or request a schedule adjustment.`,
+        sender: "spark",
+        text: `Day ${sprint.currentDay} of ${sprint.durationDays || 4}. ${completedTasks} of ${totalTasks} tasks complete.\n\nAsk me technical questions about today's practice, tune difficulty, review project missions, or request a schedule adjustment!`,
         mascotSvg: "/mascot_encouragement.svg",
         timestamp: currentTime,
       },
@@ -89,42 +89,44 @@ export const MascotDrawer: React.FC = () => {
   };
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const storageKey = getStorageKey();
-
-    try {
-      const saved = localStorage.getItem(storageKey);
-      if (saved) {
-        const parsed: PipChatSession[] = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setSessions(parsed);
-          setCurrentSessionId(parsed[0].id);
-          return;
+    if (typeof window !== "undefined") {
+      const storageKey = getStorageKey();
+      try {
+        const saved =
+          localStorage.getItem(storageKey) ||
+          localStorage.getItem(`huddle_pip_sessions_${user.id || "user-1"}`);
+        if (saved) {
+          const parsed: SparkChatSession[] = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setSessions(parsed);
+            setCurrentSessionId(parsed[0].id);
+            return;
+          }
         }
+      } catch (e) {
+        console.error(e);
       }
-    } catch (e) {
-      console.error(e);
-    }
 
-    const initialSession: PipChatSession = {
-      id: `sess-${Date.now()}`,
-      title: `Sprint Focus: ${sprint.skillTitle}`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      messages: createDefaultMessages(),
-      skillFocus: sprint.skillTitle,
-    };
+      const initialSession: SparkChatSession = {
+        id: `sess-${Date.now()}`,
+        title: `Sprint Focus: ${sprint.skillTitle}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        messages: createDefaultMessages(),
+        skillFocus: sprint.skillTitle,
+      };
 
-    setSessions([initialSession]);
-    setCurrentSessionId(initialSession.id);
-    try {
-      localStorage.setItem(storageKey, JSON.stringify([initialSession]));
-    } catch (e) {
-      console.error(e);
+      setSessions([initialSession]);
+      setCurrentSessionId(initialSession.id);
+      try {
+        localStorage.setItem(storageKey, JSON.stringify([initialSession]));
+      } catch (e) {
+        console.error(e);
+      }
     }
   }, [user.id]);
 
-  const saveSessions = (updated: PipChatSession[]) => {
+  const saveSessions = (updated: SparkChatSession[]) => {
     setSessions(updated);
     if (typeof window !== "undefined") {
       try {
@@ -146,7 +148,7 @@ export const MascotDrawer: React.FC = () => {
   }, [messages.length, isThinking, showHistory]);
 
   const handleStartNewChat = () => {
-    const newSession: PipChatSession = {
+    const newSession: SparkChatSession = {
       id: `sess-${Date.now()}`,
       title: `Discussion #${sessions.length + 1}: ${sprint.skillTitle}`,
       createdAt: new Date().toISOString(),
@@ -172,7 +174,7 @@ export const MascotDrawer: React.FC = () => {
     const remaining = sessions.filter((s) => s.id !== sessionId);
 
     if (remaining.length === 0) {
-      const freshSession: PipChatSession = {
+      const freshSession: SparkChatSession = {
         id: `sess-${Date.now()}`,
         title: `Sprint Focus: ${sprint.skillTitle}`,
         createdAt: new Date().toISOString(),
@@ -193,7 +195,7 @@ export const MascotDrawer: React.FC = () => {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!chatInput.trim() || isThinking) return;
-    if (!ensureSurveyDone("chat with Pip")) return;
+    if (!ensureSurveyDone("chat with Spark")) return;
 
     const userText = chatInput.trim();
     const currentTime = new Date().toLocaleTimeString([], {
@@ -201,7 +203,7 @@ export const MascotDrawer: React.FC = () => {
       minute: "2-digit",
     });
 
-    const newUserMsg: PipChatMessage = {
+    const newUserMsg: SparkChatMessage = {
       id: `msg-${Date.now()}-user`,
       sender: "user",
       text: userText,
@@ -219,7 +221,7 @@ export const MascotDrawer: React.FC = () => {
         userText.length > 36 ? `${userText.slice(0, 36)}...` : userText;
     }
 
-    const updatedSession: PipChatSession = {
+    const updatedSession: SparkChatSession = {
       ...(activeSession || {
         id: `sess-${Date.now()}`,
         createdAt: new Date().toISOString(),
@@ -260,9 +262,9 @@ export const MascotDrawer: React.FC = () => {
         const data = await res.json();
         const emotionSvg = data.mascotSvg || "/mascot_encouragement.svg";
 
-        const newPipMsg: PipChatMessage = {
-          id: `msg-${Date.now()}-pip`,
-          sender: "pip",
+        const newSparkMsg: SparkChatMessage = {
+          id: `msg-${Date.now()}-spark`,
+          sender: "spark",
           text: data.reply,
           mascotSvg: emotionSvg,
           timestamp: new Date().toLocaleTimeString([], {
@@ -272,12 +274,12 @@ export const MascotDrawer: React.FC = () => {
         };
 
         addMascotMessageToDb(
-          { id: newPipMsg.id, context: "chat", text: newPipMsg.text },
+          { id: newSparkMsg.id, context: "chat", text: newSparkMsg.text },
           user.id,
         );
 
-        const finalMessages = [...updatedMessages, newPipMsg];
-        const finalSession: PipChatSession = {
+        const finalMessages = [...updatedMessages, newSparkMsg];
+        const finalSession: SparkChatSession = {
           ...updatedSession,
           updatedAt: new Date().toISOString(),
           messages: finalMessages,
@@ -307,12 +309,12 @@ export const MascotDrawer: React.FC = () => {
       } else {
         throw new Error("API request failed");
       }
-    } catch (err) {
-      console.error(err);
-      const fallbackMsg: PipChatMessage = {
+    } catch (error) {
+      console.error(error);
+      const fallbackMsg: SparkChatMessage = {
         id: `msg-${Date.now()}-fallback`,
-        sender: "pip",
-        text: `I've got your back. Consistency beats intensity. Let's focus on **Day ${sprint.currentDay}** of your **${sprint.skillTitle}** sprint.`,
+        sender: "spark",
+        text: `Spark here! Consistent daily drills build extraordinary engineering depth. Let's focus on today's single action on **${sprint.skillTitle}**!`,
         mascotSvg: "/mascot_encouragement.svg",
         timestamp: new Date().toLocaleTimeString([], {
           hour: "2-digit",
@@ -321,7 +323,7 @@ export const MascotDrawer: React.FC = () => {
       };
 
       const finalMessages = [...updatedMessages, fallbackMsg];
-      const finalSession: PipChatSession = {
+      const finalSession: SparkChatSession = {
         ...updatedSession,
         updatedAt: new Date().toISOString(),
         messages: finalMessages,
@@ -338,9 +340,9 @@ export const MascotDrawer: React.FC = () => {
   const handleQuickReshuffle = () => {
     reshuffleSprint();
 
-    const reshuffleMsg: PipChatMessage = {
+    const reshuffleMsg: SparkChatMessage = {
       id: `msg-${Date.now()}-reshuffle`,
-      sender: "pip",
+      sender: "spark",
       text: "Sprint rescheduled smoothly with **zero penalties**. You can pick up Day 1 whenever you are ready.",
       mascotSvg: "/mascot_planning.svg",
       timestamp: new Date().toLocaleTimeString([], {
@@ -351,7 +353,7 @@ export const MascotDrawer: React.FC = () => {
 
     const finalMessages = [...messages, reshuffleMsg];
     if (activeSession) {
-      const finalSession: PipChatSession = {
+      const finalSession: SparkChatSession = {
         ...activeSession,
         updatedAt: new Date().toISOString(),
         messages: finalMessages,
@@ -376,22 +378,22 @@ export const MascotDrawer: React.FC = () => {
               <div className="w-13 h-13 sm:w-15 sm:h-15 p-1.5 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-800/50 flex items-center justify-center shadow-xs">
                 <img
                   src={mascotMap[currentMascotEmotion] || "/mascot_idle.svg"}
-                  alt="Pip"
+                  alt="Spark"
                   className="w-full h-full object-contain drop-shadow-sm transition-transform duration-200 hover:scale-105 cursor-pointer"
                 />
               </div>
               <span
                 className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-[#0c0d12]"
-                title="Pip is active"
+                title="Spark is online"
               />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold text-sm sm:text-base text-zinc-900 dark:text-zinc-100">
-                  Pip AI
+                  Spark AI
                 </h3>
                 <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
-                  Online
+                  Active
                 </span>
               </div>
               <p
@@ -400,7 +402,7 @@ export const MascotDrawer: React.FC = () => {
               >
                 {showHistory
                   ? "Conversation History"
-                  : activeSession?.title || "Sprint companion & concept tutor"}
+                  : activeSession?.title || "Universal engineering coach & tutor"}
               </p>
             </div>
           </div>
@@ -539,12 +541,12 @@ export const MascotDrawer: React.FC = () => {
                 key={m.id || idx}
                 className={`flex items-start gap-3 ${m.sender === "user" ? "justify-end" : "justify-start"}`}
               >
-                {m.sender === "pip" && (
+                {(m.sender === "spark" || m.sender === "pip") && (
                   <div className="shrink-0 flex flex-col items-center pt-0.5 select-none">
                     <div className="w-12 h-12 sm:w-14 sm:h-14 p-1 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex items-center justify-center transition-transform hover:scale-105 shadow-2xs">
                       <img
                         src={m.mascotSvg || "/mascot_idle.svg"}
-                        alt="Pip"
+                        alt="Spark"
                         className="w-full h-full object-contain drop-shadow-xs"
                       />
                     </div>
@@ -665,6 +667,30 @@ export const MascotDrawer: React.FC = () => {
 
                   <button
                     type="button"
+                    onClick={() =>
+                      setChatInput(
+                        `Review my project mission architecture: what edge cases should I test for?`,
+                      )
+                    }
+                    className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors shrink-0 cursor-pointer"
+                  >
+                    <span>Mission review</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setChatInput(
+                        `How can I tune my sprint difficulty to balanced or accelerated pacing?`,
+                      )
+                    }
+                    className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors shrink-0 cursor-pointer"
+                  >
+                    <span>Adaptive pacing</span>
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={handleQuickReshuffle}
                     className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors shrink-0 cursor-pointer"
                     title="Reschedule practice without penalty"
@@ -682,7 +708,7 @@ export const MascotDrawer: React.FC = () => {
             >
               <input
                 type="text"
-                placeholder="Ask Pip a question..."
+                placeholder="Ask Spark a question..."
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 disabled={isThinking}

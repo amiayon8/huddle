@@ -25,32 +25,40 @@ export const SettingsModal: React.FC = () => {
   const [careerMilestone, setCareerMilestone] = useState(user.careerMilestone);
   const [primaryGoal, setPrimaryGoal] = useState(user.primaryGoal);
   const [saved, setSaved] = useState(false);
-  const [isPipDismissed, setIsPipDismissed] = useState(false);
+  const [isSparkDismissed, setIsSparkDismissed] = useState(false);
 
   useEffect(() => {
     const syncDismissed = () => {
       if (typeof window !== 'undefined') {
-        setIsPipDismissed(Boolean(localStorage.getItem('huddle_pip_dismissed')));
+        setIsSparkDismissed(
+          Boolean(localStorage.getItem('huddle_spark_dismissed')) ||
+          Boolean(localStorage.getItem('huddle_pip_dismissed'))
+        );
       }
     };
     syncDismissed();
     window.addEventListener('storage', syncDismissed);
+    window.addEventListener('huddle_spark_visibility_change', syncDismissed);
     window.addEventListener('huddle_pip_visibility_change', syncDismissed);
     return () => {
       window.removeEventListener('storage', syncDismissed);
+      window.removeEventListener('huddle_spark_visibility_change', syncDismissed);
       window.removeEventListener('huddle_pip_visibility_change', syncDismissed);
     };
   }, []);
 
-  const togglePipDismissal = () => {
+  const toggleSparkDismissal = () => {
     if (typeof window === 'undefined') return;
-    if (isPipDismissed) {
+    if (isSparkDismissed) {
+      localStorage.removeItem('huddle_spark_dismissed');
       localStorage.removeItem('huddle_pip_dismissed');
-      setIsPipDismissed(false);
+      setIsSparkDismissed(false);
     } else {
+      localStorage.setItem('huddle_spark_dismissed', 'true');
       localStorage.setItem('huddle_pip_dismissed', 'true');
-      setIsPipDismissed(true);
+      setIsSparkDismissed(true);
     }
+    window.dispatchEvent(new Event('huddle_spark_visibility_change'));
     window.dispatchEvent(new Event('huddle_pip_visibility_change'));
   };
 
@@ -294,11 +302,11 @@ export const SettingsModal: React.FC = () => {
             <div className="space-y-4 text-xs">
               <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex flex-col items-center text-center space-y-3">
                 <div className="w-20 h-20 p-2 rounded-2xl bg-white dark:bg-[#111218] border-2 border-indigo-500 shadow-md flex items-center justify-center transition-transform hover:scale-110 cursor-pointer">
-                  <img src="/mascot_idle.svg" alt="Pip AI" className="w-full h-full object-contain" />
+                  <img src="/mascot_idle.svg" alt="Spark AI" className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <h4 className="font-bold text-sm text-zinc-900 dark:text-zinc-100">
-                    Pip AI Engineering Companion
+                    Spark AI Engineering Companion
                   </h4>
                   <p className="text-zinc-500 text-xs mt-0.5">
                     Modeled after Duolingo's mascot philosophy — active on every page to encourage 1 daily deliberate practice action.
@@ -327,7 +335,7 @@ export const SettingsModal: React.FC = () => {
               <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 space-y-1">
                 <div className="font-semibold text-zinc-900 dark:text-zinc-100">Zero-Penalty Philosophy</div>
                 <p className="text-[11px] leading-relaxed">
-                  Pip never penalizes missed days. Reshuffling a 4-day sprint is always 100% free and supportive.
+                  Spark never penalizes missed days. Reshuffling a 4-day sprint is always 100% free and supportive.
                 </p>
               </div>
 
@@ -335,15 +343,15 @@ export const SettingsModal: React.FC = () => {
                 <div>
                   <div className="font-semibold text-zinc-900 dark:text-zinc-100">Floating Mascot Badge</div>
                   <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                    Show Pip assistant badge in the bottom-right corner of the screen.
+                    Show Spark assistant badge in the bottom-right corner of the screen.
                   </p>
                 </div>
                 <button
                   type="button"
-                  onClick={togglePipDismissal}
+                  onClick={toggleSparkDismissal}
                   className="shrink-0 px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-750 font-medium text-[11px] text-zinc-800 dark:text-zinc-200 cursor-pointer transition-colors"
                 >
-                  {isPipDismissed ? 'Restore Pip' : 'Dismiss Pip'}
+                  {isSparkDismissed ? 'Restore Spark' : 'Dismiss Spark'}
                 </button>
               </div>
             </div>

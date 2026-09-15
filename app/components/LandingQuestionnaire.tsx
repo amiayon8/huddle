@@ -453,7 +453,7 @@ export const LandingQuestionnaire: React.FC = () => {
                 <div className="relative w-20 h-20 sm:w-24 sm:h-24 p-3 rounded-2xl bg-white dark:bg-[#11131e] border border-indigo-200 dark:border-indigo-800/80 shadow-2xl shadow-indigo-500/10 flex items-center justify-center transition-transform hover:scale-105 duration-300">
                   <img
                     src="/mascot_encouragement.svg"
-                    alt="Pip"
+                    alt="Spark"
                     className="w-full h-full object-contain drop-shadow-md"
                   />
                   <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900 animate-pulse" />
@@ -462,7 +462,7 @@ export const LandingQuestionnaire: React.FC = () => {
 
               <div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/50 text-xs font-semibold shadow-2xs">
-                  <span>Pip • Your Deliberate Practice Companion</span>
+                  <span>Spark • Your Deliberate Practice Companion</span>
                 </div>
               </div>
 
@@ -518,13 +518,13 @@ export const LandingQuestionnaire: React.FC = () => {
               <div className="relative shrink-0 w-12 h-12 p-1 rounded-lg bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-700 flex items-center justify-center">
                 <img
                   src={mascotMap[currentMascotEmotion] || "/mascot_idle.svg"}
-                  alt="Pip"
+                  alt="Spark"
                   className="w-full h-full object-contain"
                 />
               </div>
               <div className="text-xs text-zinc-700 dark:text-zinc-300 flex-1">
                 <div className="font-semibold text-indigo-600 dark:text-indigo-400 text-[11px] uppercase tracking-wider mb-0.5">
-                  Pip Companion
+                  Spark Companion
                 </div>
                 <p className="leading-relaxed text-[12px]">
                   {isLoadingDynamic ? (
@@ -544,7 +544,7 @@ export const LandingQuestionnaire: React.FC = () => {
                 <div className="w-16 h-16 p-2 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center">
                   <img
                     src="/mascot_deep_thinking.svg"
-                    alt="Pip AI Thinking"
+                    alt="Spark AI Thinking"
                     className="w-full h-full object-contain opacity-80"
                   />
                 </div>

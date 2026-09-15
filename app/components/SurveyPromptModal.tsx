@@ -38,7 +38,7 @@ export const SurveyPromptModal: React.FC = () => {
           <div className="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 p-1 flex items-center justify-center shrink-0 shadow-xs">
             <img
               src="/mascot_planning.svg"
-              alt="Pip"
+              alt="Spark"
               className="w-full h-full object-contain drop-shadow-xs"
             />
           </div>
@@ -66,7 +66,7 @@ export const SurveyPromptModal: React.FC = () => {
             </span>
           </p>
           <p className="text-[11.5px] opacity-90">
-            Huddle personalizes your 4-day sprint, squad check-ins, and Pip AI
+            Huddle personalizes your 4-day sprint, squad check-ins, and Spark AI
             concept breakdowns based on your 5-step intake survey. You can
             browse in preview mode, but actions are locked until completed.
           </p>

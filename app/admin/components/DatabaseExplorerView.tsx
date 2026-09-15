@@ -146,7 +146,7 @@ export const KNOWN_DATABASE_TABLES = [
   },
   {
     id: "mascot_messages",
-    name: "Pip Mascot Guidance Feed",
+    name: "Spark Mascot Guidance Feed",
     category: "Interactive & Systems",
   },
   {

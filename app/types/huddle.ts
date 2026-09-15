@@ -333,21 +333,99 @@ export interface NotificationItem {
   read: boolean;
 }
 
-export interface PipChatMessage {
+export interface SparkChatMessage {
   id: string;
-  sender: 'pip' | 'user';
+  sender: 'spark' | 'pip' | 'user';
   text: string;
   mascotSvg?: string;
   timestamp: string;
 }
 
-export interface PipChatSession {
+export interface SparkChatSession {
   id: string;
   title: string;
   createdAt: string;
   updatedAt: string;
-  messages: PipChatMessage[];
+  messages: SparkChatMessage[];
   skillFocus?: string;
+}
+
+// Backwards compatibility aliases
+export type PipChatMessage = SparkChatMessage;
+export type PipChatSession = SparkChatSession;
+
+export interface SprinterFriend {
+  id: string;
+  name: string;
+  handle: string;
+  avatar: string;
+  currentSkill: string;
+  streak: number;
+  dayNumber: number;
+  totalDays: number;
+  progressPercent: number;
+  lastActive: string;
+  statusText: string;
+  cheeredToday?: boolean;
+  nudgedToday?: boolean;
+}
+
+export type AdaptiveDifficulty = 'gentle' | 'balanced' | 'accelerated';
+
+export interface DailyNudgeSettings {
+  enabled: boolean;
+  timeOfDay: 'morning' | 'lunch' | 'evening' | 'night';
+  vibe: 'encouraging' | 'witty' | 'minimal';
+  browserNotifications: boolean;
+}
+
+export interface DailyNudgeItem {
+  id: string;
+  text: string;
+  timeText: string;
+  category: 'habit' | 'streak_shield' | 'friend_spark' | 'quick_drill';
+  read: boolean;
+}
+
+export interface ProjectMission {
+  id: string;
+  title: string;
+  skillCategory: string;
+  scenario: string;
+  objective: string;
+  deliverables: string[];
+  rubric: string[];
+  starterCode?: string;
+  starterCodeLang?: string;
+  estimatedHours: number;
+  badge: string;
+  completed: boolean;
+  submittedAt?: string;
+  submissionLink?: string;
+  submissionNotes?: string;
+}
+
+export interface ProgressShareCardData {
+  userName: string;
+  userHandle: string;
+  userAvatar: string;
+  milestoneTitle: string;
+  skillTitle: string;
+  streak: number;
+  healthPercent: number;
+  completedTasksCount: number;
+  totalTasksCount: number;
+  proofBadge?: string;
+  shareUrl: string;
+}
+
+export interface CelebrationData {
+  type: 'task_completed' | 'sprint_finished' | 'mission_cleared' | 'streak_milestone';
+  title: string;
+  subtitle: string;
+  badgeName?: string;
+  healthBoost?: number;
+  actionText?: string;
 }
 
 export interface MascotMessage {

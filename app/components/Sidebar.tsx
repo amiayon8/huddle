@@ -412,14 +412,14 @@ export const Sidebar: React.FC = () => {
               <div className="w-9 h-9 rounded-xl bg-indigo-100 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center relative shrink-0">
                 <img
                   src="/mascot_idle.svg"
-                  alt="Pip"
+                  alt="Spark"
                   className="w-7 h-7 object-contain"
                 />
                 <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1">
-                  <span>Pip AI Companion</span>
+                  <span>Spark AI Companion</span>
                   <Sparkles className="w-3 h-3 text-indigo-500" />
                 </div>
                 <p className="text-[10px] text-zinc-500 dark:text-zinc-400 leading-tight">
@@ -434,7 +434,7 @@ export const Sidebar: React.FC = () => {
               }}
               className="mt-2.5 w-full py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              <span>Ask Pip a Question</span>
+              <span>Ask Spark a Question</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>

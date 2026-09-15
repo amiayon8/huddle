@@ -70,7 +70,7 @@ export default function ForgotPasswordPage() {
           <div className="relative shrink-0 w-9 h-9 rounded-lg bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-700 p-1 flex items-center justify-center">
             <img
               src="/mascot_thinking.svg"
-              alt="Pip"
+              alt="Spark"
               className="w-full h-full object-contain"
             />
           </div>

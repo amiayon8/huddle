@@ -24,7 +24,7 @@ export default function RootIndexPage() {
         <div className="w-12 h-12 p-1.5 rounded-2xl bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 shadow-xs flex items-center justify-center">
           <img
             src="/mascot_idle.svg"
-            alt="Pip"
+            alt="Spark"
             className="w-full h-full object-contain opacity-90"
           />
         </div>

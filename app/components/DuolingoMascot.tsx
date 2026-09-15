@@ -62,14 +62,14 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 p-1 flex items-center justify-center border border-zinc-200/60 dark:border-zinc-700/60">
             <img
               src={currentSvg}
-              alt="Pip AI"
+              alt="Spark AI"
               className="w-full h-full object-contain"
             />
           </div>
           <div className="sm:hidden">
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                Pip
+                Spark
               </span>
               <span className="text-[10px] text-zinc-400 font-medium">
                 Sprint Guide
@@ -82,7 +82,7 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
           <div className="hidden sm:flex items-center justify-between gap-2 pb-1 border-b border-zinc-100 dark:border-zinc-800/60">
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                Pip AI
+                Spark AI
               </span>
               <span className="text-[10px] text-zinc-400 font-medium">
                 Sprint Coach
@@ -104,7 +104,7 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors cursor-pointer"
               >
                 <MessageSquare className="w-3 h-3" />
-                <span>Ask Pip</span>
+                <span>Ask Spark</span>
               </button>
 
               <button

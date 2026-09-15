@@ -22,6 +22,7 @@ import {
   Pause,
   Shield,
   Menu,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -55,6 +56,7 @@ export const Navbar: React.FC = () => {
     setOnboardingActive,
     sprint,
     viewMyProfile,
+    setDailyNudgeModalOpen,
   } = useHuddle();
 
   const [notificationDropdownOpen, setNotificationDropdownOpen] =
@@ -266,25 +268,37 @@ export const Navbar: React.FC = () => {
           )}
 
           <button
+            onClick={() => setDailyNudgeModalOpen(true)}
+            className="p-1.5 sm:px-2 sm:py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-amber-400 hover:bg-amber-50/50 dark:hover:bg-amber-950/30 transition-all items-center gap-1 group cursor-pointer shrink-0 hidden sm:flex"
+            title="Daily Learning Nudge Settings"
+            aria-label="Daily Learning Nudge Settings"
+          >
+            <Zap className="w-3.5 h-3.5 text-amber-500" />
+            <span className="text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
+              Nudge
+            </span>
+          </button>
+
+          <button
             onClick={() => setMascotOpen(!mascotOpen)}
             className={`hidden md:flex relative p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg sm:rounded-xl border transition-all items-center gap-1.5 sm:gap-2 group cursor-pointer shrink-0 ${
               mascotOpen
                 ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 ring-2 ring-indigo-500/20 shadow-xs"
                 : "border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30"
             }`}
-            title="Ask Pip AI"
-            aria-label="Ask Pip AI"
+            title="Ask Spark AI"
+            aria-label="Ask Spark AI"
           >
             <div className="w-5 h-5 relative shrink-0 transition-transform group-hover:scale-110">
               <img
                 src="/mascot_idle.svg"
-                alt="Pip"
+                alt="Spark"
                 className="w-full h-full object-contain"
               />
               <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-500" />
             </div>
-            <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 hidden md:inline">
-              Ask Pip
+            <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 hidden md:inline">
+              Ask Spark
             </span>
           </button>
 

@@ -109,11 +109,11 @@ export const AuthModal: React.FC = () => {
 
         <div className="flex items-center gap-3 mb-5">
           <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-900/40 p-1 flex items-center justify-center shrink-0">
-            <img src="/mascot_encouragement.svg" alt="Pip" className="w-full h-full object-contain" />
+            <img src="/mascot_encouragement.svg" alt="Spark" className="w-full h-full object-contain" />
           </div>
           <div>
             <h2 className="text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-              Huddle • Pip Companion
+              Huddle • Spark Companion
             </h2>
             <p className="text-xs text-zinc-500">
               Deliberate practice with zero doomscrolling
@@ -166,7 +166,7 @@ export const AuthModal: React.FC = () => {
               onClick={handleDemoLogin}
               className="w-full py-2 flex items-center justify-center gap-2 text-center text-xs text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
             >
-              <img src="/mascot_idle.svg" alt="Pip" className="w-4 h-4 object-contain" />
+              <img src="/mascot_idle.svg" alt="Spark" className="w-4 h-4 object-contain" />
               <span>Continue as Demo Engineer</span>
             </button>
           </div>

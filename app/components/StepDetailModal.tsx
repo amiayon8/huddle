@@ -79,14 +79,14 @@ export const StepDetailModal: React.FC = () => {
 
           <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200 dark:border-zinc-800 flex items-start gap-3">
             <div className="w-9 h-9 p-1 rounded-lg bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-700 shrink-0 flex items-center justify-center">
-              <img src="/mascot_deep_thinking.svg" alt="Pip" className="w-full h-full object-contain" />
+              <img src="/mascot_deep_thinking.svg" alt="Spark" className="w-full h-full object-contain" />
             </div>
             <div className="text-xs text-zinc-700 dark:text-zinc-300">
               <span className="font-semibold text-zinc-900 dark:text-zinc-100 block text-[11px]">
                 Architecture note
               </span>
               <p className="mt-0.5 leading-relaxed text-zinc-600 dark:text-zinc-400">
-                Draft key tradeoffs and edge cases before writing code. Ask Pip to verify performance assumptions.
+                Draft key tradeoffs and edge cases before writing code. Ask Spark to verify performance assumptions.
               </p>
             </div>
           </div>

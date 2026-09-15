@@ -29,6 +29,15 @@ import {
   PracticeSessionProgress,
   AnonymousSquadReport,
   ReportReasonCategory,
+  SprinterFriend,
+  AdaptiveDifficulty,
+  DailyNudgeSettings,
+  DailyNudgeItem,
+  ProjectMission,
+  ProgressShareCardData,
+  CelebrationData,
+  SparkChatMessage,
+  SparkChatSession,
 } from "../types/huddle";
 
 import {
@@ -265,6 +274,58 @@ interface HuddleContextType {
   viewingUserProfile: UserProfile | null;
   viewProfile: (identifierOrUser: string | UserProfile) => Promise<void>;
   viewMyProfile: () => void;
+
+  // Feature 4: Daily Learning Nudge
+  dailyNudgeSettings: DailyNudgeSettings;
+  updateDailyNudgeSettings: (updates: Partial<DailyNudgeSettings>) => void;
+  activeNudge: DailyNudgeItem | null;
+  dismissActiveNudge: () => void;
+  triggerInstantNudge: () => void;
+  dailyNudgeModalOpen: boolean;
+  setDailyNudgeModalOpen: (open: boolean) => void;
+
+  // Feature 5: Sprinter Friend
+  friends: SprinterFriend[];
+  addFriend: (handleOrCode: string) => { success: boolean; message: string };
+  cheerFriend: (friendId: string) => void;
+  nudgeFriend: (friendId: string) => void;
+
+  // Feature 7: Progress Bar of Health
+  overallSkillHealth: {
+    percent: number;
+    status: "optimal" | "maintaining" | "decaying";
+    daysUntilDecay: number;
+    decayPreventionDays: number;
+    activeSkillsCount: number;
+  };
+  boostSkillHealth: (amount: number) => void;
+
+  // Feature 8: Progress Sharing
+  shareCardData: ProgressShareCardData | null;
+  shareModalOpen: boolean;
+  openShareModal: (customData?: Partial<ProgressShareCardData>) => void;
+  closeShareModal: () => void;
+
+  // Feature 12: Project Missions
+  projectMissions: ProjectMission[];
+  selectedProjectMission: ProjectMission | null;
+  projectMissionModalOpen: boolean;
+  openProjectMission: (mission?: ProjectMission) => void;
+  closeProjectMission: () => void;
+  submitProjectMission: (missionId: string, link: string, notes: string) => void;
+
+  // Feature 13: Adaptive Difficulty
+  adaptiveDifficulty: AdaptiveDifficulty;
+  setAdaptiveDifficulty: (mode: AdaptiveDifficulty) => void;
+
+  // Feature 14: Celebration Moments
+  celebrationData: CelebrationData | null;
+  celebrationModalOpen: boolean;
+  triggerCelebration: (data: CelebrationData) => void;
+  closeCelebration: () => void;
+
+  // Feature 1: Explore Feed into Sprinter
+  addExploreItemToSprinter: (title: string, creatorName: string, durationMinutes: number) => void;
 }
 
 const HuddleContext = createContext<HuddleContextType | undefined>(undefined);
@@ -413,6 +474,197 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
   });
   const [resetDemoModalOpen, setResetDemoModalOpen] = useState(false);
   const [viewingUserProfile, setViewingUserProfile] = useState<UserProfile | null>(null);
+
+  // Feature 4: Daily Learning Nudge State
+  const [dailyNudgeSettings, setDailyNudgeSettings] = useState<DailyNudgeSettings>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("huddle_nudge_settings");
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return {
+      enabled: true,
+      timeOfDay: "morning",
+      vibe: "encouraging",
+      browserNotifications: false,
+    };
+  });
+
+  const [activeNudge, setActiveNudge] = useState<DailyNudgeItem | null>({
+    id: "nudge-init",
+    text: "⚡ Spark: 15 minutes today keeps your 8-day streak intact and shields your 92% Skill Health Bar. Ready for today's caching drill?",
+    timeText: "Scheduled for Today",
+    category: "habit",
+    read: false,
+  });
+  const [dailyNudgeModalOpen, setDailyNudgeModalOpen] = useState(false);
+
+  // Feature 5: Sprinter Friends State
+  const [friends, setFriends] = useState<SprinterFriend[]>([
+    {
+      id: "friend-1",
+      name: "Liam Zhang",
+      handle: "@liamz",
+      avatar: "/avatars/avatar-2.svg",
+      currentSkill: "Redis In-Memory Caching",
+      streak: 7,
+      dayNumber: 3,
+      totalDays: 4,
+      progressPercent: 75,
+      lastActive: "12m ago",
+      statusText: "Just cleared Day 3: Cache Stampede Mitigation",
+      cheeredToday: false,
+      nudgedToday: false,
+    },
+    {
+      id: "friend-2",
+      name: "Maya Patel",
+      handle: "@mayap",
+      avatar: "/avatars/avatar-3.svg",
+      currentSkill: "Kafka Event Streaming",
+      streak: 14,
+      dayNumber: 4,
+      totalDays: 4,
+      progressPercent: 100,
+      lastActive: "1h ago",
+      statusText: "Submitted Capstone Project: Real-time Ledger",
+      cheeredToday: true,
+      nudgedToday: false,
+    },
+    {
+      id: "friend-3",
+      name: "Leo Tanaka",
+      handle: "@leot",
+      avatar: "/avatars/avatar-4.svg",
+      currentSkill: "Kubernetes Operator Design",
+      streak: 5,
+      dayNumber: 2,
+      totalDays: 4,
+      progressPercent: 50,
+      lastActive: "3h ago",
+      statusText: "Writing custom controller reconciler loop",
+      cheeredToday: false,
+      nudgedToday: false,
+    },
+    {
+      id: "friend-4",
+      name: "Sofia Rodriguez",
+      handle: "@sofiar",
+      avatar: "/avatars/avatar-5.svg",
+      currentSkill: "GraphQL Federation Architecture",
+      streak: 9,
+      dayNumber: 1,
+      totalDays: 4,
+      progressPercent: 25,
+      lastActive: "5h ago",
+      statusText: "Designing subgraphs with Apollo Router",
+      cheeredToday: false,
+      nudgedToday: false,
+    },
+  ]);
+
+  // Feature 12: Project Missions State
+  const [projectMissions, setProjectMissions] = useState<ProjectMission[]>([
+    {
+      id: "mission-1",
+      title: "Production Caching Proxy with Multi-Tier Eviction",
+      skillCategory: "System Architecture",
+      scenario: "Your high-traffic platform experiences 80% database spikes during sudden flash sales. Build an intelligent dual-tier caching layer that eliminates cache stampede and provides sub-10ms reads.",
+      objective: "Implement an asynchronous write-behind caching engine with LRU/LFU eviction, single-flight mutex deduplication, and fallback circuit-breaking.",
+      deliverables: [
+        "Single-flight cache query deduplicator logic",
+        "Configurable multi-tier (in-memory L1 + Redis L2) storage adapter",
+        "Load test benchmark script showing p99 latency under 15ms"
+      ],
+      rubric: [
+        "Zero stampede duplicate queries under 500 concurrent requests",
+        "Graceful degradation if Redis disconnects (L1 local fallback)",
+        "Zero memory leaks on unbounded key growth"
+      ],
+      starterCode: `// Production Multi-Tier Cache Starter
+export class MultiTierCacheProxy<T> {
+  private l1Memory = new Map<string, { value: T; expiresAt: number }>();
+  private inFlight = new Map<string, Promise<T>>();
+
+  constructor(private l2Client: any, private defaultTtl = 60) {}
+
+  async getOrCompute(key: string, computeFn: () => Promise<T>): Promise<T> {
+    const cached = this.l1Memory.get(key);
+    if (cached && cached.expiresAt > Date.now()) {
+      return cached.value;
+    }
+
+    if (this.inFlight.has(key)) {
+      return this.inFlight.get(key)!;
+    }
+
+    const promise = (async () => {
+      try {
+        const val = await computeFn();
+        this.l1Memory.set(key, { value: val, expiresAt: Date.now() + 10000 });
+        return val;
+      } finally {
+        this.inFlight.delete(key);
+      }
+    })();
+
+    this.inFlight.set(key, promise);
+    return promise;
+  }
+}`,
+      starterCodeLang: "typescript",
+      estimatedHours: 3,
+      badge: "Master Systems Architect",
+      completed: false,
+    },
+    {
+      id: "mission-2",
+      title: "Transactional Outbox Daemon for Microservices",
+      skillCategory: "Backend Engineering",
+      scenario: "Eliminate distributed two-phase commit overhead between PostgreSQL and message brokers without phantom writes or dual-write data loss.",
+      objective: "Build an event publisher daemon using the Outbox pattern with transactional guarantees and idempotent consumer handlers.",
+      deliverables: [
+        "PostgreSQL outbox table migration DDL",
+        "Background poller/relay loop with exponential backoff",
+        "Idempotent consumer test suite with mock duplicates"
+      ],
+      rubric: [
+        "Guaranteed at-least-once message delivery without database lock contention",
+        "Poison-pill event isolation to dead letter queue"
+      ],
+      starterCodeLang: "sql",
+      starterCode: `-- Transactional Outbox Pattern Schema
+CREATE TABLE outbox_messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  aggregate_type VARCHAR(64) NOT NULL,
+  aggregate_id VARCHAR(64) NOT NULL,
+  event_type VARCHAR(64) NOT NULL,
+  payload JSONB NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  processed_at TIMESTAMPTZ NULL
+);`,
+      estimatedHours: 4,
+      badge: "Event-Driven Pioneer",
+      completed: false,
+    },
+  ]);
+  const [selectedProjectMission, setSelectedProjectMission] = useState<ProjectMission | null>(null);
+  const [projectMissionModalOpen, setProjectMissionModalOpen] = useState(false);
+
+  // Feature 13: Adaptive Difficulty State
+  const [adaptiveDifficulty, setAdaptiveDifficulty] = useState<AdaptiveDifficulty>("balanced");
+
+  // Feature 14: Celebration Moments State
+  const [celebrationData, setCelebrationData] = useState<CelebrationData | null>(null);
+  const [celebrationModalOpen, setCelebrationModalOpen] = useState(false);
+
+  // Feature 8: Progress Sharing State
+  const [shareCardData, setShareCardData] = useState<ProgressShareCardData | null>(null);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+
+  // Feature 7: Overall Skill Health boost accumulator
+  const [healthBoostTotal, setHealthBoostTotal] = useState(0);
 
   const isDemo =
     isDemoState ||
@@ -852,7 +1104,9 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
       setActiveTab("dashboard");
 
       if (typeof window !== "undefined") {
+        localStorage.removeItem("huddle_spark_dismissed");
         localStorage.removeItem("huddle_pip_dismissed");
+        window.dispatchEvent(new Event("huddle_spark_visibility_change"));
         window.dispatchEvent(new Event("huddle_pip_visibility_change"));
       }
 
@@ -1257,7 +1511,293 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
       };
       setNotifications((prev) => [notif, ...prev]);
       addNotificationToDb(notif, user.id);
+
+      // Feature 14 & 7: Trigger celebration moment & boost health bar
+      setHealthBoostTotal((prev) => Math.min(15, prev + 3));
+      triggerCelebration({
+        type: targetTask.dayNumber >= (sprint.durationDays || 4) ? "sprint_finished" : "task_completed",
+        title: targetTask.dayNumber >= (sprint.durationDays || 4) ? "Sprint Cleared! 🏆" : `Day ${targetTask.dayNumber} Cleared! ⚡`,
+        subtitle: `Spark verified "${targetTask.title}". +3% Skill Health, +20 XP, and milestone artifact saved!`,
+        badgeName: targetTask.artifactTitle || "Milestone Cleared",
+        healthBoost: 3,
+        actionText: "Share Progress",
+      });
     }
+  };
+
+  // Overall Skill Health calculation
+  const overallSkillHealth = {
+    percent: Math.min(
+      100,
+      Math.max(
+        70,
+        Math.round(
+          (skillsHealth.length > 0
+            ? skillsHealth.reduce((acc, s) => acc + s.healthPercent, 0) /
+              skillsHealth.length
+            : 88) + healthBoostTotal,
+        ),
+      ),
+    ),
+    status: "optimal" as const,
+    daysUntilDecay: 3,
+    decayPreventionDays: 7,
+    activeSkillsCount: skillsHealth.length || 3,
+  };
+
+  const boostSkillHealth = (amount: number) => {
+    setHealthBoostTotal((prev) => Math.min(20, prev + amount));
+  };
+
+  // Sprinter Friends actions
+  const addFriend = (handleOrCode: string) => {
+    if (!handleOrCode || handleOrCode.trim() === "") {
+      return { success: false, message: "Please enter a valid handle or friend code." };
+    }
+    const cleanHandle = handleOrCode.trim().startsWith("@") ? handleOrCode.trim() : `@${handleOrCode.trim()}`;
+    const exists = friends.some((f) => f.handle.toLowerCase() === cleanHandle.toLowerCase());
+    if (exists) {
+      return { success: false, message: `${cleanHandle} is already in your Sprinter Friends!` };
+    }
+
+    const newFriend: SprinterFriend = {
+      id: `friend-${Date.now()}`,
+      name: cleanHandle.replace("@", "").replace(/\./g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+      handle: cleanHandle,
+      avatar: `/avatars/avatar-${(friends.length % 5) + 1}.svg`,
+      currentSkill: sprint.skillTitle || "System Architecture",
+      streak: 3,
+      dayNumber: 1,
+      totalDays: 4,
+      progressPercent: 25,
+      lastActive: "Just now",
+      statusText: "Joined your Sprinter Friends network!",
+      cheeredToday: false,
+      nudgedToday: false,
+    };
+
+    setFriends((prev) => [newFriend, ...prev]);
+
+    const notif: NotificationItem = {
+      id: `n-${Date.now()}`,
+      type: "squad_checkin",
+      title: "Sprinter Friend Added",
+      description: `You are now learning alongside ${newFriend.name} (${newFriend.handle})!`,
+      timestamp: "Just now",
+      read: false,
+    };
+    setNotifications((prev) => [notif, ...prev]);
+    return { success: true, message: `Added ${newFriend.name} to your Sprinter Friends!` };
+  };
+
+  const cheerFriend = (friendId: string) => {
+    setFriends((prev) =>
+      prev.map((f) =>
+        f.id === friendId ? { ...f, cheeredToday: true, streak: f.streak } : f,
+      ),
+    );
+    const friend = friends.find((f) => f.id === friendId);
+    if (friend) {
+      const notif: NotificationItem = {
+        id: `n-${Date.now()}`,
+        type: "squad_checkin",
+        title: "Cheer Sent! 🎉",
+        description: `You sent a high-five cheer to ${friend.name}. Keep moving forward together!`,
+        timestamp: "Just now",
+        read: false,
+      };
+      setNotifications((prev) => [notif, ...prev]);
+    }
+  };
+
+  const nudgeFriend = (friendId: string) => {
+    setFriends((prev) =>
+      prev.map((f) => (f.id === friendId ? { ...f, nudgedToday: true } : f)),
+    );
+    const friend = friends.find((f) => f.id === friendId);
+    if (friend) {
+      const notif: NotificationItem = {
+        id: `n-${Date.now()}`,
+        type: "squad_checkin",
+        title: "Friendly Nudge Sent ⚡",
+        description: `Spark delivered a non-demanding study nudge to ${friend.name}.`,
+        timestamp: "Just now",
+        read: false,
+      };
+      setNotifications((prev) => [notif, ...prev]);
+    }
+  };
+
+  // Daily Learning Nudge actions
+  const updateDailyNudgeSettings = (updates: Partial<DailyNudgeSettings>) => {
+    setDailyNudgeSettings((prev) => {
+      const next = { ...prev, ...updates };
+      if (typeof window !== "undefined") {
+        localStorage.setItem("huddle_nudge_settings", JSON.stringify(next));
+      }
+      return next;
+    });
+  };
+
+  const dismissActiveNudge = () => {
+    setActiveNudge(null);
+  };
+
+  const triggerInstantNudge = () => {
+    const nudgePool = [
+      "⚡ Spark: 15 minutes today keeps your 8-day streak intact and shields your 92% Skill Health Bar.",
+      "☕ Spark: Grab a coffee — one 15-minute deliberate drill on caching keeps you ahead of 90% of engineers.",
+      "🎯 Spark: Maya just completed her project mission! Your turn to knock out Day " +
+        (sprint.currentDay || 1) +
+        ".",
+      "🛡️ Spark: Streak Shield is active. Take 10 minutes to review your latest system trade-offs.",
+    ];
+    const text = nudgePool[Math.floor(Math.random() * nudgePool.length)];
+    setActiveNudge({
+      id: `nudge-${Date.now()}`,
+      text,
+      timeText: "Just now",
+      category: "habit",
+      read: false,
+    });
+  };
+
+  // Celebration Moments actions
+  const triggerCelebration = (data: CelebrationData) => {
+    setCelebrationData(data);
+    setCelebrationModalOpen(true);
+  };
+
+  const closeCelebration = () => {
+    setCelebrationModalOpen(false);
+  };
+
+  // Progress Sharing actions
+  const openShareModal = (customData?: Partial<ProgressShareCardData>) => {
+    const defaultData: ProgressShareCardData = {
+      userName: user.name,
+      userHandle: user.handle,
+      userAvatar: user.avatar,
+      milestoneTitle: sprint.careerMilestone || "Staff Software Engineer",
+      skillTitle: sprint.skillTitle || "System Architecture",
+      streak: user.streak || 8,
+      healthPercent: overallSkillHealth.percent,
+      completedTasksCount: sprint.tasks.filter((t) => t.completed).length,
+      totalTasksCount: sprint.tasks.length || 4,
+      proofBadge: "Verified Deliberate Practice",
+      shareUrl:
+        typeof window !== "undefined"
+          ? `${window.location.origin}/profile/${user.id}`
+          : "https://huddle.app",
+    };
+    setShareCardData({ ...defaultData, ...customData });
+    setShareModalOpen(true);
+  };
+
+  const closeShareModal = () => {
+    setShareModalOpen(false);
+  };
+
+  // Project Missions actions
+  const openProjectMission = (mission?: ProjectMission) => {
+    if (mission) {
+      setSelectedProjectMission(mission);
+    } else {
+      setSelectedProjectMission(projectMissions[0]);
+    }
+    setProjectMissionModalOpen(true);
+  };
+
+  const closeProjectMission = () => {
+    setProjectMissionModalOpen(false);
+  };
+
+  const submitProjectMission = (missionId: string, link: string, notes: string) => {
+    setProjectMissions((prev) =>
+      prev.map((m) =>
+        m.id === missionId
+          ? {
+              ...m,
+              completed: true,
+              submittedAt: "Just now",
+              submissionLink: link,
+              submissionNotes: notes,
+            }
+          : m,
+      ),
+    );
+
+    const targetMission = projectMissions.find((m) => m.id === missionId);
+    const missionTitle = targetMission
+      ? targetMission.title
+      : "Capstone Project Mission";
+
+    // Add portfolio piece
+    const newPortfolioItem: PortfolioItem = {
+      id: `port-mission-${Date.now()}`,
+      title: `Capstone Mission: ${missionTitle}`,
+      category: targetMission?.skillCategory || sprint.skillTitle,
+      date: "Just now",
+      description: `Verified real-world capstone project mission. Link: ${link || "Verified GitHub Repo"}. Notes: ${notes}`,
+      artifactType: "live_demo",
+      previewSnippet: `// Project Mission Verified Deliverable\nexport const missionProof = {\n  title: "${missionTitle}",\n  verifiedBy: "Spark AI",\n  link: "${link}",\n  status: "PRODUCTION_READY"\n};`,
+      isPublished: true,
+      sourceTaskId: missionId,
+      tags: [sprint.skillTitle, "Project Mission", "Capstone", "Verified Proof"],
+    };
+    setPortfolioItems((prev) => [newPortfolioItem, ...prev]);
+    addPortfolioItemToDb(newPortfolioItem, user.id);
+
+    // Boost health and trigger celebration
+    boostSkillHealth(8);
+    setProjectMissionModalOpen(false);
+
+    triggerCelebration({
+      type: "mission_cleared",
+      title: "Project Mission Cleared! 🚀",
+      subtitle: `Spark verified your capstone deliverable for "${missionTitle}". +8% Health Bar & Capstone Badge unlocked!`,
+      badgeName: targetMission?.badge || "Capstone Master",
+      healthBoost: 8,
+      actionText: "Share Capstone Achievement",
+    });
+  };
+
+  // Feature 1: Explore Feed into Sprinter
+  const addExploreItemToSprinter = (
+    title: string,
+    creatorName: string,
+    durationMinutes: number,
+  ) => {
+    const newTask: SprintTask = {
+      id: `task-explore-${Date.now()}`,
+      dayNumber: sprint.tasks.length + 1,
+      title: title,
+      description: `Added from Explore Feed. Curated by ${creatorName}. Complete to earn deliberate practice XP.`,
+      type: "build",
+      creatorName: creatorName,
+      creatorHandle: `@${creatorName.toLowerCase().replace(/\s+/g, "")}`,
+      creatorAvatar: "/avatars/avatar-2.svg",
+      estimatedMinutes: durationMinutes || 15,
+      completed: false,
+      producesArtifact: true,
+      artifactTitle: `${title} Implementation`,
+      artifactType: "code",
+    };
+
+    setSprint((prev) => ({
+      ...prev,
+      tasks: [...prev.tasks, newTask],
+    }));
+
+    const notif: NotificationItem = {
+      id: `n-${Date.now()}`,
+      type: "next_step",
+      title: "Added to AI Skill Sprinter! ⚡",
+      description: `"${title}" has been added to your current sprint queue.`,
+      timestamp: "Just now",
+      read: false,
+    };
+    setNotifications((prev) => [notif, ...prev]);
   };
 
   // Zero-penalty Sprint Reshuffle
@@ -2355,6 +2895,52 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
         markNotificationRead,
         updateUserProfile,
         finishOnboarding,
+
+        // Feature 4: Daily Learning Nudge
+        dailyNudgeSettings,
+        updateDailyNudgeSettings,
+        activeNudge,
+        dismissActiveNudge,
+        triggerInstantNudge,
+        dailyNudgeModalOpen,
+        setDailyNudgeModalOpen,
+
+        // Feature 5: Sprinter Friends
+        friends,
+        addFriend,
+        cheerFriend,
+        nudgeFriend,
+
+        // Feature 7: Progress Bar of Health
+        overallSkillHealth,
+        boostSkillHealth,
+
+        // Feature 8: Progress Sharing
+        shareCardData,
+        shareModalOpen,
+        openShareModal,
+        closeShareModal,
+
+        // Feature 12: Project Missions
+        projectMissions,
+        selectedProjectMission,
+        projectMissionModalOpen,
+        openProjectMission,
+        closeProjectMission,
+        submitProjectMission,
+
+        // Feature 13: Adaptive Difficulty
+        adaptiveDifficulty,
+        setAdaptiveDifficulty,
+
+        // Feature 14: Celebration Moments
+        celebrationData,
+        celebrationModalOpen,
+        triggerCelebration,
+        closeCelebration,
+
+        // Feature 1: Explore Feed into Sprinter
+        addExploreItemToSprinter,
       }}
     >
       {children}

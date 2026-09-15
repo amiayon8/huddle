@@ -111,13 +111,13 @@ export async function POST(req: NextRequest) {
       prompt = `The user selected favourite subject(s): "${selectedSubjects}".
 Generate Question 2 asking about their hobbies.
 Provide 5-6 relevant hobby options with short descriptions that connect with their subjects.
-Tone: Friendly, encouraging Pip.
+Tone: Friendly, encouraging Spark.
 Return strictly valid JSON with this schema:
 {
   "question": "What is your hobby?",
   "subtitle": "Short subtitle mentioning their interest in ${selectedSubjects}",
   "mascotEmotion": "encouragement",
-  "mascotNote": "Encouraging 1-sentence thought from Pip connecting subjects and hobbies",
+  "mascotNote": "Encouraging 1-sentence thought from Spark connecting subjects and hobbies",
   "isMultiple": true,
   "options": [
     { "id": "string", "title": "string", "desc": "string", "badge": "string" }
@@ -127,15 +127,15 @@ Return strictly valid JSON with this schema:
       prompt = `The user selected subjects: "${selectedSubjects}", hobbies: "${selectedHobbies}".
 Generate Question 3:
 Question title: "How would you describe your current learning stage?"
-Subtitle: "Pip tunes your sprint intensity, schedule rhythms, and daily depth."
+Subtitle: "Spark tunes your sprint intensity, schedule rhythms, and daily depth."
 Provide 4 learning stage options corresponding to their age/stage.
-Tone: Warm, welcoming Pip.
+Tone: Warm, welcoming Spark.
 Return strictly valid JSON with this schema:
 {
   "question": "How would you describe your current learning stage?",
-  "subtitle": "Pip tunes your sprint intensity, schedule rhythms, and daily depth.",
+  "subtitle": "Spark tunes your sprint intensity, schedule rhythms, and daily depth.",
   "mascotEmotion": "thinking",
-  "mascotNote": "Pip will calibrate your daily workload to your current career rhythm.",
+  "mascotNote": "Spark will calibrate your daily workload to your current career rhythm.",
   "isMultiple": false,
   "options": [
     { "id": "string", "title": "string", "desc": "string", "badge": "string" }
@@ -152,9 +152,9 @@ Generate 5-6 tailored career options matching their background.
 Return strictly valid JSON with this schema:
 {
   "question": "What do you want to be (profession)?",
-  "subtitle": "Pip curated these high-leverage roles matching your background and passions.",
+  "subtitle": "Spark curated these high-leverage roles matching your background and passions.",
   "mascotEmotion": "planning",
-  "mascotNote": "Pip's 1-2 sentence reflection connecting background to career paths",
+  "mascotNote": "Spark's 1-2 sentence reflection connecting background to career paths",
   "isMultiple": false,
   "options": [
     { "id": "string", "title": "string", "desc": "string", "badge": "string" }
@@ -172,9 +172,9 @@ Provide 5-6 technical skills tailored to help them achieve "${selectedProfession
 Return strictly valid JSON with this schema:
 {
   "question": "Which skill do you want to start with?",
-  "subtitle": "Select 1 or more focus areas. Pip will construct your daily 15-20 min practice sprint.",
+  "subtitle": "Select 1 or more focus areas. Spark will construct your daily 15-20 min practice sprint.",
   "mascotEmotion": "success",
-  "mascotNote": "Pip's guidance on taking daily steps to build proof",
+  "mascotNote": "Spark's guidance on taking daily steps to build proof",
   "isMultiple": true,
   "options": [
     { "id": "string", "title": "string", "desc": "string", "badge": "string" }
@@ -273,7 +273,7 @@ async function generateSmartFallback(
     "Hobbies reveal how you naturally learn, explore, and stay in flow.";
   let mascotEmotion = "encouragement";
   let mascotNote =
-    "Pip loves combining analytical subjects with playful hobbies. Tell me what energizes you!";
+    "Spark loves combining analytical subjects with playful hobbies. Tell me what energizes you!";
   let isMultiple = true;
 
   if (step === 3) {
@@ -301,7 +301,7 @@ async function generateSmartFallback(
       "Select 1 to 3 core skills. You can expand your tech tree at any time.";
     mascotEmotion = "deep_thinking";
     mascotNote =
-      "Pick the skills that excite you right now. We will craft a focused 4-day sprint around your top choice.";
+      "Pick the skills that excite you right now. Spark will craft a focused 4-day sprint around your top choice.";
     isMultiple = true;
   }
 

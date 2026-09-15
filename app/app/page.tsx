@@ -25,6 +25,10 @@ import { ResetDemoModal } from '../components/ResetDemoModal';
 import { FloatingMascotBadge } from '../components/FloatingMascotBadge';
 import { SurveyPromptModal } from '../components/SurveyPromptModal';
 import { PracticeSessionModal } from '../components/PracticeSessionModal';
+import { DailyNudgeModal } from '../components/DailyNudgeModal';
+import { CelebrationModal } from '../components/CelebrationModal';
+import { ProgressShareModal } from '../components/ProgressShareModal';
+import { ProjectMissionModal } from '../components/ProjectMissionModal';
 
 export default function AppPage() {
   const router = useRouter();
@@ -104,6 +108,10 @@ export default function AppPage() {
         <ResetDemoModal />
         <SurveyPromptModal />
         <PracticeSessionModal />
+        <DailyNudgeModal />
+        <CelebrationModal />
+        <ProgressShareModal />
+        <ProjectMissionModal />
       </div>
     );
   }
@@ -139,7 +147,7 @@ export default function AppPage() {
         <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 sm:px-6">
           <div className="max-w-7xl w-full mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-2 text-amber-900 dark:text-amber-200">
-              <img src="/mascot_planning.svg" alt="Pip" className="w-5 h-5 object-contain shrink-0" />
+              <img src="/mascot_planning.svg" alt="Spark" className="w-5 h-5 object-contain shrink-0" />
               <span>
                 <strong>Intake Survey Incomplete (Preview Mode):</strong> Actions are locked until you complete the 5-step intake survey.
               </span>
@@ -172,6 +180,10 @@ export default function AppPage() {
       <ResetDemoModal />
       <SurveyPromptModal />
       <PracticeSessionModal />
+      <DailyNudgeModal />
+      <CelebrationModal />
+      <ProgressShareModal />
+      <ProjectMissionModal />
     </div>
   );
 }

@@ -145,7 +145,7 @@ export const BingeQuizModal: React.FC = () => {
                       ? "/mascot_success.svg"
                       : "/mascot_encouragement.svg"
                 }
-                alt="Pip"
+                alt="Spark"
                 className="w-full h-full object-contain drop-shadow-xs"
               />
             </div>

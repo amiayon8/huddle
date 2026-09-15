@@ -85,7 +85,7 @@ export const ResetDemoModal: React.FC = () => {
           <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 p-1 flex items-center justify-center shrink-0 shadow-xs">
             <img
               src="/mascot_planning.svg"
-              alt="Pip Planning"
+              alt="Spark Planning"
               className="w-full h-full object-contain drop-shadow-xs"
             />
           </div>
