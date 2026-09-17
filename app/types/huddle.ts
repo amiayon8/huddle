@@ -10,16 +10,22 @@ export type OnboardingStep =
   | 'ready';
 
 export interface UserSurveyData {
-  subjects: string[];
+  skill?: string;
+  goal?: string;
+  level?: 'Beginner' | 'Intermediate' | 'Advanced' | string;
+  dailyTime?: string;
+  learningPreference?: string;
+  // Legacy optional fields for backward compatibility
+  subjects?: string[];
   subjectsOther?: string;
-  hobbies: string[];
+  hobbies?: string[];
   hobbiesOther?: string;
   age?: string;
   ageInput?: string;
   learningStage?: string;
   targetProfession?: string;
   professionOther?: string;
-  startingSkills: string[];
+  startingSkills?: string[];
   skillsOther?: string;
   completedAt?: string;
 }
@@ -477,11 +483,13 @@ export interface BingeQuizQuestion {
 
 export type ActiveTab = 
   | 'dashboard'
+  | 'sprint'
   | 'overview'
   | 'journey'
   | 'squad'
   | 'macro_squad'
   | 'explore'
+  | 'growth_map'
   | 'community'
   | 'creators'
   | 'progress'

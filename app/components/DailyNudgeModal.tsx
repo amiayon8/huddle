@@ -39,19 +39,19 @@ export const DailyNudgeModal: React.FC = () => {
       id: "encouraging",
       title: "Warm & Supportive",
       desc: "Positive, habit-building, celebrates small wins.",
-      sample: "⚡ Spark: 15 minutes today keeps your 8-day streak intact and shields your 92% Skill Health Bar.",
+      sample: "⚡ Pip: 15 minutes today keeps your sprint momentum intact and shields your mastery progress!",
     },
     {
       id: "witty",
-      title: "Witty & Playful",
-      desc: "Fun analogies connecting your code practice to your hobbies.",
-      sample: "☕ Spark: Coffee is brewed. Just 1 quick caching drill today and your distributed proxy is ready to rock!",
+      title: "Fun & Playful",
+      desc: "Fun, friendly analogies to keep learning enjoyable.",
+      sample: "☕ Pip: Coffee is brewed! Just 1 quick drill today whenever you're ready—zero pressure.",
     },
     {
       id: "minimal",
-      title: "Direct & Minimal",
-      desc: "One sentence, no fluff, straight to today's action item.",
-      sample: "🎯 Spark: Day 2 deliberate practice drill ready (15m).",
+      title: "Direct & Gentle",
+      desc: "One sentence, no demands, straight to today's focus.",
+      sample: "🎯 Pip: Day 2 sprint drill ready whenever you have 15 minutes.",
     },
   ];
 
@@ -80,7 +80,7 @@ export const DailyNudgeModal: React.FC = () => {
                 </span>
               </h2>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                Spark reminds you at the right time in a fun, non-demanding way.
+                Sparkreminds you at the right time in a fun, non-demanding way.
               </p>
             </div>
           </div>
@@ -109,16 +109,14 @@ export const DailyNudgeModal: React.FC = () => {
             onClick={() =>
               updateDailyNudgeSettings({ enabled: !dailyNudgeSettings.enabled })
             }
-            className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
-              dailyNudgeSettings.enabled
+            className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${dailyNudgeSettings.enabled
                 ? "bg-indigo-600"
                 : "bg-zinc-300 dark:bg-zinc-700"
-            }`}
+              }`}
           >
             <span
-              className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                dailyNudgeSettings.enabled ? "translate-x-5" : ""
-              }`}
+              className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${dailyNudgeSettings.enabled ? "translate-x-5" : ""
+                }`}
             />
           </button>
         </div>
@@ -135,11 +133,10 @@ export const DailyNudgeModal: React.FC = () => {
                 key={opt.id}
                 type="button"
                 onClick={() => updateDailyNudgeSettings({ timeOfDay: opt.id })}
-                className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
-                  dailyNudgeSettings.timeOfDay === opt.id
+                className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${dailyNudgeSettings.timeOfDay === opt.id
                     ? "border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/40 text-indigo-950 dark:text-indigo-200 ring-2 ring-indigo-500/20"
                     : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-white dark:bg-[#0c0d12]"
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-base">{opt.icon}</span>
@@ -167,11 +164,10 @@ export const DailyNudgeModal: React.FC = () => {
                 key={vibe.id}
                 type="button"
                 onClick={() => updateDailyNudgeSettings({ vibe: vibe.id })}
-                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
-                  dailyNudgeSettings.vibe === vibe.id
+                className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${dailyNudgeSettings.vibe === vibe.id
                     ? "border-amber-500 bg-amber-50/50 dark:bg-amber-950/40 text-amber-950 dark:text-amber-200 ring-2 ring-amber-500/20"
                     : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-white dark:bg-[#0c0d12]"
-                }`}
+                  }`}
               >
                 <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
                   {vibe.title}

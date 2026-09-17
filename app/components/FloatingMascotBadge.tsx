@@ -1,168 +1,76 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MessageSquare, X } from "lucide-react";
+import { MessageSquare, Sparkles } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
 
 export const FloatingMascotBadge: React.FC = () => {
   const { setMascotOpen, user, sprint, activeTab } = useHuddle();
   const [speechBubble, setSpeechBubble] = useState<string>(
-    "Ask Spark for sprint guidance, architecture trade-offs, and code hints.",
+    "Hi! I'm Pip. Ask me anything about your sprint or today's drill.",
   );
   const [showSpeech, setShowSpeech] = useState(true);
-  const [isDismissed, setIsDismissed] = useState(true);
-
-  useEffect(() => {
-    const syncDismissedStatus = () => {
-      const isStoredDismissed =
-        typeof window !== "undefined" &&
-        (Boolean(localStorage.getItem("huddle_spark_dismissed")) ||
-         Boolean(localStorage.getItem("huddle_pip_dismissed")));
-      setIsDismissed(isStoredDismissed);
-    };
-
-    syncDismissedStatus();
-    window.addEventListener("storage", syncDismissedStatus);
-    window.addEventListener("huddle_spark_visibility_change", syncDismissedStatus);
-    window.addEventListener("huddle_pip_visibility_change", syncDismissedStatus);
-
-    return () => {
-      window.removeEventListener("storage", syncDismissedStatus);
-      window.removeEventListener("huddle_spark_visibility_change", syncDismissedStatus);
-      window.removeEventListener("huddle_pip_visibility_change", syncDismissedStatus);
-    };
-  }, []);
 
   useEffect(() => {
     switch (activeTab) {
       case "dashboard":
       case "overview":
         setSpeechBubble(
-          `Day ${sprint.currentDay}: 15 minutes today maintains your Health Bar and advances your sprint!`,
+          `Day ${sprint.currentDay || 1}: Complete today's drill to keep your progress bar advancing!`,
         );
         break;
-      case "journey":
-        setSpeechBubble(
-          `Mapping ${sprint.skillTitle} towards ${user.careerMilestone}. Select any milestone node to begin.`,
-        );
-        break;
-      case "squad":
-        setSpeechBubble(
-          "Your micro-squad shares daily progress and project mission deliverables.",
-        );
-        break;
-      case "creators":
       case "explore":
+      case "creators":
         setSpeechBubble(
-          "Explore Feed: Short video bites curated by verified staff engineers with reproducible code.",
-        );
-        break;
-      case "community":
-        setSpeechBubble(
-          "Discuss architecture trade-offs or request peer code reviews from the community.",
-        );
-        break;
-      case "profile":
-        setSpeechBubble(
-          "Your verified portfolio proof artifacts are automatically compiled as you clear sprint tasks.",
+          "Browse short videos and learning ideas. You can add any concept to our sprint!",
         );
         break;
       default:
         setSpeechBubble(
-          "Need an architecture breakdown or sprint reschedule? Ask Spark.",
+          "Need code explanations or sprint adjustments? Tap here to ask Pip!",
         );
     }
     setShowSpeech(true);
-  }, [
-    activeTab,
-    sprint.currentDay,
-    sprint.skillTitle,
-    user.careerMilestone,
-  ]);
-
-  const handleDismiss = () => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("huddle_spark_dismissed", "true");
-      window.dispatchEvent(new Event("huddle_spark_visibility_change"));
-    }
-    setIsDismissed(true);
-  };
-
-  const handleMascotClick = () => {
-    setMascotOpen(true);
-  };
-
-  if (isDismissed) {
-    return null;
-  }
+  }, [activeTab, sprint.currentDay, sprint.skillTitle]);
 
   return (
     <aside
-      aria-label="Spark AI Assistant"
-      className="fixed bottom-6 right-4 z-40 flex items-end gap-2.5 pointer-events-none select-none animate-in slide-in-from-bottom-4 duration-200"
+      className="fixed bottom-5 right-5 z-40 flex items-end gap-2.5 select-none"
+      aria-label="Spark AI Chatbot Assistant"
     >
+      {/* Speech Bubble */}
       {showSpeech && (
-        <div className="pointer-events-auto relative max-w-[220px] sm:max-w-[260px] p-3 rounded-2xl bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 shadow-xl text-zinc-800 dark:text-zinc-200 text-xs font-medium leading-snug animate-in fade-in duration-150">
-          <div className="flex items-start justify-between gap-1 mb-1">
-            <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-              Spark Assistant
-            </span>
-            <button
-              onClick={handleDismiss}
-              className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-0.5 cursor-pointer"
-              title="Dismiss Spark"
-              aria-label="Dismiss Spark"
-            >
-              <X className="w-3 h-3" />
-            </button>
+        <div
+          onClick={() => setMascotOpen(true)}
+          className="relative max-w-xs bg-white dark:bg-[#111218] border border-indigo-200/80 dark:border-indigo-900/60 rounded-2xl p-3 shadow-xl text-xs text-zinc-700 dark:text-zinc-200 animate-in fade-in slide-in-from-bottom-2 duration-200 cursor-pointer hidden sm:block hover:border-indigo-400 dark:hover:border-indigo-700 transition-colors"
+        >
+          <div className="flex items-center gap-1.5 font-bold text-[11px] text-indigo-600 dark:text-indigo-400 mb-1">
+            <Sparkles className="w-3 h-3" />
+            <span>Spark AI Tutor</span>
           </div>
-          <p className="text-[11.5px] text-zinc-600 dark:text-zinc-300 line-clamp-3">
-            {speechBubble}
-          </p>
-          <div className="mt-2 pt-1.5 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-            <button
-              onClick={() => setMascotOpen(true)}
-              className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer"
-            >
-              <MessageSquare className="w-3 h-3" />
-              <span>Ask Spark</span>
-            </button>
-            <button
-              onClick={handleDismiss}
-              className="text-[11px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 cursor-pointer"
-            >
-              Dismiss
-            </button>
-          </div>
+          <p className="leading-relaxed text-[11.5px]">{speechBubble}</p>
+          {/* Bubble tail */}
+          <div className="absolute right-[-6px] bottom-4 w-3 h-3 bg-white dark:bg-[#111218] border-r border-b border-indigo-200/80 dark:border-indigo-900/60 transform rotate-[-45deg]" />
         </div>
       )}
 
-      <div className="pointer-events-auto relative group shrink-0">
-        <button
-          onClick={(event) => {
-            event.stopPropagation();
-            handleDismiss();
-          }}
-          className="absolute -top-1.5 -left-1.5 z-10 w-4 h-4 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-xs cursor-pointer"
-          title="Dismiss Spark"
-          aria-label="Dismiss Spark"
-        >
-          <X className="w-2.5 h-2.5" />
-        </button>
-        <div
-          onClick={handleMascotClick}
-          className="cursor-pointer transition-transform duration-150 hover:scale-105 active:scale-95"
-          title="Spark Engineering Coach"
-        >
-          <div className="w-12 h-12 p-1.5 rounded-2xl bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-700 shadow-lg flex items-center justify-center">
-            <img
-              src="/mascot_idle.svg"
-              alt="Spark"
-              className="w-full h-full object-contain"
-            />
-          </div>
+      {/* Floating SparkMascot Button */}
+      <button
+        onClick={() => setMascotOpen(true)}
+        className="relative group w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 p-0.5 shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer flex items-center justify-center"
+        aria-label="Open Spark AI Chatbot"
+        title="Open Spark AI Chatbot"
+      >
+        <div className="w-full h-full rounded-[14px] bg-white dark:bg-[#0c0d12] flex items-center justify-center p-2 relative overflow-hidden">
+          <img
+            src="/mascot_idle.svg"
+            alt="Pip"
+            className="w-full h-full object-contain transform group-hover:scale-110 transition-transform"
+          />
+          {/* Active online dot */}
+          <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-[#0c0d12]" />
         </div>
-      </div>
+      </button>
     </aside>
   );
 };

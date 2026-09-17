@@ -2689,19 +2689,28 @@ CREATE TABLE outbox_messages (
       });
       return next;
     });
-    updateSprintSkillInDb(user.id, mainSkill, milestone).then((tasks) => {
-      if (tasks && tasks.length > 0) {
-        setSprint((prev) => ({
-          ...prev,
-          skillTitle: mainSkill,
-          tasks,
-        }));
-      } else {
-        setSprint((prev) => ({
-          ...prev,
-          skillTitle: mainSkill,
-        }));
-      }
+    updateSprintSkillInDb(
+      user.id,
+      mainSkill,
+      milestone,
+      completeSurvey.level || "Intermediate",
+      completeSurvey.dailyTime || "20 mins / day"
+    ).then((tasks) => {
+      const finalTasks =
+        tasks && tasks.length > 0
+          ? tasks
+          : generateTasksForSkill(
+              sprint?.id || "sprint-1",
+              mainSkill,
+              completeSurvey.level || "Intermediate",
+              completeSurvey.dailyTime || "20 mins / day"
+            );
+      setSprint((prev) => ({
+        ...prev,
+        skillTitle: mainSkill,
+        durationDays: finalTasks.length,
+        tasks: finalTasks,
+      }));
     });
     setHasSkippedToPreview(false);
     setSurveyPromptModalOpen(false);

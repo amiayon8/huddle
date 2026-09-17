@@ -73,15 +73,15 @@ export const MascotDrawer: React.FC = () => {
     return [
       {
         id: `msg-${Date.now()}-1`,
-        sender: "spark",
-        text: `I'm Spark, your engineering mentor for this sprint on **${skill}**.\n\nWe focus on short, deliberate technical practice. You're building towards **${milestone}** with analogies drawn from **${hobbies}** and **${subjects}** when helpful.`,
+        sender: "pip",
+        text: `Hi ${user.name || "there"}! I'm Pip, your AI deliberate practice tutor for this sprint on **${skill}**.\n\nI've tailored your path for your goal (**${user.surveyData?.goal || user.primaryGoal || "Mastery"}**) at a **${user.surveyData?.level || "Intermediate"}** level (${user.surveyData?.dailyTime || "30 mins / day"}).`,
         mascotSvg: "/mascot_idle.svg",
         timestamp: currentTime,
       },
       {
         id: `msg-${Date.now()}-2`,
-        sender: "spark",
-        text: `Day ${sprint.currentDay} of ${sprint.durationDays || 4}. ${completedTasks} of ${totalTasks} tasks complete.\n\nAsk me technical questions about today's practice, tune difficulty, review project missions, or request a schedule adjustment!`,
+        sender: "pip",
+        text: `Day ${sprint.currentDay || 1} of ${sprint.durationDays || 6}. ${completedTasks} of ${totalTasks} daily milestones cleared.\n\nAsk me technical questions about today's practice drill, request code examples, or have me adapt your sprint anytime!`,
         mascotSvg: "/mascot_encouragement.svg",
         timestamp: currentTime,
       },

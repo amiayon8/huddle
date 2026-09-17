@@ -1516,42 +1516,45 @@ export async function updateSquadMemberCheckInInDb(
 export const generateTasksForSkill = (
   sprintId: string,
   skillTitle: string,
+  level: string = "Intermediate",
+  dailyTime: string = "20 mins / day"
 ): SprintTask[] => {
   const lower = skillTitle.toLowerCase();
+  const minutes = parseInt(dailyTime) || 20;
 
   if (
     lower.includes("next") ||
     lower.includes("react") ||
-    lower.includes("front")
+    lower.includes("front") ||
+    lower.includes("web")
   ) {
     return [
       {
         id: `task-${Date.now()}-1`,
         dayNumber: 1,
-        title: "React Server Components & Streaming Architecture",
-        description:
-          "Implement streaming SSR layouts with Suspense boundaries and payload serialization.",
+        title: "React Server Components & Component Tree Architecture",
+        description: "Understand server vs. client boundaries, serialization boundaries, and Suspense layouts.",
         type: "learn",
         creatorName: "Marcus Vance",
         creatorHandle: "@marcus_vance",
         creatorAvatar: "/avatars/avatar-3.svg",
-        estimatedMinutes: 20,
-        completed: false,
+        estimatedMinutes: minutes,
+        completed: true,
+        completedAt: new Date(Date.now() - 86400000).toISOString(),
         producesArtifact: true,
-        artifactTitle: "Streaming Next.js Layout Architecture",
+        artifactTitle: "RSC Component Architecture",
         artifactType: "code",
       },
       {
         id: `task-${Date.now()}-2`,
         dayNumber: 2,
-        title: "Optimistic UI Updates & Server Actions",
-        description:
-          "Build zero-latency form mutations with useOptimistic and transactional database updates.",
+        title: "Optimistic UI Mutations & Server Actions",
+        description: "Build zero-latency form mutations with useOptimistic, revalidating tags without full refreshes.",
         type: "build",
         creatorName: "Elena Rostova",
         creatorHandle: "@elena_distrib",
         creatorAvatar: "/avatars/avatar-2.svg",
-        estimatedMinutes: 22,
+        estimatedMinutes: minutes,
         completed: false,
         producesArtifact: true,
         artifactTitle: "Optimistic Action State Machine",
@@ -1560,235 +1563,241 @@ export const generateTasksForSkill = (
       {
         id: `task-${Date.now()}-3`,
         dayNumber: 3,
-        title: "Route Handlers & Edge Runtime Caching",
-        description:
-          "Configure incremental static regeneration (ISR) and stale-while-revalidate headers.",
+        title: "Route Handlers & Edge Runtime Caching Strategies",
+        description: "Configure incremental static regeneration (ISR) and stale-while-revalidate caching headers.",
         type: "learn",
         creatorName: "Marcus Vance",
         creatorHandle: "@marcus_vance",
         creatorAvatar: "/avatars/avatar-3.svg",
-        estimatedMinutes: 18,
+        estimatedMinutes: minutes,
         completed: false,
         producesArtifact: false,
       },
       {
         id: `task-${Date.now()}-4`,
         dayNumber: 4,
-        title: "Real-World Proof: Open-Source Next.js PR",
-        description:
-          "Draft and publish a verified pull request demonstrating streaming performance gains.",
+        title: "State Synchronization & Custom Hook Abstractions",
+        description: "Decouple complex state transitions into reusable, resilient custom React hooks.",
+        type: "build",
+        creatorName: "Elena Rostova",
+        creatorHandle: "@elena_distrib",
+        creatorAvatar: "/avatars/avatar-2.svg",
+        estimatedMinutes: minutes,
+        completed: false,
+        producesArtifact: true,
+        artifactTitle: "Sync Engine Custom Hook",
+        artifactType: "code",
+      },
+      {
+        id: `task-${Date.now()}-5`,
+        dayNumber: 5,
+        title: "Web Performance Profiling & Layout Shift Prevention",
+        description: "Diagnose Core Web Vitals, eliminate cumulative layout shifts, and profile re-render bottlenecks.",
+        type: "learn",
+        creatorName: "Marcus Vance",
+        creatorHandle: "@marcus_vance",
+        creatorAvatar: "/avatars/avatar-3.svg",
+        estimatedMinutes: minutes,
+        completed: false,
+        producesArtifact: false,
+      },
+      {
+        id: `task-${Date.now()}-6`,
+        dayNumber: 6,
+        title: "Production Deliverable: End-to-End Feature Verification",
+        description: "Ship a complete production-grade feature with error boundaries, tests, and telemetry.",
         type: "real_world_proof",
         creatorName: "Elena Rostova",
         creatorHandle: "@elena_distrib",
         creatorAvatar: "/avatars/avatar-2.svg",
-        estimatedMinutes: 15,
+        estimatedMinutes: minutes,
         completed: false,
         producesArtifact: true,
-        artifactTitle: "Next.js Streaming PR #412",
+        artifactTitle: "Production Next.js Feature PR",
         artifactType: "summary",
       },
     ];
   }
 
-  if (lower.includes("type") || lower.includes("ts")) {
+  if (lower.includes("python") || lower.includes("data") || lower.includes("ai") || lower.includes("machine")) {
     return [
       {
         id: `task-${Date.now()}-1`,
         dayNumber: 1,
-        title: "Advanced Generics & Template Literal Types",
-        description:
-          "Build type-safe route parsers and regex-like string unions using template literal types.",
+        title: "Python Data Structures & Memory Model Internals",
+        description: "Explore object mutability, reference counting, generators, and memory overhead in Python.",
         type: "learn",
-        creatorName: "Marcus Vance",
-        creatorHandle: "@marcus_vance",
-        creatorAvatar: "/avatars/avatar-3.svg",
-        estimatedMinutes: 18,
-        completed: false,
+        creatorName: "Dr. Aris Thorne",
+        creatorHandle: "@aris_py",
+        creatorAvatar: "/avatars/avatar-1.svg",
+        estimatedMinutes: minutes,
+        completed: true,
+        completedAt: new Date(Date.now() - 86400000).toISOString(),
         producesArtifact: true,
-        artifactTitle: "Template Literal Type Parser",
+        artifactTitle: "Memory Profiling Benchmark",
         artifactType: "code",
       },
       {
         id: `task-${Date.now()}-2`,
         dayNumber: 2,
-        title: "Conditional Types & Infer Pattern Matching",
-        description:
-          "Implement dynamic type extractors to infer return types and deeply nested record properties.",
+        title: "Vectorized Operations with NumPy & Pandas",
+        description: "Replace inefficient nested loops with high-throughput vectorized operations.",
         type: "build",
-        creatorName: "Marcus Vance",
-        creatorHandle: "@marcus_vance",
-        creatorAvatar: "/avatars/avatar-3.svg",
-        estimatedMinutes: 20,
+        creatorName: "Elena Rostova",
+        creatorHandle: "@elena_distrib",
+        creatorAvatar: "/avatars/avatar-2.svg",
+        estimatedMinutes: minutes,
         completed: false,
         producesArtifact: true,
-        artifactTitle: "Strict Conditional Type System",
+        artifactTitle: "Vectorized Pipeline Script",
         artifactType: "code",
       },
       {
         id: `task-${Date.now()}-3`,
         dayNumber: 3,
-        title: "Discriminated Unions & Exhaustive Type Guards",
-        description:
-          "Enforce compile-time exhaustiveness checks across state machines and domain events.",
+        title: "AsyncIO & Concurrency Patterns",
+        description: "Master event loops, async context managers, and high-throughput concurrent workers.",
         type: "learn",
-        creatorName: "Elena Rostova",
-        creatorHandle: "@elena_distrib",
-        creatorAvatar: "/avatars/avatar-2.svg",
-        estimatedMinutes: 16,
+        creatorName: "Dr. Aris Thorne",
+        creatorHandle: "@aris_py",
+        creatorAvatar: "/avatars/avatar-1.svg",
+        estimatedMinutes: minutes,
         completed: false,
         producesArtifact: false,
       },
       {
         id: `task-${Date.now()}-4`,
         dayNumber: 4,
-        title: "Real-World Proof: Type-Safe SDK Package",
-        description:
-          "Publish a strictly typed library utility with zero any or unknown leaks to GitHub.",
-        type: "real_world_proof",
-        creatorName: "Marcus Vance",
-        creatorHandle: "@marcus_vance",
-        creatorAvatar: "/avatars/avatar-3.svg",
-        estimatedMinutes: 15,
-        completed: false,
-        producesArtifact: true,
-        artifactTitle: "Type-Safe Utility Module #78",
-        artifactType: "summary",
-      },
-    ];
-  }
-
-  if (
-    lower.includes("ui") ||
-    lower.includes("product") ||
-    lower.includes("design")
-  ) {
-    return [
-      {
-        id: `task-${Date.now()}-1`,
-        dayNumber: 1,
-        title: "Design Tokens & Semantic Color Systems",
-        description:
-          "Establish fluid clamp spacing tokens and light/dark theme variables with WCAG contrast.",
-        type: "learn",
-        creatorName: "Elena Rostova",
-        creatorHandle: "@elena_distrib",
-        creatorAvatar: "/avatars/avatar-2.svg",
-        estimatedMinutes: 18,
-        completed: false,
-        producesArtifact: true,
-        artifactTitle: "Semantic Design Token Palette",
-        artifactType: "code",
-      },
-      {
-        id: `task-${Date.now()}-2`,
-        dayNumber: 2,
-        title: "Hardware-Accelerated Micro-interactions",
-        description:
-          "Craft 60fps spring animations composited on the GPU using transform and opacity.",
+        title: "Model Prompt Engineering & API Orchestration",
+        description: "Implement structured JSON schema generation and function-calling with LLM APIs.",
         type: "build",
         creatorName: "Elena Rostova",
         creatorHandle: "@elena_distrib",
         creatorAvatar: "/avatars/avatar-2.svg",
-        estimatedMinutes: 20,
+        estimatedMinutes: minutes,
         completed: false,
         producesArtifact: true,
-        artifactTitle: "GPU-Accelerated Modal Motion",
+        artifactTitle: "Prompt Orchestration Pipeline",
         artifactType: "code",
       },
       {
-        id: `task-${Date.now()}-3`,
-        dayNumber: 3,
-        title: "Accessible Keyboard Navigation & Focus Traps",
-        description:
-          "Audit tab order, aria attributes, and live regions to guarantee full screen reader usability.",
+        id: `task-${Date.now()}-5`,
+        dayNumber: 5,
+        title: "Data Validation & Robust Error Handling",
+        description: "Build robust input validation layers using Pydantic models with custom validators.",
         type: "learn",
-        creatorName: "Marcus Vance",
-        creatorHandle: "@marcus_vance",
-        creatorAvatar: "/avatars/avatar-3.svg",
-        estimatedMinutes: 16,
+        creatorName: "Dr. Aris Thorne",
+        creatorHandle: "@aris_py",
+        creatorAvatar: "/avatars/avatar-1.svg",
+        estimatedMinutes: minutes,
         completed: false,
         producesArtifact: false,
       },
       {
-        id: `task-${Date.now()}-4`,
-        dayNumber: 4,
-        title: "Real-World Proof: Accessible Design System PR",
-        description:
-          "Ship an accessible component module with comprehensive keyboard and visual test proofs.",
+        id: `task-${Date.now()}-6`,
+        dayNumber: 6,
+        title: "Capstone Pipeline: Production AI Ingestion Microservice",
+        description: "Package and benchmark an automated processing script with logging and test coverage.",
         type: "real_world_proof",
         creatorName: "Elena Rostova",
         creatorHandle: "@elena_distrib",
         creatorAvatar: "/avatars/avatar-2.svg",
-        estimatedMinutes: 15,
+        estimatedMinutes: minutes,
         completed: false,
         producesArtifact: true,
-        artifactTitle: "Accessible UI Component PR #204",
+        artifactTitle: "Production Python Microservice",
         artifactType: "summary",
       },
     ];
   }
 
+  // Default: System Architecture / General Skill 6-day sprint
   return [
     {
       id: `task-${Date.now()}-1`,
       dayNumber: 1,
-      title: "Distributed Caching & Invalidation Topologies",
-      description:
-        "Architect multi-tier caching with write-behind queues and cache warming strategies.",
+      title: `${skillTitle}: Core Foundations & Architecture Patterns`,
+      description: `Deconstruct the essential primitives and standard conventions of ${skillTitle}.`,
       type: "learn",
       creatorName: "Elena Rostova",
       creatorHandle: "@elena_distrib",
       creatorAvatar: "/avatars/avatar-2.svg",
-      estimatedMinutes: 20,
-      completed: false,
+      estimatedMinutes: minutes,
+      completed: true,
+      completedAt: new Date(Date.now() - 86400000).toISOString(),
       producesArtifact: true,
-      artifactTitle: "Distributed Cache Topology Blueprint",
+      artifactTitle: `${skillTitle} Architectural Foundations`,
       artifactType: "code",
     },
     {
       id: `task-${Date.now()}-2`,
       dayNumber: 2,
-      title: "Idempotency Keys & Distributed Locking",
-      description:
-        "Implement distributed locking mechanisms to protect mission-critical database write paths.",
+      title: `${skillTitle}: Hands-on Implementation & Core Mechanics`,
+      description: `Implement real-world patterns with testable code and immediate feedback loops.`,
       type: "build",
-      creatorName: "Elena Rostova",
-      creatorHandle: "@elena_distrib",
-      creatorAvatar: "/avatars/avatar-2.svg",
-      estimatedMinutes: 22,
+      creatorName: "Marcus Vance",
+      creatorHandle: "@marcus_vance",
+      creatorAvatar: "/avatars/avatar-3.svg",
+      estimatedMinutes: minutes,
       completed: false,
       producesArtifact: true,
-      artifactTitle: "Idempotent API Mutex Engine",
+      artifactTitle: `${skillTitle} Prototype Module`,
       artifactType: "code",
     },
     {
       id: `task-${Date.now()}-3`,
       dayNumber: 3,
-      title: "Database Connection Pooling & Replication Failover",
-      description:
-        "Benchmark read replica query routing, connection pools, and automatic failovers.",
+      title: `${skillTitle}: Edge Cases, Resiliency & Error Handling`,
+      description: `Harden implementations against unexpected failures, timeouts, and edge cases.`,
       type: "learn",
-      creatorName: "Marcus Vance",
-      creatorHandle: "@marcus_vance",
-      creatorAvatar: "/avatars/avatar-3.svg",
-      estimatedMinutes: 18,
+      creatorName: "Elena Rostova",
+      creatorHandle: "@elena_distrib",
+      creatorAvatar: "/avatars/avatar-2.svg",
+      estimatedMinutes: minutes,
       completed: false,
       producesArtifact: false,
     },
     {
       id: `task-${Date.now()}-4`,
       dayNumber: 4,
-      title: "Real-World Proof: Architecture Decision Record (ADR)",
-      description:
-        "Draft and commit a production ADR evaluating data consistency tradeoffs on GitHub.",
+      title: `${skillTitle}: Performance Optimization & Scalability`,
+      description: `Measure throughput, locate bottlenecks, and apply targeted performance optimizations.`,
+      type: "build",
+      creatorName: "Dr. Aris Thorne",
+      creatorHandle: "@aris_py",
+      creatorAvatar: "/avatars/avatar-1.svg",
+      estimatedMinutes: minutes,
+      completed: false,
+      producesArtifact: true,
+      artifactTitle: "Benchmark Analysis & Fixes",
+      artifactType: "code",
+    },
+    {
+      id: `task-${Date.now()}-5`,
+      dayNumber: 5,
+      title: `${skillTitle}: Security & Production Hardening`,
+      description: `Apply industry security standards, access controls, and sanitize input boundaries.`,
+      type: "learn",
+      creatorName: "Marcus Vance",
+      creatorHandle: "@marcus_vance",
+      creatorAvatar: "/avatars/avatar-3.svg",
+      estimatedMinutes: minutes,
+      completed: false,
+      producesArtifact: false,
+    },
+    {
+      id: `task-${Date.now()}-6`,
+      dayNumber: 6,
+      title: `Capstone Deliverable: ${skillTitle} Production Portfolio Proof`,
+      description: `Synthesize all sprint concepts into a verified production-ready project deliverable.`,
       type: "real_world_proof",
       creatorName: "Elena Rostova",
       creatorHandle: "@elena_distrib",
       creatorAvatar: "/avatars/avatar-2.svg",
-      estimatedMinutes: 15,
+      estimatedMinutes: minutes,
       completed: false,
       producesArtifact: true,
-      artifactTitle: "Production Architecture ADR #88",
+      artifactTitle: `${skillTitle} Production PR & Architecture Docs`,
       artifactType: "summary",
     },
   ];
@@ -1798,6 +1807,8 @@ export async function updateSprintSkillInDb(
   userId: string,
   skillTitle: string,
   milestone: string,
+  level: string = "Intermediate",
+  dailyTime: string = "20 mins / day",
 ): Promise<SprintTask[] | null> {
   try {
     const { data: sprintRecord } = await supabase
@@ -1805,13 +1816,14 @@ export async function updateSprintSkillInDb(
       .update({
         skill_title: skillTitle,
         career_milestone: milestone,
+        duration_days: 6,
       })
       .eq("user_id", userId)
       .select("id")
       .single();
 
     const targetSprintId = sprintRecord?.id || "sprint-1";
-    const newTasks = generateTasksForSkill(targetSprintId, skillTitle);
+    const newTasks = generateTasksForSkill(targetSprintId, skillTitle, level, dailyTime);
 
     await supabase
       .from("sprint_tasks")

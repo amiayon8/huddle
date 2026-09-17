@@ -13,23 +13,20 @@ import {
   Play,
   Sparkles,
   Zap,
-  Flame,
   Compass,
+  Video,
+  Lightbulb,
 } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
-import { DuolingoMascot } from "./DuolingoMascot";
 import { CodeBlock } from "./CodeBlock";
 
 export const CreatorView: React.FC = () => {
   const {
-    creators,
     creatorPosts,
     toggleLikeCreatorPost,
     toggleBookmarkCreatorPost,
-    toggleFollowCreator,
-    setCreatorUploadModalOpen,
-    setMascotOpen,
     addExploreItemToSprinter,
+    setMascotOpen,
   } = useHuddle();
 
   const [selectedTag, setSelectedTag] = useState<string>("All");
@@ -56,12 +53,12 @@ export const CreatorView: React.FC = () => {
   const handleAddToSprinter = (post: (typeof creatorPosts)[0]) => {
     addExploreItemToSprinter(post.title, post.creatorName, 15);
     setAddedPostId(post.id);
-    setTimeout(() => setAddedPostId(null), 2000);
+    setTimeout(() => setAddedPostId(null), 2500);
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-16 animate-in fade-in duration-150">
-      {/* Header */}
+    <div className="max-w-4xl mx-auto space-y-6 pb-20 animate-in fade-in duration-150">
+      {/* Feed Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200/80 dark:border-zinc-800/80 pb-5">
         <div>
           <div className="flex items-center gap-2">
@@ -72,32 +69,79 @@ export const CreatorView: React.FC = () => {
               Explore Feed
             </h1>
             <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold">
-              Curiosity + Entertainment
+              Dynamic Discovery
             </span>
           </div>
           <p className="text-xs sm:text-sm text-zinc-500 mt-1">
-            Short skill-based videos, architecture blueprints, and learning ideas you can casually discover & add to your Sprinter.
+            A dynamic feed of short skill-based videos, resources, and learning ideas to casually browse and discover.
           </p>
         </div>
 
         <button
-          onClick={() => setCreatorUploadModalOpen(true)}
+          onClick={() => setMascotOpen(true)}
           className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition-colors self-start sm:self-auto cursor-pointer shrink-0"
         >
-          <Plus className="w-3.5 h-3.5" />
-          <span>Contribute Blueprint</span>
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>Ask Sparkfor Ideas</span>
         </button>
       </div>
 
-      {/* Spark Mascot Guidance */}
-      <DuolingoMascot
-        emotion="deep_thinking"
-        size="md"
-        speechText="Browse short 5-15 minute engineering videos and patterns below. Tap **Add to Sprinter** on any topic to weave it directly into your daily practice!"
-        showQuickActions={true}
-      />
+      {/* Spark Hero: Find / Start a New Skill */}
+      <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-indigo-50/90 via-purple-50/40 to-white dark:from-indigo-950/40 dark:via-[#0e1017] dark:to-purple-950/20 border border-indigo-200/80 dark:border-indigo-900/50 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <img
+              src="/mascot_idle.svg"
+              alt="Spark"
+              className="w-10 h-10 object-contain shrink-0"
+            />
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
+                Start a New Skill with Spark
+              </span>
+              <h2 className="text-base sm:text-lg font-black text-zinc-950 dark:text-white">
+                Ready to sprint on a new discipline?
+              </h2>
+            </div>
+          </div>
+          <button
+            onClick={() => setMascotOpen(true)}
+            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer self-start sm:self-auto shrink-0"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Generate Sprint with Spark</span>
+          </button>
+        </div>
 
-      {/* Search & Topic Filters */}
+        <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          Tell Spark what you want to master. Spark will instantly synthesize an adaptive 6-day path with manageable daily drills tailored to your schedule.
+        </p>
+
+        {/* Quick Skill Selector Pills */}
+        <div className="flex flex-wrap items-center gap-1.5 pt-1">
+          <span className="text-[11px] font-semibold text-zinc-400 mr-1">Trending:</span>
+          {[
+            "React & Next.js App Router",
+            "TypeScript Systems & Generics",
+            "Python AI Agent Orchestration",
+            "System Design & Scalability",
+            "PostgreSQL Performance & Indexing",
+            "Rust for Systems Engineering",
+          ].map((skillName) => (
+            <button
+              key={skillName}
+              onClick={() => {
+                setMascotOpen(true);
+              }}
+              className="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-400 dark:hover:border-indigo-600 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer shadow-2xs"
+            >
+              + {skillName}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Search & Filter Bar */}
       <div className="space-y-3">
         <div className="relative">
           <Search className="absolute left-3.5 top-3 w-4 h-4 text-zinc-400" />
@@ -105,7 +149,7 @@ export const CreatorView: React.FC = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search short videos, distributed patterns, or authors..."
+            placeholder="Search short videos, topics, blueprints, or authors..."
             className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 shadow-xs"
           />
         </div>
@@ -115,11 +159,10 @@ export const CreatorView: React.FC = () => {
             <button
               key={tag}
               onClick={() => setSelectedTag(tag)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${
-                selectedTag === tag
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors cursor-pointer ${selectedTag === tag
                   ? "bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 font-semibold"
                   : "bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700"
-              }`}
+                }`}
             >
               {tag}
             </button>
@@ -127,64 +170,15 @@ export const CreatorView: React.FC = () => {
         </div>
       </div>
 
-      {/* Featured Mentors */}
-      <div className="rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/90 dark:bg-[#11131d]/90 backdrop-blur-xl p-5 space-y-3.5 shadow-xs">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-bold text-zinc-950 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span>Featured Mentors & Staff Engineers</span>
-          </span>
-          <span className="text-[11px] text-zinc-400">
-            {creators.length} verified creators
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {creators.map((creator) => (
-            <div
-              key={creator.id}
-              className="p-3 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between gap-3"
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <img
-                  src={creator.avatar}
-                  alt={creator.name}
-                  className="w-9 h-9 rounded-xl object-cover ring-1 ring-zinc-200 dark:ring-zinc-700 shrink-0"
-                />
-                <div className="min-w-0">
-                  <div className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 truncate">
-                    {creator.name}
-                  </div>
-                  <div className="text-[11px] text-zinc-500 truncate">
-                    {creator.title}
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={() => toggleFollowCreator(creator.id)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors shrink-0 cursor-pointer ${
-                  creator.isFollowing
-                    ? "bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
-                    : "bg-indigo-600 hover:bg-indigo-700 text-white"
-                }`}
-              >
-                {creator.isFollowing ? "Following" : "Follow"}
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Feed Cards */}
+      {/* Feed List */}
       <div className="space-y-4">
         {filteredPosts.length === 0 ? (
           <div className="p-8 text-center rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] space-y-1.5">
             <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-              No skill bites match your search criteria.
+              No learning ideas match your search criteria.
             </p>
             <p className="text-xs text-zinc-500">
-              Try adjusting your query or selecting another technical topic tag.
+              Try adjusting your query or selecting another skill tag.
             </p>
           </div>
         ) : (
@@ -193,7 +187,7 @@ export const CreatorView: React.FC = () => {
               key={post.id}
               className="rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/90 dark:bg-[#11131d]/90 backdrop-blur-xl p-5 sm:p-6 space-y-4 hover:border-indigo-300 dark:hover:border-indigo-900/60 transition-all shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)]"
             >
-              {/* Card Author & Meta */}
+              {/* Card Meta & Video Duration */}
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <img
@@ -220,8 +214,8 @@ export const CreatorView: React.FC = () => {
                   <span className="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/60 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold uppercase tracking-wide">
                     {post.skillTag}
                   </span>
-                  <span className="inline-flex items-center gap-1 text-xs text-zinc-500 font-medium">
-                    <Play className="w-3 h-3 fill-current text-indigo-500" />
+                  <span className="inline-flex items-center gap-1 text-xs text-zinc-500 font-medium px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800">
+                    <Video className="w-3 h-3 text-indigo-500" />
                     <span>{post.duration}</span>
                   </span>
                 </div>
@@ -236,15 +230,15 @@ export const CreatorView: React.FC = () => {
                   {post.description}
                 </p>
 
-                {/* Spark's Key Takeaway Callout */}
+                {/* Pip's Takeaway Callout */}
                 <div className="p-3 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/40 flex items-start gap-2.5">
                   <img
                     src="/mascot_idle.svg"
-                    alt="Spark"
+                    alt="Pip"
                     className="w-5 h-5 object-contain shrink-0 mt-0.5"
                   />
                   <div className="text-[11.5px] text-amber-950 dark:text-amber-200 leading-snug">
-                    <strong className="font-bold">Spark's Takeaway:</strong> Master the trade-offs between memory overhead vs. read latency before implementing this in production.
+                    <strong className="font-bold">Pip's Takeaway:</strong> Understand the trade-offs before implementation. Focus on clarity and observable state behavior.
                   </div>
                 </div>
 
@@ -260,7 +254,7 @@ export const CreatorView: React.FC = () => {
                 <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 space-y-1.5">
                   <div className="text-[11px] font-bold text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5 uppercase tracking-wider">
                     <FileCode className="w-3.5 h-3.5 text-indigo-500" />
-                    <span>Attached Blueprints & References</span>
+                    <span>Attached Blueprints & Resources</span>
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
                     {post.resourceLinks.map((link, index) => (
@@ -279,16 +273,15 @@ export const CreatorView: React.FC = () => {
                 </div>
               )}
 
-              {/* Card Actions */}
+              {/* Action Bar */}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 text-xs">
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => toggleLikeCreatorPost(post.id)}
-                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer ${
-                      post.userLiked
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer ${post.userLiked
                         ? "text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 font-semibold"
                         : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                    }`}
+                      }`}
                   >
                     <Heart
                       className={`w-3.5 h-3.5 ${post.userLiked ? "fill-rose-500" : ""}`}
@@ -298,44 +291,34 @@ export const CreatorView: React.FC = () => {
 
                   <button
                     onClick={() => toggleBookmarkCreatorPost(post.id)}
-                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer ${
-                      post.bookmarked
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer ${post.bookmarked
                         ? "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 font-semibold"
                         : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                    }`}
+                      }`}
                   >
                     <Bookmark
                       className={`w-3.5 h-3.5 ${post.bookmarked ? "fill-indigo-500" : ""}`}
                     />
                     <span>{post.bookmarked ? "Saved" : "Save"}</span>
                   </button>
-
-                  <button
-                    onClick={() => setMascotOpen(true)}
-                    className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-semibold cursor-pointer pl-1"
-                  >
-                    Discuss with Spark
-                  </button>
                 </div>
 
-                {/* Primary Action: Add to AI Skill Sprinter */}
                 <button
                   onClick={() => handleAddToSprinter(post)}
-                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-semibold text-xs transition-all cursor-pointer shadow-xs ${
-                    addedPostId === post.id
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer shadow-xs ${addedPostId === post.id
                       ? "bg-emerald-600 text-white"
-                      : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20"
-                  }`}
+                      : "bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-950"
+                    }`}
                 >
                   {addedPostId === post.id ? (
                     <>
-                      <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                      <span>Added to Sprinter!</span>
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Added to Pip's Sprint!</span>
                     </>
                   ) : (
                     <>
-                      <Zap className="w-3.5 h-3.5" />
-                      <span>Add to AI Skill Sprinter</span>
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add to Sprint</span>
                     </>
                   )}
                 </button>
@@ -347,4 +330,3 @@ export const CreatorView: React.FC = () => {
     </div>
   );
 };
-

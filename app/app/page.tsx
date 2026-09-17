@@ -6,29 +6,17 @@ import { useHuddle } from '../context/HuddleContext';
 import { Navbar } from '../components/Navbar';
 import { Sidebar } from '../components/Sidebar';
 import { DashboardView } from '../components/DashboardView';
-import { JourneyView } from '../components/JourneyView';
-import { SquadView } from '../components/SquadView';
-import { CommunityView } from '../components/CommunityView';
 import { CreatorView } from '../components/CreatorView';
-import { ProgressView } from '../components/ProgressView';
-import { PublicProfileView } from '../components/PublicProfileView';
 import { LandingQuestionnaire } from '../components/LandingQuestionnaire';
+import { GrowthMapView } from '../components/GrowthMapView';
+import { ProfileView } from '../components/ProfileView';
 import { AuthModal } from '../components/AuthModal';
 import { MascotDrawer } from '../components/MascotDrawer';
 import { SearchModal } from '../components/SearchModal';
 import { SettingsModal } from '../components/SettingsModal';
-import { StepDetailModal } from '../components/StepDetailModal';
-import { CreatorDetailModal } from '../components/CreatorDetailModal';
-import { CreatorUploadModal } from '../components/CreatorUploadModal';
-import { BingeQuizModal } from '../components/BingeQuizModal';
 import { ResetDemoModal } from '../components/ResetDemoModal';
 import { FloatingMascotBadge } from '../components/FloatingMascotBadge';
-import { SurveyPromptModal } from '../components/SurveyPromptModal';
-import { PracticeSessionModal } from '../components/PracticeSessionModal';
 import { DailyNudgeModal } from '../components/DailyNudgeModal';
-import { CelebrationModal } from '../components/CelebrationModal';
-import { ProgressShareModal } from '../components/ProgressShareModal';
-import { ProjectMissionModal } from '../components/ProjectMissionModal';
 
 export default function AppPage() {
   const router = useRouter();
@@ -58,29 +46,15 @@ export default function AppPage() {
     if (typeof window === 'undefined') return;
 
     const searchParams = new URLSearchParams(window.location.search);
-    const fromAuthQuery = searchParams.get('from') === 'auth' || searchParams.get('tab') === 'explore';
-    const fromAuthSession = sessionStorage.getItem('redirected_from_auth') === 'true';
-    const referrer = document.referrer;
-    const fromAuthReferrer = Boolean(
-      referrer &&
-      (referrer.includes('/auth/login') ||
-       referrer.includes('/auth/signup') ||
-       referrer.includes('/auth/forgot-password') ||
-       referrer.includes('/login') ||
-       referrer.includes('/signup') ||
-       referrer.includes('/forgot-password'))
-    );
-
-    if (fromAuthQuery || fromAuthSession || fromAuthReferrer) {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'explore') {
       setActiveTab('explore');
-      if (fromAuthSession) {
-        sessionStorage.removeItem('redirected_from_auth');
-      }
-      if (fromAuthQuery && window.history.replaceState) {
-        window.history.replaceState(null, '', window.location.pathname);
-      }
+    } else if (tabParam === 'growth_map') {
+      setActiveTab('growth_map');
+    } else if (tabParam === 'profile') {
+      setActiveTab('profile');
     } else {
-      setActiveTab('overview');
+      setActiveTab('dashboard');
     }
   }, [setActiveTab]);
 
@@ -96,6 +70,7 @@ export default function AppPage() {
     return null;
   }
 
+  // Feature 1: Skill Personalization flow
   if ((!user.onboardingCompleted && !hasSkippedToPreview) || onboardingActive) {
     return (
       <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-100 font-sans transition-colors">
@@ -104,14 +79,8 @@ export default function AppPage() {
         <SearchModal />
         <SettingsModal />
         <MascotDrawer />
-        <BingeQuizModal />
         <ResetDemoModal />
-        <SurveyPromptModal />
-        <PracticeSessionModal />
         <DailyNudgeModal />
-        <CelebrationModal />
-        <ProgressShareModal />
-        <ProjectMissionModal />
       </div>
     );
   }
@@ -119,44 +88,40 @@ export default function AppPage() {
   const renderActiveView = () => {
     switch (activeTab) {
       case 'dashboard':
+      case 'sprint':
       case 'overview':
         return <DashboardView />;
-      case 'journey':
-        return <JourneyView />;
-      case 'squad':
-      case 'macro_squad':
-        return <SquadView />;
-      case 'community':
-        return <CommunityView />;
-      case 'creators':
       case 'explore':
+      case 'creators':
         return <CreatorView />;
-      case 'progress':
+      case 'growth_map':
+      case 'journey':
+        return <GrowthMapView />;
       case 'profile':
-        return <PublicProfileView />;
+        return <ProfileView />;
       default:
         return <DashboardView />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-100 flex flex-col font-sans transition-colors">
+    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-100 flex flex-col font-sans transition-colors md:pl-64 lg:pl-72">
       <Navbar />
 
       {!user.onboardingCompleted && (
         <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 sm:px-6">
           <div className="max-w-7xl w-full mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-2 text-amber-900 dark:text-amber-200">
-              <img src="/mascot_planning.svg" alt="Spark" className="w-5 h-5 object-contain shrink-0" />
+              <img src="/mascot_planning.svg" alt="Pip" className="w-5 h-5 object-contain shrink-0" />
               <span>
-                <strong>Intake Survey Incomplete (Preview Mode):</strong> Actions are locked until you complete the 5-step intake survey.
+                <strong>Skill Personalization Incomplete (Preview Mode):</strong> Actions are locked until you personalize your skill profile.
               </span>
             </div>
             <button
               onClick={() => setOnboardingActive(true)}
               className="px-3 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-xs transition-colors shrink-0 cursor-pointer"
             >
-              Complete Survey Now (1 min) →
+              Personalize Now (1 min) →
             </button>
           </div>
         </div>
@@ -173,17 +138,8 @@ export default function AppPage() {
       <MascotDrawer />
       <SearchModal />
       <SettingsModal />
-      <StepDetailModal />
-      <CreatorDetailModal />
-      <CreatorUploadModal />
-      <BingeQuizModal />
       <ResetDemoModal />
-      <SurveyPromptModal />
-      <PracticeSessionModal />
       <DailyNudgeModal />
-      <CelebrationModal />
-      <ProgressShareModal />
-      <ProjectMissionModal />
     </div>
   );
 }

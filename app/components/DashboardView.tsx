@@ -3,84 +3,66 @@
 import React, { useState } from "react";
 import {
   Play,
-  Users,
   Check,
   RotateCcw,
-  FileCode,
   CheckCircle2,
   Clock,
   ChevronDown,
   ChevronUp,
-  Video,
-  ArrowRight,
   Sparkles,
   Flame,
   Target,
-  Trophy,
-  ShieldCheck,
   BookOpen,
   Zap,
   Bell,
-  Gauge,
-  Sliders,
-  Share2,
+  Lock,
+  ArrowRight,
 } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
-import { DuolingoMascot } from "./DuolingoMascot";
 import { ProgressBarOfHealth } from "./ProgressBarOfHealth";
-import { SprinterFriendsView } from "./SprinterFriendsView";
+import { SprintTaskModal } from "./SprintTaskModal";
+import { SprintTask } from "../types/huddle";
 
 export const DashboardView: React.FC = () => {
   const {
     user,
     sprint,
-    squad,
-    secondsFocusedToday,
-    isTimerRunning,
-    isAppFocused,
-    toggleFocusTimer,
-    openPracticeSession,
-    practiceProgressMap,
     reshuffleSprint,
-    setActiveTab,
-    adaptiveDifficulty,
-    setAdaptiveDifficulty,
     activeNudge,
     dismissActiveNudge,
     setDailyNudgeModalOpen,
-    openProjectMission,
-    projectMissions,
-    openShareModal,
+    setMascotOpen,
   } = useHuddle();
 
+  const [activeModalTask, setActiveModalTask] = useState<SprintTask | null>(null);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
-
-  const formatFocusTime = (totalSeconds: number) => {
-    const minutes = Math.floor(totalSeconds / 60);
-    const remainingSeconds = totalSeconds % 60;
-    return `${minutes}m ${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}s`;
-  };
 
   const tasks = sprint?.tasks || [];
   const completedCount = tasks.filter((task) => task.completed).length;
-  const totalTasks = tasks.length;
-  const sprintProgressPercent =
-    totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
-
-  const activeTask =
-    tasks.find((task) => !task.completed) ||
-    (tasks.length > 0 ? tasks[tasks.length - 1] : null);
+  const totalTasks = tasks.length || 6;
   const isSprintComplete = totalTasks > 0 && completedCount === totalTasks;
 
-  const currentMission = projectMissions?.[0];
+  // Determine Today's active task (first uncompleted task or last task if complete)
+  const todayTask =
+    tasks.find((task) => !task.completed) ||
+    (tasks.length > 0 ? tasks[tasks.length - 1] : null);
 
-  if (!activeTask) {
+  const openTaskRunner = (task: SprintTask) => {
+    setActiveModalTask(task);
+    setIsTaskModalOpen(true);
+  };
+
+  const userSkill = sprint?.skillTitle || user.surveyData?.skill || "Software Architecture";
+  const userLevel = user.surveyData?.level || "Intermediate";
+  const userGoal = user.surveyData?.goal || user.primaryGoal || "Build real-world projects";
+  const dailyTime = user.surveyData?.dailyTime || "30 mins / day";
+  const learningPreference = user.surveyData?.learningPreference || "Hands-on projects & practice";
+
+  if (!todayTask) {
     return (
       <div className="max-w-4xl mx-auto py-24 flex flex-col items-center justify-center gap-4 text-zinc-500">
-        <div className="relative">
-          <div className="w-10 h-10 border-2 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin" />
-          <Sparkles className="w-4 h-4 text-indigo-500 absolute inset-0 m-auto animate-pulse" />
-        </div>
+        <div className="w-10 h-10 border-2 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin" />
         <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
           Syncing Sprint Engine...
         </span>
@@ -90,10 +72,10 @@ export const DashboardView: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-20 animate-in fade-in duration-200">
-      {/* Feature 7: Visual Progress Bar of Health */}
+      {/* Feature 6: Visual Progress Bar of Skill Development */}
       <ProgressBarOfHealth />
 
-      {/* Feature 4: Daily Learning Nudge Banner */}
+      {/* Feature 4: Smart Notification Reminder Banner */}
       {activeNudge && (
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-indigo-500/10 to-purple-500/10 border border-amber-200/70 dark:border-amber-900/50 text-xs animate-in slide-in-from-top-2 duration-200">
           <div className="flex items-center gap-3 min-w-0">
@@ -103,7 +85,7 @@ export const DashboardView: React.FC = () => {
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">
-                  Daily Learning Nudge
+                  Pip's Learning Reminder
                 </span>
                 <span className="text-zinc-400">•</span>
                 <span className="text-[10px] text-zinc-500">{activeNudge.timeText}</span>
@@ -119,7 +101,7 @@ export const DashboardView: React.FC = () => {
               onClick={() => setDailyNudgeModalOpen(true)}
               className="px-2.5 py-1 rounded-lg border border-amber-300 dark:border-amber-800/80 bg-white/60 dark:bg-zinc-900/60 text-amber-900 dark:text-amber-200 font-semibold text-[11px] hover:bg-white dark:hover:bg-zinc-800 transition-colors cursor-pointer"
             >
-              Adjust Nudge
+              Adjust Time
             </button>
             <button
               onClick={dismissActiveNudge}
@@ -131,225 +113,139 @@ export const DashboardView: React.FC = () => {
         </div>
       )}
 
-      {/* Feature 3: AI Skill Sprinter Main Card */}
+      {/* Feature 3: AI Skill Sprinter (Pip's Personalized Sprint Synthesis) */}
       <div className="relative overflow-hidden rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#11131d]/90 backdrop-blur-xl p-6 sm:p-7 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.4)]">
         <div className="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent blur-3xl pointer-events-none" />
 
-        <div className="relative space-y-5">
-          {/* Header Row */}
+        <div className="relative space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 font-bold text-[11px] tracking-wide uppercase">
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-600 dark:bg-indigo-400"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-600 dark:bg-indigo-400" />
                 </span>
-                Day {activeTask.dayNumber} of {sprint.durationDays}
+                AI Skill Sprinter
               </span>
               <span className="text-zinc-300 dark:text-zinc-700">•</span>
               <span className="text-zinc-500 dark:text-zinc-400 font-semibold text-xs">
-                {sprint.skillTitle}
+                Pip's Adaptive Path
               </span>
             </div>
 
             <button
               onClick={() => reshuffleSprint()}
               className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium transition-colors cursor-pointer px-2.5 py-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
-              title="Reschedule sprint without losing progress"
+              title="Reshuffle or regenerate sprint"
             >
-              <RotateCcw className="w-3.5 h-3.5 transition-transform group-hover:rotate-180 duration-300" />
-              <span>Reshuffle Sprint</span>
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Adapt Sprint</span>
             </button>
           </div>
 
-          {/* Title & Career Milestone */}
-          <div className="space-y-1.5">
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-950 dark:text-white">
-              {sprint.skillTitle}
-            </h1>
-            <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
-              <span>Target Milestone:</span>
-              <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 font-bold text-xs">
-                {sprint.careerMilestone}
-              </span>
-            </p>
-          </div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-1">
+            <div className="space-y-1">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-950 dark:text-white">
+                {userSkill}
+              </h1>
+              <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 flex flex-wrap items-center gap-2">
+                <span>Goal:</span>
+                <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 font-bold text-xs">
+                  {userGoal}
+                </span>
+                <span>•</span>
+                <span>Level: <strong>{userLevel}</strong></span>
+                <span>•</span>
+                <span>Pace: <strong>{dailyTime}</strong></span>
+              </p>
+            </div>
 
-          {/* Feature 13: Adaptive Difficulty Flow Control */}
-          <div className="p-3.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs">
-            <div className="flex items-center gap-2">
-              <Gauge className="w-4 h-4 text-indigo-500 shrink-0" />
-              <div>
-                <span className="font-bold text-zinc-900 dark:text-zinc-100">
-                  Adaptive Difficulty:
-                </span>{" "}
-                <span className="text-zinc-500 dark:text-zinc-400 text-[11px]">
-                  Spark adjusts practice depth to preserve flow.
+            {/* Quick Metrics */}
+            <div className="flex items-center gap-2 self-stretch sm:self-auto">
+              <div className="px-3.5 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 text-center flex-1 sm:flex-initial">
+                <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                  Cleared
+                </span>
+                <span className="text-sm font-black text-zinc-900 dark:text-white">
+                  {completedCount} / {totalTasks} Days
+                </span>
+              </div>
+
+              <div className="px-3.5 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 text-center flex-1 sm:flex-initial">
+                <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                  Streak
+                </span>
+                <span className="text-sm font-black text-amber-500 flex items-center justify-center gap-1">
+                  <Flame className="w-3.5 h-3.5 fill-current" />
+                  <span>{user.streak || 1}d</span>
                 </span>
               </div>
             </div>
-
-            <div className="inline-flex items-center p-1 rounded-xl bg-white dark:bg-[#0c0d12] border border-zinc-200 dark:border-zinc-800 shadow-xs">
-              {(
-                [
-                  { id: "gentle", label: "🧘 Gentle / Reinforced" },
-                  { id: "balanced", label: "⚖️ Balanced (15m)" },
-                  { id: "accelerated", label: "⚡ Accelerated / Hardcore" },
-                ] as const
-              ).map((mode) => (
-                <button
-                  key={mode.id}
-                  onClick={() => setAdaptiveDifficulty(mode.id)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
-                    adaptiveDifficulty === mode.id
-                      ? "bg-indigo-600 text-white shadow-xs"
-                      : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
-                  }`}
-                >
-                  {mode.label}
-                </button>
-              ))}
-            </div>
           </div>
 
-          {/* Three Key Metrics */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-1">
-            <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 transition-colors min-w-0">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/60 dark:border-indigo-800/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
-                <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-[9px] sm:text-[10px] font-semibold text-zinc-400 uppercase tracking-wider truncate">
-                  Delivered
+          {/* Today's Recommended Drill Banner */}
+          {!isSprintComplete ? (
+            <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-500/10 via-purple-500/5 to-transparent border border-indigo-200/70 dark:border-indigo-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
+              <div className="space-y-1">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                  <Zap className="w-3.5 h-3.5" />
+                  <span>Today's Focus • Day {todayTask.dayNumber}</span>
                 </div>
-                <div className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 tabular-nums whitespace-nowrap">
-                  {completedCount} / {totalTasks}{" "}
-                  <span className="text-[10px] sm:text-xs font-normal text-zinc-500">
-                    Days
-                  </span>
+                <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                  {todayTask.title}
                 </div>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  {todayTask.description}
+                </p>
               </div>
-            </div>
 
-            <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 transition-colors min-w-0">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200/60 dark:border-amber-800/60 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
-                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-[9px] sm:text-[10px] font-semibold text-zinc-400 uppercase tracking-wider truncate">
-                  Focus Time
-                </div>
-                <div className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 tabular-nums whitespace-nowrap">
-                  {formatFocusTime(secondsFocusedToday)}
-                </div>
-              </div>
+              <button
+                onClick={() => openTaskRunner(todayTask)}
+                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-indigo-500/20 shrink-0"
+              >
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>Start Today's Drill</span>
+                <span className="text-indigo-200 font-normal">
+                  ({todayTask.estimatedMinutes}m)
+                </span>
+              </button>
             </div>
-
-            <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 transition-colors min-w-0">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/60 dark:border-emerald-800/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
-                <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-[9px] sm:text-[10px] font-semibold text-zinc-400 uppercase tracking-wider truncate">
-                  Sprint Streak
+          ) : (
+            <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white shrink-0 shadow-xs">
+                  <CheckCircle2 className="w-5 h-5" />
                 </div>
-                <div className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 tabular-nums whitespace-nowrap">
-                  {user?.streak || 1}{" "}
-                  <span className="text-[10px] sm:text-xs font-normal text-zinc-500">
-                    Days Active
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Next Drill or Completion Status */}
-          <div className="pt-2">
-            {!isSprintComplete ? (
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-r from-indigo-500/10 via-purple-500/5 to-transparent border border-indigo-200/60 dark:border-indigo-900/40">
-                <div className="space-y-0.5">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-                    <Zap className="w-3 h-3" />
-                    <span>Next Recommended Drill</span>
-                  </div>
-                  <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
-                    {activeTask.title}
+                <div>
+                  <div className="text-sm font-bold">Sprint Cleared Successfully!</div>
+                  <div className="text-emerald-700/80 dark:text-emerald-300/80 font-normal">
+                    All {totalTasks} daily milestones completed. Sparkis ready for your next skill sprint!
                   </div>
                 </div>
-
-                <button
-                  onClick={() => openPracticeSession(activeTask, false)}
-                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-indigo-500/20 shrink-0"
-                >
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>Launch Practice Session</span>
-                  <span className="text-indigo-200 font-normal">
-                    ({activeTask.estimatedMinutes}m)
-                  </span>
-                </button>
               </div>
-            ) : (
-              <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-semibold">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white shrink-0 shadow-xs">
-                    <CheckCircle2 className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold">
-                      Sprint Completed Successfully!
-                    </div>
-                    <div className="text-emerald-700/80 dark:text-emerald-300/80 font-normal">
-                      All {totalTasks} deliverables verified and ready for capstone project mission.
-                    </div>
-                  </div>
-                </div>
 
-                <button
-                  onClick={() => openShareModal()}
-                  className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0"
-                >
-                  <Share2 className="w-3.5 h-3.5" />
-                  <span>Share Progress</span>
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Curriculum Completion Bar */}
-          <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-white/[0.06]">
-            <div className="flex justify-between text-xs text-zinc-500 dark:text-zinc-400">
-              <span className="font-semibold">Curriculum Completion</span>
-              <span className="font-bold text-zinc-900 dark:text-zinc-100 tabular-nums">
-                {sprintProgressPercent}% Complete
-              </span>
+              <button
+                onClick={() => reshuffleSprint()}
+                className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer shrink-0"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>New Sprint</span>
+              </button>
             </div>
-            <div className="w-full h-2 bg-zinc-100 dark:bg-zinc-800/80 rounded-full overflow-hidden p-0.5">
-              <div
-                className="h-full bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 rounded-full transition-all duration-500 ease-out shadow-[0_0_12px_rgba(99,102,241,0.5)]"
-                style={{ width: `${sprintProgressPercent}%` }}
-              />
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* Mascot Card */}
-      <DuolingoMascot
-        emotion={isSprintComplete ? "success" : "encouragement"}
-        size="md"
-        showQuickActions={true}
-      />
-
-      {/* Feature 6: Finishing System (Deliberate Practice Schedule) */}
-      <div className="rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#11131d]/90 backdrop-blur-xl p-6 sm:p-7 space-y-6 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.4)]">
+      {/* Feature 5: Adaptive Skill Sprint (Simple 5-7 Day Path) */}
+      <div className="rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#11131d]/90 backdrop-blur-xl p-6 sm:p-7 space-y-5 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.4)]">
         <div className="flex items-center justify-between border-b border-zinc-100 dark:border-white/[0.06] pb-4">
           <div>
             <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-indigo-500" />
-              <span>4-Day Finishing System</span>
+              <span>Adaptive Skill Sprint ({totalTasks}-Day Path)</span>
             </h2>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              Clear marks of completion for each step with instant visual proof stamps.
+              Today is highlighted and active; future days stay simple and greyed.
             </p>
           </div>
           <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 tabular-nums">
@@ -357,100 +253,112 @@ export const DashboardView: React.FC = () => {
           </span>
         </div>
 
+        {/* The 5-7 Day Sprint Path */}
         <div className="space-y-3">
           {tasks.map((task, index) => {
             const isCompleted = task.completed;
-            const isCurrent =
-              !isCompleted && (index === 0 || tasks[index - 1].completed);
+            const isToday = task.id === todayTask?.id && !isCompleted;
+            const isFuture = !isCompleted && !isToday;
             const isExpanded = expandedTaskId === task.id;
-            const progress = practiceProgressMap[task.id];
 
             return (
               <div
                 key={task.id}
-                className={`rounded-xl border transition-all duration-200 overflow-hidden ${
-                  isCurrent
-                    ? "border-indigo-500/80 bg-indigo-50/30 dark:bg-indigo-950/20 shadow-sm"
+                className={`rounded-xl border transition-all duration-200 overflow-hidden ${isToday
+                    ? "border-indigo-600 bg-indigo-50/40 dark:bg-indigo-950/30 ring-2 ring-indigo-500/20 shadow-md shadow-indigo-500/10"
                     : isCompleted
-                      ? "border-emerald-500/30 bg-emerald-50/10 dark:bg-emerald-950/10"
-                      : "border-zinc-200/60 dark:border-zinc-800/60 bg-white dark:bg-[#111218] hover:border-zinc-300 dark:hover:border-zinc-700"
-                }`}
+                      ? "border-emerald-500/30 bg-emerald-50/10 dark:bg-emerald-950/10 opacity-90"
+                      : "border-zinc-200/50 dark:border-zinc-800/40 bg-zinc-50/40 dark:bg-zinc-900/20 opacity-60"
+                  }`}
               >
-                <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-start gap-3.5 min-w-0">
+                    {/* Day status badge / button */}
                     <button
-                      onClick={() => openPracticeSession(task, isCompleted)}
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all cursor-pointer ${
-                        isCompleted
-                          ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/25 ring-2 ring-emerald-500/30"
-                          : isCurrent
-                            ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25 ring-2 ring-indigo-500/30"
-                            : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 border border-zinc-200 dark:border-zinc-700"
-                      }`}
+                      onClick={() => !isFuture && openTaskRunner(task)}
+                      disabled={isFuture}
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all ${isCompleted
+                          ? "bg-emerald-600 text-white shadow-xs cursor-pointer"
+                          : isToday
+                            ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/30 ring-2 ring-indigo-400 cursor-pointer animate-pulse"
+                            : "bg-zinc-200 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed"
+                        }`}
                       title={
                         isCompleted
-                          ? "Review completed practice"
-                          : "Start practice"
+                          ? "Review completed drill"
+                          : isToday
+                            ? "Today's Active Drill"
+                            : "Future Day (Simple / Greyed)"
                       }
                     >
                       {isCompleted ? (
                         <Check className="w-5 h-5 stroke-[2.5]" />
+                      ) : isToday ? (
+                        <span className="text-xs font-bold font-mono">0{task.dayNumber}</span>
                       ) : (
-                        <span className="text-xs font-bold font-mono">
-                          0{task.dayNumber}
-                        </span>
+                        <Lock className="w-4 h-4 opacity-50" />
                       )}
                     </button>
 
-                    <div className="min-w-0 space-y-1">
+                    {/* Day Info */}
+                    <div className="min-w-0 space-y-0.5">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">
-                          Day {task.dayNumber} • {task.estimatedMinutes}m drill
+                        <span className={`text-[11px] font-semibold ${isToday ? "text-indigo-600 dark:text-indigo-400 font-bold" : "text-zinc-500 dark:text-zinc-400"}`}>
+                          Day 0{task.dayNumber} • {task.estimatedMinutes}m
                         </span>
-                        {task.producesArtifact && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
-                            <FileCode className="w-3 h-3 text-indigo-500" />
-                            <span>Artifact</span>
+
+                        {isToday && (
+                          <span className="px-2 py-0.5 rounded-md bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-wider">
+                            TODAY
                           </span>
                         )}
+
                         {isCompleted && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300/40">
-                            <ShieldCheck className="w-3 h-3" />
-                            <span>CLEARED</span>
+                          <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold">
+                            CLEARED
                           </span>
                         )}
-                        {isCurrent && (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-600 text-white uppercase tracking-wider">
-                            Active Drill
+
+                        {isFuture && (
+                          <span className="text-[10px] text-zinc-400">
+                            Upcoming
                           </span>
                         )}
                       </div>
 
                       <h3
-                        className={`text-sm font-semibold truncate ${
-                          isCompleted
-                            ? "text-zinc-500 dark:text-zinc-400"
-                            : "text-zinc-950 dark:text-zinc-100"
-                        }`}
+                        className={`text-sm font-semibold truncate ${isToday
+                            ? "text-zinc-950 dark:text-white font-bold"
+                            : isCompleted
+                              ? "text-zinc-600 dark:text-zinc-300 line-through decoration-zinc-400"
+                              : "text-zinc-500 dark:text-zinc-400"
+                          }`}
                       >
                         {task.title}
                       </h3>
                     </div>
                   </div>
 
+                  {/* Actions on right */}
                   <div className="flex items-center gap-2 sm:self-center shrink-0">
-                    <button
-                      onClick={() => openPracticeSession(task, isCompleted)}
-                      className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                        isCompleted
-                          ? "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300"
-                          : isCurrent
-                            ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
-                            : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400"
-                      }`}
-                    >
-                      {isCompleted ? "Review" : "Start"}
-                    </button>
+                    {isToday && (
+                      <button
+                        onClick={() => openTaskRunner(task)}
+                        className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
+                      >
+                        <Play className="w-3 h-3 fill-current" />
+                        <span>Start Today</span>
+                      </button>
+                    )}
+
+                    {isCompleted && (
+                      <button
+                        onClick={() => openTaskRunner(task)}
+                        className="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold cursor-pointer"
+                      >
+                        Review
+                      </button>
+                    )}
 
                     <button
                       onClick={() =>
@@ -469,127 +377,28 @@ export const DashboardView: React.FC = () => {
                 </div>
 
                 {isExpanded && (
-                  <div className="px-5 pb-4 pt-2 border-t border-zinc-100 dark:border-white/[0.06] text-xs space-y-3 bg-zinc-50/50 dark:bg-zinc-900/20">
+                  <div className="px-5 pb-4 pt-2 border-t border-zinc-100 dark:border-white/[0.06] text-xs space-y-2 bg-zinc-50/50 dark:bg-zinc-900/20">
                     <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
                       {task.description}
                     </p>
-
-                    {progress?.reflectionNotes && (
-                      <div className="p-3 rounded-xl bg-white dark:bg-[#0c0d12] border border-zinc-200/60 dark:border-zinc-800 space-y-1 shadow-xs">
-                        <span className="font-semibold text-zinc-700 dark:text-zinc-300 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                          <span>Saved Reflection</span>
-                        </span>
-                        <p className="text-zinc-600 dark:text-zinc-400 text-xs italic">
-                          "{progress.reflectionNotes}"
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="flex items-center gap-2 pt-1 text-[11px] text-zinc-500">
-                      <img
-                        src={task.creatorAvatar}
-                        alt={task.creatorName}
-                        className="w-4 h-4 rounded-full object-cover"
-                      />
+                    <div className="flex items-center justify-between text-[11px] text-zinc-400 pt-1">
                       <span>Curated by {task.creatorName}</span>
+                      <span>Estimated focus: {task.estimatedMinutes} minutes</span>
                     </div>
                   </div>
                 )}
               </div>
             );
           })}
-
-          {/* Feature 12: Project Mission Capstone Launcher */}
-          {currentMission && (
-            <div className="rounded-2xl border-2 border-dashed border-amber-300 dark:border-amber-800/60 bg-gradient-to-r from-amber-500/10 via-indigo-500/5 to-transparent p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-500/20">
-                  <Trophy className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-[10px] font-bold uppercase tracking-wider">
-                      Real-World Project Mission
-                    </span>
-                    <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
-                      +8% Skill Health
-                    </span>
-                  </div>
-                  <h4 className="text-sm font-bold text-zinc-950 dark:text-white mt-0.5">
-                    {currentMission.title}
-                  </h4>
-                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                    Complete this real-world mini-project to unlock verified portfolio proof.
-                  </p>
-                </div>
-              </div>
-
-              <button
-                onClick={() => openProjectMission(currentMission)}
-                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-md shadow-amber-500/20 transition-all cursor-pointer flex items-center gap-1.5 shrink-0"
-              >
-                <span>Launch Project Mission</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
-      {/* Feature 5: Sprinter Friends Activity View */}
-      <SprinterFriendsView />
-
-      {/* Feature 10 & 11: Micro-Squad Sync Room */}
-      <div className="rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/80 dark:bg-[#11131d]/90 backdrop-blur-xl p-6 space-y-4 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.4)]">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-              <Users className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
-                Micro-Squad Sync Room
-              </h3>
-              <span className="text-[11px] text-zinc-500">
-                {squad.name} • {squad.currentProgress}/{squad.targetProgress}{" "}
-                milestones completed
-              </span>
-            </div>
-          </div>
-
-          <button
-            onClick={() => setActiveTab("squad")}
-            className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer flex items-center gap-1"
-          >
-            <span>Open Squad Room</span>
-            <ArrowRight className="w-3 h-3" />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {squad.activityPings.slice(0, 2).map((ping) => (
-            <div
-              key={ping.id}
-              className="p-3.5 rounded-xl bg-zinc-50/70 dark:bg-zinc-900/40 border border-zinc-200/50 dark:border-zinc-800/60 flex items-center gap-3 text-xs"
-            >
-              <img
-                src={ping.memberAvatar}
-                alt={ping.memberName}
-                className="w-8 h-8 rounded-lg object-cover ring-1 ring-zinc-200 dark:ring-zinc-700"
-              />
-              <div className="flex-1 min-w-0">
-                <div className="font-semibold text-zinc-900 dark:text-zinc-100 truncate text-xs">
-                  {ping.memberName}
-                </div>
-                <div className="text-zinc-500 dark:text-zinc-400 text-[11px] truncate">
-                  {ping.actionText}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Task Execution Modal */}
+      <SprintTaskModal
+        task={activeModalTask}
+        isOpen={isTaskModalOpen}
+        onClose={() => setIsTaskModalOpen(false)}
+      />
     </div>
   );
 };
