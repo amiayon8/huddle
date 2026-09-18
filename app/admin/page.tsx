@@ -36,7 +36,6 @@ import {
   Tag,
   ThumbsUp,
   MessageCircle,
-  Sparkles,
   Zap,
   Copy,
   CheckCheck,

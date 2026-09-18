@@ -7,8 +7,9 @@ import { HuddleProvider } from "./context/HuddleContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Huddle — Skill Development Platform",
-  description: "A calm, focused space for deliberate skill practice with intimate 4-member micro-squads and curated roadmap steps.",
+  title: "Huddle - Skill Development Platform",
+  description:
+    "A calm, focused space for deliberate skill practice with intimate 4-member micro-squads and curated roadmap steps.",
   icons: {
     icon: [
       { url: "/logo_light.svg", media: "(prefers-color-scheme: light)" },
@@ -31,10 +32,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-100 antialiased selection:bg-indigo-600 selection:text-white transition-colors duration-150`}>
-        <HuddleProvider>
-          {children}
-        </HuddleProvider>
+      <body
+        className={`${inter.className} min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-100 antialiased selection:bg-indigo-600 selection:text-white transition-colors duration-150`}
+      >
+        <HuddleProvider>{children}</HuddleProvider>
       </body>
     </html>
   );

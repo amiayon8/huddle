@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { MessageSquare, Sparkles, ChevronRight } from "lucide-react";
+import React from "react";
+import { MessageSquare, ChevronRight } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
 import { MarkdownRenderer } from "./MarkdownRenderer";
 
@@ -40,9 +40,13 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
   };
 
   const currentSvg = mascotMap[emotion] || "/mascot_idle.svg";
-  const completedTasksCount = sprint.tasks ? sprint.tasks.filter((t) => t.completed).length : 0;
+  const completedTasksCount = sprint.tasks
+    ? sprint.tasks.filter((t) => t.completed).length
+    : 0;
   const totalTasksCount = sprint.tasks?.length || 4;
-  const progressPercent = Math.round((completedTasksCount / totalTasksCount) * 100);
+  const progressPercent = Math.round(
+    (completedTasksCount / totalTasksCount) * 100,
+  );
   const defaultSpeech =
     speechText ||
     sprint.mascotNarration ||
@@ -62,7 +66,7 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 p-1 flex items-center justify-center border border-zinc-200/60 dark:border-zinc-700/60">
             <img
               src={currentSvg}
-              alt="Spark AI"
+              alt="Spark"
               className="w-full h-full object-contain"
             />
           </div>
@@ -72,7 +76,7 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
                 Spark
               </span>
               <span className="text-[10px] text-zinc-400 font-medium">
-                Sprint Guide
+                AI Companion
               </span>
             </div>
           </div>
@@ -82,10 +86,10 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
           <div className="hidden sm:flex items-center justify-between gap-2 pb-1 border-b border-zinc-100 dark:border-zinc-800/60">
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                Spark AI
+                Spark
               </span>
               <span className="text-[10px] text-zinc-400 font-medium">
-                Sprint Coach
+                Your AI Companion
               </span>
             </div>
             <span className="text-[11px] font-medium text-zinc-500">

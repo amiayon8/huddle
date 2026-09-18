@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
   X,
-  RotateCcw,
   Send,
   Plus,
   History,
@@ -19,14 +18,8 @@ import { SparkChatMessage, SparkChatSession } from "../types/huddle";
 import { addMascotMessageToDb } from "../lib/supabase";
 
 export const MascotDrawer: React.FC = () => {
-  const {
-    mascotOpen,
-    setMascotOpen,
-    sprint,
-    reshuffleSprint,
-    user,
-    ensureSurveyDone,
-  } = useHuddle();
+  const { mascotOpen, setMascotOpen, sprint, reshuffleSprint, user } =
+    useHuddle();
 
   const [chatInput, setChatInput] = useState("");
   const [currentMascotEmotion, setCurrentMascotEmotion] =
@@ -50,21 +43,7 @@ export const MascotDrawer: React.FC = () => {
   const getStorageKey = () => `huddle_spark_sessions_${user.id || "user-1"}`;
 
   const createDefaultMessages = (): SparkChatMessage[] => {
-    const milestone =
-      user.surveyData?.targetProfession ||
-      user.careerMilestone ||
-      "Staff Software Engineer";
     const skill = sprint?.skillTitle || "System Architecture";
-    const hobbies = user.surveyData?.hobbies?.length
-      ? user.surveyData.hobbies.join(", ")
-      : "technology";
-    const subjects = user.surveyData?.subjects?.length
-      ? user.surveyData.subjects.join(", ")
-      : "computing";
-    const completedTasks = sprint?.tasks
-      ? sprint.tasks.filter((t) => t.completed).length
-      : 0;
-    const totalTasks = sprint?.tasks ? sprint.tasks.length : 4;
     const currentTime = new Date().toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
@@ -73,16 +52,9 @@ export const MascotDrawer: React.FC = () => {
     return [
       {
         id: `msg-${Date.now()}-1`,
-        sender: "pip",
-        text: `Hi ${user.name || "there"}! I'm Pip, your AI deliberate practice tutor for this sprint on **${skill}**.\n\nI've tailored your path for your goal (**${user.surveyData?.goal || user.primaryGoal || "Mastery"}**) at a **${user.surveyData?.level || "Intermediate"}** level (${user.surveyData?.dailyTime || "30 mins / day"}).`,
+        sender: "spark",
+        text: `Hi ${user.name || "there"}! I'm Spark - your AI Companion for **${skill}**.\n\nWhether you need task-specific instructions broken down step by step, help verifying your progress, or advice on your long-term Growth Map, I am right here by your side. What can we tackle today?`,
         mascotSvg: "/mascot_idle.svg",
-        timestamp: currentTime,
-      },
-      {
-        id: `msg-${Date.now()}-2`,
-        sender: "pip",
-        text: `Day ${sprint.currentDay || 1} of ${sprint.durationDays || 6}. ${completedTasks} of ${totalTasks} daily milestones cleared.\n\nAsk me technical questions about today's practice drill, request code examples, or have me adapt your sprint anytime!`,
-        mascotSvg: "/mascot_encouragement.svg",
         timestamp: currentTime,
       },
     ];
@@ -94,7 +66,7 @@ export const MascotDrawer: React.FC = () => {
       try {
         const saved =
           localStorage.getItem(storageKey) ||
-          localStorage.getItem(`huddle_pip_sessions_${user.id || "user-1"}`);
+          localStorage.getItem(`huddle_spark_sessions_${user.id || "user-1"}`);
         if (saved) {
           const parsed: SparkChatSession[] = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
@@ -109,7 +81,7 @@ export const MascotDrawer: React.FC = () => {
 
       const initialSession: SparkChatSession = {
         id: `sess-${Date.now()}`,
-        title: `Sprint Focus: ${sprint.skillTitle}`,
+        title: `Topic: ${sprint.skillTitle}`,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         messages: createDefaultMessages(),
@@ -139,230 +111,192 @@ export const MascotDrawer: React.FC = () => {
 
   const activeSession =
     sessions.find((s) => s.id === currentSessionId) || sessions[0];
-  const messages = activeSession ? activeSession.messages : [];
+  const messages = activeSession?.messages || [];
 
   useEffect(() => {
-    if (chatEndRef.current && !showHistory) {
-      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (mascotOpen && !showHistory) {
+      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages.length, isThinking, showHistory]);
+  }, [messages.length, mascotOpen, isThinking, showHistory]);
 
   const handleStartNewChat = () => {
     const newSession: SparkChatSession = {
       id: `sess-${Date.now()}`,
-      title: `Discussion #${sessions.length + 1}: ${sprint.skillTitle}`,
+      title: `Topic: ${sprint.skillTitle}`,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       messages: createDefaultMessages(),
       skillFocus: sprint.skillTitle,
     };
-
     const updated = [newSession, ...sessions];
     saveSessions(updated);
     setCurrentSessionId(newSession.id);
     setShowHistory(false);
-    setCurrentMascotEmotion("idle");
   };
 
-  const handleSelectSession = (sessionId: string) => {
-    setCurrentSessionId(sessionId);
+  const handleSelectSession = (id: string) => {
+    setCurrentSessionId(id);
     setShowHistory(false);
   };
 
-  const handleDeleteSession = (sessionId: string, e: React.MouseEvent) => {
+  const handleDeleteSession = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const remaining = sessions.filter((s) => s.id !== sessionId);
-
-    if (remaining.length === 0) {
-      const freshSession: SparkChatSession = {
-        id: `sess-${Date.now()}`,
-        title: `Sprint Focus: ${sprint.skillTitle}`,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        messages: createDefaultMessages(),
-        skillFocus: sprint.skillTitle,
-      };
-      saveSessions([freshSession]);
-      setCurrentSessionId(freshSession.id);
+    const updated = sessions.filter((s) => s.id !== id);
+    if (updated.length === 0) {
+      const reset = [
+        {
+          id: `sess-${Date.now()}`,
+          title: `Topic: ${sprint.skillTitle}`,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          messages: createDefaultMessages(),
+          skillFocus: sprint.skillTitle,
+        },
+      ];
+      saveSessions(reset);
+      setCurrentSessionId(reset[0].id);
     } else {
-      saveSessions(remaining);
-      if (currentSessionId === sessionId) {
-        setCurrentSessionId(remaining[0].id);
+      saveSessions(updated);
+      if (currentSessionId === id) {
+        setCurrentSessionId(updated[0].id);
       }
     }
   };
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSendMessage = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!chatInput.trim() || isThinking) return;
-    if (!ensureSurveyDone("chat with Spark")) return;
 
     const userText = chatInput.trim();
-    const currentTime = new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    setChatInput("");
 
-    const newUserMsg: SparkChatMessage = {
-      id: `msg-${Date.now()}-user`,
+    const userMessage: SparkChatMessage = {
+      id: `msg-${Date.now()}`,
       sender: "user",
       text: userText,
-      timestamp: currentTime,
-    };
-
-    const updatedMessages = [...messages, newUserMsg];
-
-    let sessionTitle = activeSession?.title || "Engineering Discussion";
-    if (
-      sessionTitle.startsWith("Sprint Focus") ||
-      sessionTitle.startsWith("Discussion #")
-    ) {
-      sessionTitle =
-        userText.length > 36 ? `${userText.slice(0, 36)}...` : userText;
-    }
-
-    const updatedSession: SparkChatSession = {
-      ...(activeSession || {
-        id: `sess-${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        skillFocus: sprint.skillTitle,
-      }),
-      title: sessionTitle,
-      updatedAt: new Date().toISOString(),
-      messages: updatedMessages,
-    };
-
-    const nextSessions = sessions.map((s) =>
-      s.id === updatedSession.id ? updatedSession : s,
-    );
-    saveSessions(nextSessions);
-
-    setChatInput("");
-    setIsThinking(true);
-    setCurrentMascotEmotion("deep_thinking");
-
-    try {
-      const res = await fetch("/api/mascot", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messages: updatedMessages.map((m) => ({
-            sender: m.sender,
-            text: m.text,
-          })),
-          userProfile: user,
-          surveyData: user.surveyData,
-          sprintContext: sprint,
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        const emotionSvg = data.mascotSvg || "/mascot_encouragement.svg";
-
-        const newSparkMsg: SparkChatMessage = {
-          id: `msg-${Date.now()}-spark`,
-          sender: "spark",
-          text: data.reply,
-          mascotSvg: emotionSvg,
-          timestamp: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        };
-
-        addMascotMessageToDb(
-          { id: newSparkMsg.id, context: "chat", text: newSparkMsg.text },
-          user.id,
-        );
-
-        const finalMessages = [...updatedMessages, newSparkMsg];
-        const finalSession: SparkChatSession = {
-          ...updatedSession,
-          updatedAt: new Date().toISOString(),
-          messages: finalMessages,
-        };
-
-        saveSessions(
-          sessions.map((s) => (s.id === finalSession.id ? finalSession : s)),
-        );
-
-        setCurrentMascotEmotion(
-          emotionSvg.includes("planning")
-            ? "planning"
-            : emotionSvg.includes("success")
-              ? "success"
-              : emotionSvg.includes("deep")
-                ? "deep_thinking"
-                : "encouragement",
-        );
-
-        if (
-          userText.toLowerCase().includes("reshuffle") ||
-          userText.toLowerCase().includes("busy") ||
-          userText.toLowerCase().includes("missed")
-        ) {
-          reshuffleSprint(userText);
-        }
-      } else {
-        throw new Error("API request failed");
-      }
-    } catch (error) {
-      console.error(error);
-      const fallbackMsg: SparkChatMessage = {
-        id: `msg-${Date.now()}-fallback`,
-        sender: "spark",
-        text: `Spark here! Consistent daily drills build extraordinary engineering depth. Let's focus on today's single action on **${sprint.skillTitle}**!`,
-        mascotSvg: "/mascot_encouragement.svg",
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      };
-
-      const finalMessages = [...updatedMessages, fallbackMsg];
-      const finalSession: SparkChatSession = {
-        ...updatedSession,
-        updatedAt: new Date().toISOString(),
-        messages: finalMessages,
-      };
-      saveSessions(
-        sessions.map((s) => (s.id === finalSession.id ? finalSession : s)),
-      );
-      setCurrentMascotEmotion("encouragement");
-    } finally {
-      setIsThinking(false);
-    }
-  };
-
-  const handleQuickReshuffle = () => {
-    reshuffleSprint();
-
-    const reshuffleMsg: SparkChatMessage = {
-      id: `msg-${Date.now()}-reshuffle`,
-      sender: "spark",
-      text: "Sprint rescheduled smoothly with **zero penalties**. You can pick up Day 1 whenever you are ready.",
-      mascotSvg: "/mascot_planning.svg",
       timestamp: new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       }),
     };
 
-    const finalMessages = [...messages, reshuffleMsg];
+    const newMessages = [...messages, userMessage];
+
     if (activeSession) {
-      const finalSession: SparkChatSession = {
+      const updatedSession: SparkChatSession = {
         ...activeSession,
         updatedAt: new Date().toISOString(),
-        messages: finalMessages,
+        messages: newMessages,
       };
       saveSessions(
-        sessions.map((s) => (s.id === finalSession.id ? finalSession : s)),
+        sessions.map((s) => (s.id === updatedSession.id ? updatedSession : s)),
       );
     }
-    setCurrentMascotEmotion("planning");
+
+    if (user.id) {
+      addMascotMessageToDb(
+        { id: `msg-${Date.now()}`, context: "chat", text: userText },
+        user.id,
+      );
+    }
+
+    setIsThinking(true);
+    setCurrentMascotEmotion("thinking");
+
+    try {
+      const response = await fetch("/api/mascot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: userText,
+          history: messages.slice(-8),
+          messages: [...messages.slice(-8), { sender: "user", text: userText }],
+          userContext: {
+            name: user.name,
+            currentSkill: sprint.skillTitle,
+            currentDay: sprint.currentDay,
+            totalDays: sprint.durationDays || 6,
+          },
+          sprintContext: {
+            skillTitle: sprint.skillTitle,
+            currentDay: sprint.currentDay,
+            durationDays: sprint.durationDays || 6,
+          },
+        }),
+      });
+
+      const data = await response.json();
+      const sparkReply =
+        data.reply ||
+        "I am here to help. Could you tell me more about what you would like to explore?";
+      const emotion = data.emotion || "encouragement";
+      const aiChatTitle = data.chatTitle;
+
+      const sparkMessage: SparkChatMessage = {
+        id: `msg-${Date.now() + 1}`,
+        sender: "spark",
+        text: sparkReply,
+        mascotSvg: data.mascotSvg || mascotMap[emotion] || "/mascot_idle.svg",
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+
+      const finalMessages = [...newMessages, sparkMessage];
+      if (activeSession) {
+        const finalSession: SparkChatSession = {
+          ...activeSession,
+          title: aiChatTitle || activeSession.title,
+          updatedAt: new Date().toISOString(),
+          messages: finalMessages,
+        };
+        saveSessions(
+          sessions.map((s) => (s.id === finalSession.id ? finalSession : s)),
+        );
+      }
+
+      if (user.id) {
+        addMascotMessageToDb(
+          { id: `msg-${Date.now() + 1}`, context: "chat", text: sparkReply },
+          user.id,
+        );
+      }
+
+      setCurrentMascotEmotion(emotion);
+    } catch {
+      const fallbackReply =
+        "I am currently having trouble connecting. Let's continue in a moment, or try asking your question again.";
+      const errorMsg: SparkChatMessage = {
+        id: `msg-${Date.now() + 1}`,
+        sender: "spark",
+        text: fallbackReply,
+        mascotSvg: "/mascot_idle.svg",
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+
+      const finalMessages = [...newMessages, errorMsg];
+      if (activeSession) {
+        const finalSession: SparkChatSession = {
+          ...activeSession,
+          updatedAt: new Date().toISOString(),
+          messages: finalMessages,
+        };
+        saveSessions(
+          sessions.map((s) => (s.id === finalSession.id ? finalSession : s)),
+        );
+      }
+      setCurrentMascotEmotion("idle");
+    } finally {
+      setIsThinking(false);
+    }
+  };
+
+  const handleQuickQuestion = (question: string) => {
+    setChatInput(question);
   };
 
   if (!mascotOpen) return null;
@@ -371,38 +305,27 @@ export const MascotDrawer: React.FC = () => {
     <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
       <div className="flex-1" onClick={() => setMascotOpen(false)} />
 
-      <div className="w-full sm:w-[500px] bg-white dark:bg-[#0c0d12] border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-200">
-        <div className="p-4 sm:p-5 border-b border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between">
-          <div className="flex items-center gap-3.5">
-            <div className="relative shrink-0">
-              <div className="w-13 h-13 sm:w-15 sm:h-15 p-1.5 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-800/50 flex items-center justify-center shadow-xs">
-                <img
-                  src={mascotMap[currentMascotEmotion] || "/mascot_idle.svg"}
-                  alt="Spark"
-                  className="w-full h-full object-contain drop-shadow-sm transition-transform duration-200 hover:scale-105 cursor-pointer"
-                />
-              </div>
-              <span
-                className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-[#0c0d12]"
-                title="Spark is online"
+      <div className="w-full sm:w-[480px] bg-white dark:bg-[#111218] border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-150">
+        <div className="p-4 sm:p-5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1 flex items-center justify-center shrink-0">
+              <img
+                src={mascotMap[currentMascotEmotion] || "/mascot_idle.svg"}
+                alt="Spark"
+                className="w-full h-full object-contain"
               />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-sm sm:text-base text-zinc-900 dark:text-zinc-100">
-                  Spark AI
-                </h3>
-                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
-                  Active
-                </span>
-              </div>
+              <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
+                Spark - Your AI Companion
+              </h3>
               <p
-                className="text-[11px] text-zinc-500 truncate max-w-[170px] sm:max-w-[210px]"
+                className="text-xs text-zinc-500 truncate max-w-[180px] sm:max-w-[220px]"
                 title={activeSession?.title}
               >
                 {showHistory
-                  ? "Conversation History"
-                  : activeSession?.title || "Universal engineering coach & tutor"}
+                  ? "Conversation history"
+                  : activeSession?.title || "Ask questions or explore concepts"}
               </p>
             </div>
           </div>
@@ -410,31 +333,28 @@ export const MascotDrawer: React.FC = () => {
           <div className="flex items-center gap-1.5">
             <button
               onClick={handleStartNewChat}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:border-indigo-500 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
-              title="Start a new chat session"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-xs font-medium transition-colors cursor-pointer"
+              title="Start a new conversation"
             >
-              <Plus className="w-3.5 h-3.5 text-indigo-500" />
+              <Plus className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">New</span>
             </button>
 
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold shadow-2xs transition-all cursor-pointer ${
+              className={`p-2 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
                 showHistory
-                  ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400"
-                  : "border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 text-zinc-700 dark:text-zinc-300 hover:border-indigo-400"
+                  ? "border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40"
+                  : "border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800"
               }`}
-              title="View past conversations"
+              title="View conversation history"
             >
               <History className="w-3.5 h-3.5" />
-              <span className="text-[10.5px] px-1.5 py-0.2 rounded-full bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-mono">
-                {sessions.length}
-              </span>
             </button>
 
             <button
               onClick={() => setMascotOpen(false)}
-              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors ml-1 cursor-pointer"
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -442,7 +362,7 @@ export const MascotDrawer: React.FC = () => {
         </div>
 
         {showHistory ? (
-          <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
+          <div className="flex-1 overflow-y-auto p-5 space-y-4">
             <div className="flex items-center justify-between pb-1">
               <div className="flex items-center gap-2">
                 <button
@@ -451,25 +371,17 @@ export const MascotDrawer: React.FC = () => {
                 >
                   <ArrowLeft className="w-4 h-4" />
                 </button>
-                <h4 className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-zinc-100">
-                  Previous Conversations ({sessions.length})
+                <h4 className="font-semibold text-xs text-zinc-900 dark:text-zinc-100">
+                  Previous conversations ({sessions.length})
                 </h4>
               </div>
-              <button
-                onClick={handleStartNewChat}
-                className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>New Discussion</span>
-              </button>
             </div>
 
-            <p className="text-[11.5px] text-zinc-500 pb-2">
-              Select any past discussion to reopen it with complete contextual
-              memory and prior dialogue history.
+            <p className="text-xs text-zinc-500">
+              Choose any past conversation to pick up right where you left off.
             </p>
 
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {sessions.map((sess) => {
                 const isActive = sess.id === currentSessionId;
                 const dateFormatted = new Date(
@@ -477,57 +389,41 @@ export const MascotDrawer: React.FC = () => {
                 ).toLocaleDateString([], {
                   month: "short",
                   day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
                 });
 
                 return (
                   <div
                     key={sess.id}
                     onClick={() => handleSelectSession(sess.id)}
-                    className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer group flex items-center justify-between ${
+                    className={`p-3 rounded-xl border text-left transition-colors cursor-pointer flex items-center justify-between ${
                       isActive
-                        ? "border-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/30 ring-1 ring-indigo-500/20"
-                        : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] hover:border-zinc-300 dark:hover:border-zinc-700"
+                        ? "border-indigo-500/80 bg-indigo-50/30 dark:bg-indigo-950/20"
+                        : "border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-[#111218] hover:border-zinc-300 dark:hover:border-zinc-700"
                     }`}
                   >
                     <div className="space-y-1 min-w-0 pr-3">
                       <div className="flex items-center gap-2">
-                        <MessageSquare className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                        <h5 className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 truncate">
+                        <MessageSquare className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                        <h5 className="font-medium text-xs text-zinc-900 dark:text-zinc-100 truncate">
                           {sess.title}
                         </h5>
-                        {isActive && (
-                          <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 shrink-0">
-                            Active
-                          </span>
-                        )}
                       </div>
-                      <div className="flex items-center gap-3 text-[10.5px] text-zinc-500">
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          <span>{dateFormatted}</span>
-                        </span>
+                      <div className="flex items-center gap-2 text-[11px] text-zinc-400">
+                        <span>{dateFormatted}</span>
                         <span>•</span>
                         <span>{sess.messages.length} messages</span>
-                        {sess.skillFocus && (
-                          <>
-                            <span>•</span>
-                            <span className="truncate">{sess.skillFocus}</span>
-                          </>
-                        )}
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 shrink-0">
+                    <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={(e) => handleDeleteSession(sess.id, e)}
-                        className="p-1.5 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors opacity-70 group-hover:opacity-100"
-                        title="Delete this chat"
+                        className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                        title="Delete conversation"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
-                      <ChevronRight className="w-4 h-4 text-zinc-400 group-hover:text-indigo-500 transition-transform group-hover:translate-x-0.5" />
+                      <ChevronRight className="w-4 h-4 text-zinc-400" />
                     </div>
                   </div>
                 );
@@ -535,30 +431,30 @@ export const MascotDrawer: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 text-xs sm:text-[13px]">
+          <div className="flex-1 overflow-y-auto p-5 space-y-4 text-xs">
             {messages.map((m, idx) => (
               <div
                 key={m.id || idx}
-                className={`flex items-start gap-3 ${m.sender === "user" ? "justify-end" : "justify-start"}`}
+                className={`flex items-start gap-3 ${
+                  m.sender === "user" ? "justify-end" : "justify-start"
+                }`}
               >
-                {(m.sender === "spark" || m.sender === "pip") && (
-                  <div className="shrink-0 flex flex-col items-center pt-0.5 select-none">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 p-1 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex items-center justify-center transition-transform hover:scale-105 shadow-2xs">
-                      <img
-                        src={m.mascotSvg || "/mascot_idle.svg"}
-                        alt="Spark"
-                        className="w-full h-full object-contain drop-shadow-xs"
-                      />
-                    </div>
+                {m.sender === "spark" && (
+                  <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 p-1 flex items-center justify-center shrink-0">
+                    <img
+                      src={m.mascotSvg || "/mascot_idle.svg"}
+                      alt="Spark"
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                 )}
 
-                <div className="space-y-1 max-w-[82%]">
+                <div className="space-y-1 max-w-[85%]">
                   <div
                     className={`p-3.5 rounded-2xl leading-relaxed ${
                       m.sender === "user"
-                        ? "bg-indigo-600 text-white rounded-br-xs"
-                        : "bg-zinc-100 dark:bg-zinc-800/70 text-zinc-900 dark:text-zinc-100 rounded-bl-xs border border-zinc-200/60 dark:border-zinc-700/60"
+                        ? "bg-indigo-600 text-white"
+                        : "bg-zinc-100 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100 border border-zinc-200/50 dark:border-zinc-700/50"
                     }`}
                   >
                     {m.sender === "user" ? (
@@ -569,7 +465,9 @@ export const MascotDrawer: React.FC = () => {
                   </div>
                   {m.timestamp && (
                     <div
-                      className={`text-[10px] text-zinc-400 px-1 ${m.sender === "user" ? "text-right" : "text-left"}`}
+                      className={`text-[10px] text-zinc-400 px-1 ${
+                        m.sender === "user" ? "text-right" : "text-left"
+                      }`}
                     >
                       {m.timestamp}
                     </div>
@@ -579,15 +477,15 @@ export const MascotDrawer: React.FC = () => {
             ))}
 
             {isThinking && (
-              <div className="flex items-center gap-3 text-zinc-500 text-xs py-2 pl-1 animate-in fade-in duration-150">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 p-1 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-2.5 text-zinc-500 text-xs py-2">
+                <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 p-1 flex items-center justify-center shrink-0">
                   <img
-                    src="/mascot_deep_thinking.svg"
+                    src="/mascot_thinking.svg"
                     alt="Thinking"
-                    className="w-full h-full object-contain opacity-80"
+                    className="w-full h-full object-contain opacity-70"
                   />
                 </div>
-                <div className="p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 text-xs border border-zinc-200/60 dark:border-zinc-700/60 flex items-center gap-2">
+                <div className="p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs flex items-center gap-2">
                   <div className="w-2.5 h-2.5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
                   <span>Thinking...</span>
                 </div>
@@ -599,108 +497,26 @@ export const MascotDrawer: React.FC = () => {
         )}
 
         {!showHistory && (
-          <div className="p-3 sm:p-4 border-t border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/40 space-y-2.5">
-            {(() => {
-              const survey = user?.surveyData;
-              const primaryHobby = survey?.hobbies?.[0] || "Gaming";
-              const primarySubject =
-                survey?.subjects?.[0] || "Computer Science";
-              const targetProfession =
-                survey?.targetProfession ||
-                user?.careerMilestone ||
-                "Staff Architect";
-              const primarySkill =
-                survey?.startingSkills?.[0] ||
-                sprint?.skillTitle ||
-                "System Design";
-              const learningStage = survey?.learningStage || "Rising Engineer";
-
-              return (
-                <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 hide-scrollbar">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setChatInput(
-                        `Explain ${sprint?.skillTitle || "today step"} using a ${primaryHobby} analogy`,
-                      )
-                    }
-                    className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors shrink-0 cursor-pointer"
-                  >
-                    <span>{primaryHobby} analogy</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setChatInput(
-                        `How does today's step build proof for a ${targetProfession} role?`,
-                      )
-                    }
-                    className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors shrink-0 cursor-pointer"
-                  >
-                    <span>{targetProfession} context</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setChatInput(
-                        `Connect today's task to fundamental ${primarySubject} principles`,
-                      )
-                    }
-                    className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors shrink-0 cursor-pointer"
-                  >
-                    <span>{primarySubject} theory</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setChatInput(
-                        `Give me a 20-min practice drill for ${primarySkill} at my ${learningStage} level`,
-                      )
-                    }
-                    className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors shrink-0 cursor-pointer"
-                  >
-                    <span>20 min drill</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setChatInput(
-                        `Review my project mission architecture: what edge cases should I test for?`,
-                      )
-                    }
-                    className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors shrink-0 cursor-pointer"
-                  >
-                    <span>Mission review</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setChatInput(
-                        `How can I tune my sprint difficulty to balanced or accelerated pacing?`,
-                      )
-                    }
-                    className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors shrink-0 cursor-pointer"
-                  >
-                    <span>Adaptive pacing</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleQuickReshuffle}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors shrink-0 cursor-pointer"
-                    title="Reschedule practice without penalty"
-                  >
-                    <RotateCcw className="w-3 h-3 text-zinc-400" />
-                    <span>Reschedule</span>
-                  </button>
-                </div>
-              );
-            })()}
+          <div className="p-4 border-t border-zinc-100 dark:border-zinc-800 space-y-3">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
+              {[
+                sprint?.tasks?.find((t) => !t.completed)
+                  ? `How do I complete "${sprint.tasks.find((t) => !t.completed)?.title}" step by step?`
+                  : "What should I complete today to keep my momentum?",
+                "How does today's milestone contribute to my bigger goal?",
+                "Can you give me practical, actionable guidance for this topic?",
+                "What edge cases should I look out for before submitting evidence?",
+              ].map((prompt, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => handleQuickQuestion(prompt)}
+                  className="px-2.5 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200/80 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors shrink-0 cursor-pointer"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
 
             <form
               onSubmit={handleSendMessage}
@@ -708,16 +524,17 @@ export const MascotDrawer: React.FC = () => {
             >
               <input
                 type="text"
-                placeholder="Ask Spark a question..."
+                placeholder="Ask Spark anything about your task, code, or growth path..."
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 disabled={isThinking}
-                className="flex-1 px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 placeholder:text-zinc-400"
+                className="flex-1 px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 placeholder:text-zinc-400"
               />
               <button
                 type="submit"
                 disabled={!chatInput.trim() || isThinking}
-                className="p-2 rounded-xl bg-indigo-600 disabled:opacity-50 hover:bg-indigo-700 text-white transition-colors shadow-xs cursor-pointer"
+                className="p-2.5 rounded-xl bg-indigo-600 disabled:opacity-40 hover:bg-indigo-700 text-white transition-colors cursor-pointer"
+                aria-label="Send message"
               >
                 <Send className="w-3.5 h-3.5" />
               </button>

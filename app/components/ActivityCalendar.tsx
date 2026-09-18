@@ -6,7 +6,6 @@ import {
   Flame,
   Clock,
   Target,
-  Sparkles,
   ChevronLeft,
   ChevronRight,
   BarChart3,
@@ -599,7 +598,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
           {activeSelected && (
             <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between text-xs">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-emerald-500" />
+                <Zap className="w-4 h-4 text-emerald-500" />
                 <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                   {formatFullDate(activeSelected.date)}:
                 </span>

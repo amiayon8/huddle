@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useRef } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
 import {
   UserProfile,
   SkillHealth,
@@ -200,7 +206,9 @@ interface HuddleContextType {
     taskId: string,
     customSnippet?: string,
     reflection?: string,
+    evidence?: string,
   ) => void;
+  toggleTaskSubtask: (taskId: string, subtaskId: string) => void;
   openPracticeSession: (task: SprintTask, reviewMode?: boolean) => void;
   closePracticeSession: () => void;
   completePracticeSession: (
@@ -312,7 +320,11 @@ interface HuddleContextType {
   projectMissionModalOpen: boolean;
   openProjectMission: (mission?: ProjectMission) => void;
   closeProjectMission: () => void;
-  submitProjectMission: (missionId: string, link: string, notes: string) => void;
+  submitProjectMission: (
+    missionId: string,
+    link: string,
+    notes: string,
+  ) => void;
 
   // Feature 13: Adaptive Difficulty
   adaptiveDifficulty: AdaptiveDifficulty;
@@ -325,7 +337,11 @@ interface HuddleContextType {
   closeCelebration: () => void;
 
   // Feature 1: Explore Feed into Sprinter
-  addExploreItemToSprinter: (title: string, creatorName: string, durationMinutes: number) => void;
+  addExploreItemToSprinter: (
+    title: string,
+    creatorName: string,
+    durationMinutes: number,
+  ) => void;
 }
 
 const HuddleContext = createContext<HuddleContextType | undefined>(undefined);
@@ -473,23 +489,25 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     return false;
   });
   const [resetDemoModalOpen, setResetDemoModalOpen] = useState(false);
-  const [viewingUserProfile, setViewingUserProfile] = useState<UserProfile | null>(null);
+  const [viewingUserProfile, setViewingUserProfile] =
+    useState<UserProfile | null>(null);
 
   // Feature 4: Daily Learning Nudge State
-  const [dailyNudgeSettings, setDailyNudgeSettings] = useState<DailyNudgeSettings>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("huddle_nudge_settings");
-        if (saved) return JSON.parse(saved);
-      } catch (e) {}
-    }
-    return {
-      enabled: true,
-      timeOfDay: "morning",
-      vibe: "encouraging",
-      browserNotifications: false,
-    };
-  });
+  const [dailyNudgeSettings, setDailyNudgeSettings] =
+    useState<DailyNudgeSettings>(() => {
+      if (typeof window !== "undefined") {
+        try {
+          const saved = localStorage.getItem("huddle_nudge_settings");
+          if (saved) return JSON.parse(saved);
+        } catch (e) {}
+      }
+      return {
+        enabled: true,
+        timeOfDay: "morning",
+        vibe: "encouraging",
+        browserNotifications: false,
+      };
+    });
 
   const [activeNudge, setActiveNudge] = useState<DailyNudgeItem | null>({
     id: "nudge-init",
@@ -570,17 +588,19 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
       id: "mission-1",
       title: "Production Caching Proxy with Multi-Tier Eviction",
       skillCategory: "System Architecture",
-      scenario: "Your high-traffic platform experiences 80% database spikes during sudden flash sales. Build an intelligent dual-tier caching layer that eliminates cache stampede and provides sub-10ms reads.",
-      objective: "Implement an asynchronous write-behind caching engine with LRU/LFU eviction, single-flight mutex deduplication, and fallback circuit-breaking.",
+      scenario:
+        "Your high-traffic platform experiences 80% database spikes during sudden flash sales. Build an intelligent dual-tier caching layer that eliminates cache stampede and provides sub-10ms reads.",
+      objective:
+        "Implement an asynchronous write-behind caching engine with LRU/LFU eviction, single-flight mutex deduplication, and fallback circuit-breaking.",
       deliverables: [
         "Single-flight cache query deduplicator logic",
         "Configurable multi-tier (in-memory L1 + Redis L2) storage adapter",
-        "Load test benchmark script showing p99 latency under 15ms"
+        "Load test benchmark script showing p99 latency under 15ms",
       ],
       rubric: [
         "Zero stampede duplicate queries under 500 concurrent requests",
         "Graceful degradation if Redis disconnects (L1 local fallback)",
-        "Zero memory leaks on unbounded key growth"
+        "Zero memory leaks on unbounded key growth",
       ],
       starterCode: `// Production Multi-Tier Cache Starter
 export class MultiTierCacheProxy<T> {
@@ -622,16 +642,18 @@ export class MultiTierCacheProxy<T> {
       id: "mission-2",
       title: "Transactional Outbox Daemon for Microservices",
       skillCategory: "Backend Engineering",
-      scenario: "Eliminate distributed two-phase commit overhead between PostgreSQL and message brokers without phantom writes or dual-write data loss.",
-      objective: "Build an event publisher daemon using the Outbox pattern with transactional guarantees and idempotent consumer handlers.",
+      scenario:
+        "Eliminate distributed two-phase commit overhead between PostgreSQL and message brokers without phantom writes or dual-write data loss.",
+      objective:
+        "Build an event publisher daemon using the Outbox pattern with transactional guarantees and idempotent consumer handlers.",
       deliverables: [
         "PostgreSQL outbox table migration DDL",
         "Background poller/relay loop with exponential backoff",
-        "Idempotent consumer test suite with mock duplicates"
+        "Idempotent consumer test suite with mock duplicates",
       ],
       rubric: [
         "Guaranteed at-least-once message delivery without database lock contention",
-        "Poison-pill event isolation to dead letter queue"
+        "Poison-pill event isolation to dead letter queue",
       ],
       starterCodeLang: "sql",
       starterCode: `-- Transactional Outbox Pattern Schema
@@ -649,18 +671,22 @@ CREATE TABLE outbox_messages (
       completed: false,
     },
   ]);
-  const [selectedProjectMission, setSelectedProjectMission] = useState<ProjectMission | null>(null);
+  const [selectedProjectMission, setSelectedProjectMission] =
+    useState<ProjectMission | null>(null);
   const [projectMissionModalOpen, setProjectMissionModalOpen] = useState(false);
 
   // Feature 13: Adaptive Difficulty State
-  const [adaptiveDifficulty, setAdaptiveDifficulty] = useState<AdaptiveDifficulty>("balanced");
+  const [adaptiveDifficulty, setAdaptiveDifficulty] =
+    useState<AdaptiveDifficulty>("balanced");
 
   // Feature 14: Celebration Moments State
-  const [celebrationData, setCelebrationData] = useState<CelebrationData | null>(null);
+  const [celebrationData, setCelebrationData] =
+    useState<CelebrationData | null>(null);
   const [celebrationModalOpen, setCelebrationModalOpen] = useState(false);
 
   // Feature 8: Progress Sharing State
-  const [shareCardData, setShareCardData] = useState<ProgressShareCardData | null>(null);
+  const [shareCardData, setShareCardData] =
+    useState<ProgressShareCardData | null>(null);
   const [shareModalOpen, setShareModalOpen] = useState(false);
 
   // Feature 7: Overall Skill Health boost accumulator
@@ -717,7 +743,10 @@ CREATE TABLE outbox_messages (
             setSecondsFocusedToday(dbProfile.focusSecondsToday);
             secondsFocusedRef.current = dbProfile.focusSecondsToday;
           }
-        } else if (dbProfile.lastFocusDate && dbProfile.lastFocusDate !== today) {
+        } else if (
+          dbProfile.lastFocusDate &&
+          dbProfile.lastFocusDate !== today
+        ) {
           // New day rollover: reset daily counter and persist
           setSecondsFocusedToday(0);
           secondsFocusedRef.current = 0;
@@ -993,11 +1022,7 @@ CREATE TABLE outbox_messages (
       // Auto-persist to Supabase every 10 seconds while timer is active
       autoSyncInterval = setInterval(() => {
         const activeUid = user?.id || "user-1";
-        saveFocusTimerToDb(
-          activeUid,
-          secondsFocusedRef.current,
-          true,
-        );
+        saveFocusTimerToDb(activeUid, secondsFocusedRef.current, true);
       }, 10000);
     }
 
@@ -1022,7 +1047,10 @@ CREATE TABLE outbox_messages (
       if (profile) {
         setUser(profile);
         const today = new Date().toISOString().split("T")[0];
-        if (profile.lastFocusDate === today && typeof profile.focusSecondsToday === "number") {
+        if (
+          profile.lastFocusDate === today &&
+          typeof profile.focusSecondsToday === "number"
+        ) {
           setSecondsFocusedToday(profile.focusSecondsToday);
           secondsFocusedRef.current = profile.focusSecondsToday;
         } else {
@@ -1105,13 +1133,12 @@ CREATE TABLE outbox_messages (
 
       if (typeof window !== "undefined") {
         localStorage.removeItem("huddle_spark_dismissed");
-        localStorage.removeItem("huddle_pip_dismissed");
+        localStorage.removeItem("huddle_spark_dismissed");
         window.dispatchEvent(new Event("huddle_spark_visibility_change"));
-        window.dispatchEvent(new Event("huddle_pip_visibility_change"));
+        window.dispatchEvent(new Event("huddle_spark_visibility_change"));
       }
 
       await loadAllSupabaseData("user-1");
-
 
       return { success: true };
     } catch (err: any) {
@@ -1350,12 +1377,13 @@ CREATE TABLE outbox_messages (
     taskId: string,
     customSnippet?: string,
     reflection?: string,
+    evidence?: string,
   ) => {
     if (!ensureSurveyDone("complete sprint tasks")) return;
     const targetTask = sprint.tasks.find((t) => t.id === taskId);
     if (!targetTask) return;
 
-    const nextCompleted = !targetTask.completed;
+    const nextCompleted = evidence ? true : !targetTask.completed;
 
     setSprint((prev) => ({
       ...prev,
@@ -1365,6 +1393,8 @@ CREATE TABLE outbox_messages (
               ...t,
               completed: nextCompleted,
               completedAt: nextCompleted ? "Just now" : undefined,
+              submittedEvidence: evidence || t.submittedEvidence,
+              evidenceVerified: nextCompleted ? true : false,
             }
           : t,
       ),
@@ -1515,14 +1545,35 @@ CREATE TABLE outbox_messages (
       // Feature 14 & 7: Trigger celebration moment & boost health bar
       setHealthBoostTotal((prev) => Math.min(15, prev + 3));
       triggerCelebration({
-        type: targetTask.dayNumber >= (sprint.durationDays || 4) ? "sprint_finished" : "task_completed",
-        title: targetTask.dayNumber >= (sprint.durationDays || 4) ? "Sprint Cleared! 🏆" : `Day ${targetTask.dayNumber} Cleared! ⚡`,
-        subtitle: `Spark verified "${targetTask.title}". +3% Skill Health, +20 XP, and milestone artifact saved!`,
+        type:
+          targetTask.dayNumber >= (sprint.durationDays || 4)
+            ? "sprint_finished"
+            : "task_completed",
+        title:
+          targetTask.dayNumber >= (sprint.durationDays || 4)
+            ? "Sprint Cleared"
+            : `Day ${targetTask.dayNumber} Cleared`,
+        subtitle: `Spark verified "${targetTask.title}". Your milestone artifact has been saved.`,
         badgeName: targetTask.artifactTitle || "Milestone Cleared",
         healthBoost: 3,
         actionText: "Share Progress",
       });
     }
+  };
+
+  const toggleTaskSubtask = (taskId: string, subtaskId: string) => {
+    setSprint((prev) => ({
+      ...prev,
+      tasks: prev.tasks.map((task) => {
+        if (task.id !== taskId || !task.subtasks) return task;
+        return {
+          ...task,
+          subtasks: task.subtasks.map((st) =>
+            st.id === subtaskId ? { ...st, completed: !st.completed } : st,
+          ),
+        };
+      }),
+    }));
   };
 
   // Overall Skill Health calculation
@@ -1552,17 +1603,30 @@ CREATE TABLE outbox_messages (
   // Sprinter Friends actions
   const addFriend = (handleOrCode: string) => {
     if (!handleOrCode || handleOrCode.trim() === "") {
-      return { success: false, message: "Please enter a valid handle or friend code." };
+      return {
+        success: false,
+        message: "Please enter a valid handle or friend code.",
+      };
     }
-    const cleanHandle = handleOrCode.trim().startsWith("@") ? handleOrCode.trim() : `@${handleOrCode.trim()}`;
-    const exists = friends.some((f) => f.handle.toLowerCase() === cleanHandle.toLowerCase());
+    const cleanHandle = handleOrCode.trim().startsWith("@")
+      ? handleOrCode.trim()
+      : `@${handleOrCode.trim()}`;
+    const exists = friends.some(
+      (f) => f.handle.toLowerCase() === cleanHandle.toLowerCase(),
+    );
     if (exists) {
-      return { success: false, message: `${cleanHandle} is already in your Sprinter Friends!` };
+      return {
+        success: false,
+        message: `${cleanHandle} is already in your Sprinter Friends!`,
+      };
     }
 
     const newFriend: SprinterFriend = {
       id: `friend-${Date.now()}`,
-      name: cleanHandle.replace("@", "").replace(/\./g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+      name: cleanHandle
+        .replace("@", "")
+        .replace(/\./g, " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase()),
       handle: cleanHandle,
       avatar: `/avatars/avatar-${(friends.length % 5) + 1}.svg`,
       currentSkill: sprint.skillTitle || "System Architecture",
@@ -1587,7 +1651,10 @@ CREATE TABLE outbox_messages (
       read: false,
     };
     setNotifications((prev) => [notif, ...prev]);
-    return { success: true, message: `Added ${newFriend.name} to your Sprinter Friends!` };
+    return {
+      success: true,
+      message: `Added ${newFriend.name} to your Sprinter Friends!`,
+    };
   };
 
   const cheerFriend = (friendId: string) => {
@@ -1646,7 +1713,7 @@ CREATE TABLE outbox_messages (
   const triggerInstantNudge = () => {
     const nudgePool = [
       "⚡ Spark: 15 minutes today keeps your 8-day streak intact and shields your 92% Skill Health Bar.",
-      "☕ Spark: Grab a coffee — one 15-minute deliberate drill on caching keeps you ahead of 90% of engineers.",
+      "☕ Spark: Grab a coffee - one 15-minute deliberate drill on caching keeps you ahead of 90% of engineers.",
       "🎯 Spark: Maya just completed her project mission! Your turn to knock out Day " +
         (sprint.currentDay || 1) +
         ".",
@@ -1712,7 +1779,11 @@ CREATE TABLE outbox_messages (
     setProjectMissionModalOpen(false);
   };
 
-  const submitProjectMission = (missionId: string, link: string, notes: string) => {
+  const submitProjectMission = (
+    missionId: string,
+    link: string,
+    notes: string,
+  ) => {
     setProjectMissions((prev) =>
       prev.map((m) =>
         m.id === missionId
@@ -1743,7 +1814,12 @@ CREATE TABLE outbox_messages (
       previewSnippet: `// Project Mission Verified Deliverable\nexport const missionProof = {\n  title: "${missionTitle}",\n  verifiedBy: "Spark AI",\n  link: "${link}",\n  status: "PRODUCTION_READY"\n};`,
       isPublished: true,
       sourceTaskId: missionId,
-      tags: [sprint.skillTitle, "Project Mission", "Capstone", "Verified Proof"],
+      tags: [
+        sprint.skillTitle,
+        "Project Mission",
+        "Capstone",
+        "Verified Proof",
+      ],
     };
     setPortfolioItems((prev) => [newPortfolioItem, ...prev]);
     addPortfolioItemToDb(newPortfolioItem, user.id);
@@ -1908,7 +1984,6 @@ CREATE TABLE outbox_messages (
     setNotifications((prev) => [notif, ...prev]);
     addNotificationToDb(notif, user.id);
 
-
     addSquadActivityPingToDb(
       squad.id,
       user.id,
@@ -2050,7 +2125,6 @@ CREATE TABLE outbox_messages (
       updateProfileInDb(user.id, { reputation: nextRep });
       return { ...prev, reputation: nextRep };
     });
-
 
     const notif: NotificationItem = {
       id: `n-${Date.now()}`,
@@ -2195,17 +2269,15 @@ CREATE TABLE outbox_messages (
           recent_encouragement: "Founded this squad",
           role: "lead",
         });
-        supabase
-          .from("squad_projects")
-          .insert({
-            id: `proj-${newSquad.id}`,
-            squad_id: newSquad.id,
-            title: `Team Blueprint: ${payload.skillFocus}`,
-            description: payload.sharedGoal,
-            deadline: "Sunday, 11:59 PM",
-            deliverables: [],
-            submissions: [],
-          });
+        supabase.from("squad_projects").insert({
+          id: `proj-${newSquad.id}`,
+          squad_id: newSquad.id,
+          title: `Team Blueprint: ${payload.skillFocus}`,
+          description: payload.sharedGoal,
+          deadline: "Sunday, 11:59 PM",
+          deliverables: [],
+          submissions: [],
+        });
         supabase
           .from("profiles")
           .update({ squad_id: newSquad.id })
@@ -2694,7 +2766,7 @@ CREATE TABLE outbox_messages (
       mainSkill,
       milestone,
       completeSurvey.level || "Intermediate",
-      completeSurvey.dailyTime || "20 mins / day"
+      completeSurvey.dailyTime || "20 mins / day",
     ).then((tasks) => {
       const finalTasks =
         tasks && tasks.length > 0
@@ -2703,7 +2775,7 @@ CREATE TABLE outbox_messages (
               sprint?.id || "sprint-1",
               mainSkill,
               completeSurvey.level || "Intermediate",
-              completeSurvey.dailyTime || "20 mins / day"
+              completeSurvey.dailyTime || "20 mins / day",
             );
       setSprint((prev) => ({
         ...prev,
@@ -2877,6 +2949,7 @@ CREATE TABLE outbox_messages (
         resetFocusTimer,
 
         completeSprintTask,
+        toggleTaskSubtask,
         reshuffleSprint,
         completeStep,
         checkInSquad,

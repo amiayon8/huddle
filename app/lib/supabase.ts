@@ -318,29 +318,43 @@ export async function fetchCurrentSprint(
       .eq("sprint_id", sprintData.id)
       .order("day_number", { ascending: true });
 
-    let tasks: SprintTask[] = (tasksData || []).map((t: any) => ({
-      id: t.id,
-      dayNumber: t.day_number,
-      title: t.title,
-      description: t.description || "",
-      type: t.task_type || "learn",
-      creatorName: t.creator_name || "Elena Rostova",
-      creatorHandle: t.creator_handle || "@elena_distrib",
-      creatorAvatar: t.creator_avatar || "/avatars/avatar-2.svg",
-      estimatedMinutes: t.estimated_minutes || 20,
-      completed: t.completed || false,
-      completedAt: t.completed_at,
-      producesArtifact: t.produces_artifact || false,
-      artifactTitle: t.artifact_title,
-      artifactType: t.artifact_type,
-      realWorldActionDescription: t.real_world_action_description,
-    }));
+    const templateTasks = generateTasksForSkill(
+      sprintData.id,
+      sprintData.skill_title || "System Architecture",
+    );
+
+    let tasks: SprintTask[] = (tasksData || []).map((t: any, index: number) => {
+      const template =
+        templateTasks.find((item) => item.dayNumber === t.day_number) ||
+        templateTasks[index] ||
+        templateTasks[0];
+      return {
+        id: t.id,
+        dayNumber: t.day_number,
+        title: t.title,
+        description: t.description || template?.description || "",
+        type: t.task_type || template?.type || "learn",
+        creatorName: t.creator_name || template?.creatorName || "Sumaiya Kabir",
+        creatorHandle: t.creator_handle || template?.creatorHandle || "@sumaiya_kabir",
+        creatorAvatar: t.creator_avatar || template?.creatorAvatar || "/avatars/avatar-2.svg",
+        estimatedMinutes: t.estimated_minutes || template?.estimatedMinutes || 20,
+        completed: t.completed || false,
+        completedAt: t.completed_at,
+        producesArtifact: t.produces_artifact || template?.producesArtifact || false,
+        artifactTitle: t.artifact_title || template?.artifactTitle,
+        artifactType: t.artifact_type || template?.artifactType,
+        realWorldActionDescription: t.real_world_action_description || template?.realWorldActionDescription,
+        sparkGuidance: t.spark_guidance || t.sparkGuidance || template?.sparkGuidance,
+        resources: t.resources || template?.resources,
+        subtasks: t.subtasks || template?.subtasks,
+        evidenceRequirement: t.evidence_requirement || t.evidenceRequirement || template?.evidenceRequirement,
+        submittedEvidence: t.submitted_evidence || t.submittedEvidence,
+        evidenceVerified: t.evidence_verified || t.evidenceVerified || false,
+      };
+    });
 
     if (tasks.length === 0) {
-      tasks = generateTasksForSkill(
-        sprintData.id,
-        sprintData.skill_title || "System Architecture",
-      );
+      tasks = templateTasks;
     }
 
     return {
@@ -1523,6 +1537,459 @@ export const generateTasksForSkill = (
   const minutes = parseInt(dailyTime) || 20;
 
   if (
+    lower.includes("presentation") ||
+    lower.includes("slide") ||
+    lower.includes("speaking") ||
+    lower.includes("pitch")
+  ) {
+    return [
+      {
+        id: `task-${Date.now()}-1`,
+        dayNumber: 1,
+        title: "Create your first presentation slide",
+        description: "Distill a complex topic into one compelling, visually balanced slide with high clarity.",
+        type: "build",
+        creatorName: "Sarah Lin",
+        creatorHandle: "@sarah_design",
+        creatorAvatar: "/avatars/avatar-1.svg",
+        estimatedMinutes: minutes,
+        completed: false,
+        producesArtifact: true,
+        artifactTitle: "Headline & Hook Slide Deck",
+        artifactType: "summary",
+        sparkGuidance: {
+          overview: "When creating your first slide, remember that a slide is a visual anchor for your voice, not a transcript. Focus on one single idea.",
+          keySteps: [
+            "Choose the main idea.",
+            "Create the title.",
+            "Add the key information.",
+            "Keep the slide simple."
+          ],
+          proTip: "If an audience member can't understand the main point within 3 seconds, remove two elements."
+        },
+        resources: [
+          {
+            id: "res-1-1",
+            type: "video",
+            title: "Principles of High-Impact Slide Composition",
+            durationOrReadTime: "7 min video",
+            description: "Visual hierarchy, typography sizing, and negative space principles."
+          },
+          {
+            id: "res-1-2",
+            type: "doc",
+            title: "Slide Readability & Contrast Guide",
+            durationOrReadTime: "4 min read",
+            description: "Industry guidelines on font pairings, contrast ratios, and line height."
+          },
+          {
+            id: "res-1-3",
+            type: "tutorial",
+            title: "Step-by-Step Title and Key Point Structuring",
+            durationOrReadTime: "5 min guide",
+            description: "How to craft action titles that deliver the takeaway upfront."
+          },
+          {
+            id: "res-1-4",
+            type: "example",
+            title: "Before & After Slide Teardowns",
+            durationOrReadTime: "Interactive breakdown",
+            description: "Side-by-side analysis of cluttered slides transformed into clear visuals."
+          }
+        ],
+        subtasks: [
+          { id: "sub-1-1", title: "Select a single core idea or problem to communicate", completed: false },
+          { id: "sub-1-2", title: "Write an action-oriented title summarizing the conclusion", completed: false },
+          { id: "sub-1-3", title: "Add 2 to 3 concise supporting bullets or data points", completed: false },
+          { id: "sub-1-4", title: "Remove distracting styling or filler text", completed: false }
+        ],
+        evidenceRequirement: {
+          type: "screenshot",
+          prompt: "Please provide a screenshot, image file, or link to your completed slide so Spark can verify your layout.",
+          placeholder: "Paste screenshot link or public Figma/Canva/Keynote URL...",
+          verificationQuestion: "Does your slide communicate a single clear idea with an action title?"
+        }
+      },
+      {
+        id: `task-${Date.now()}-2`,
+        dayNumber: 2,
+        title: "Visual Hierarchy and Data Callouts",
+        description: "Transform raw statistics and points into intuitive visual callouts and charts.",
+        type: "build",
+        creatorName: "Sarah Lin",
+        creatorHandle: "@sarah_design",
+        creatorAvatar: "/avatars/avatar-1.svg",
+        estimatedMinutes: minutes,
+        completed: false,
+        producesArtifact: true,
+        artifactTitle: "Data Visualization Slide",
+        artifactType: "summary",
+        sparkGuidance: {
+          overview: "Numbers only resonate when given context. Pair every big metric with a comparative anchor.",
+          keySteps: [
+            "Select your focal metric.",
+            "Enlarge the primary statistic.",
+            "Write a brief one-line caption explaining why it matters.",
+            "Align labels horizontally for effortless scanning."
+          ],
+          proTip: "Never use more than one accent color on a data slide. Let the key number be the focal point."
+        },
+        resources: [
+          {
+            id: "res-2-1",
+            type: "video",
+            title: "Visualizing Metrics for Executive Audiences",
+            durationOrReadTime: "6 min video",
+            description: "Highlighting key performance numbers without overwhelming tables."
+          },
+          {
+            id: "res-2-2",
+            type: "doc",
+            title: "Chart Selection Cheat Sheet",
+            durationOrReadTime: "3 min read",
+            description: "When to use bar charts, metric cards, sparklines, or bullet charts."
+          },
+          {
+            id: "res-2-3",
+            type: "example",
+            title: "Metric Card Layout Template",
+            durationOrReadTime: "Component spec",
+            description: "Clean layout pattern for displaying 3 key comparative numbers."
+          }
+        ],
+        subtasks: [
+          { id: "sub-2-1", title: "Identify the most impactful metric to display", completed: false },
+          { id: "sub-2-2", title: "Structure a primary callout with 3x larger font weight", completed: false },
+          { id: "sub-2-3", title: "Add comparative benchmark context underneath", completed: false }
+        ],
+        evidenceRequirement: {
+          type: "link",
+          prompt: "Share your slide preview link or attach a screenshot showing your metric callout.",
+          placeholder: "https://...",
+          verificationQuestion: "Is the focal statistic immediately distinct from the secondary text?"
+        }
+      },
+      {
+        id: `task-${Date.now()}-3`,
+        dayNumber: 3,
+        title: "Story Arc and Narrative Pacing",
+        description: "Arrange slides into a compelling narrative arc that moves from tension to resolution.",
+        type: "learn",
+        creatorName: "Sarah Lin",
+        creatorHandle: "@sarah_design",
+        creatorAvatar: "/avatars/avatar-1.svg",
+        estimatedMinutes: minutes,
+        completed: false,
+        producesArtifact: false,
+        sparkGuidance: {
+          overview: "A great presentation is a narrative journey: Status Quo, Catalyst, Complication, Solution, and Action.",
+          keySteps: [
+            "Define the audience's current pain point.",
+            "Introduce the opportunity or turning point.",
+            "Present your proposed solution concisely.",
+            "State the exact next step required."
+          ],
+          proTip: "Transitions between slides should bridge the previous thought directly into the next."
+        },
+        resources: [
+          {
+            id: "res-3-1",
+            type: "video",
+            title: "The 3-Act Structure for Professional Presentations",
+            durationOrReadTime: "9 min video",
+            description: "Building urgency and maintaining audience attention across slides."
+          },
+          {
+            id: "res-3-2",
+            type: "doc",
+            title: "Slide Sequence & Outline Matrix",
+            durationOrReadTime: "5 min read",
+            description: "Pacing frameworks used by top conference speakers."
+          }
+        ],
+        subtasks: [
+          { id: "sub-3-1", title: "Outline the 5-part narrative progression", completed: false },
+          { id: "sub-3-2", title: "Draft transition phrases between adjacent slides", completed: false },
+          { id: "sub-3-3", title: "Verify that the climax leads into a direct call to action", completed: false }
+        ],
+        evidenceRequirement: {
+          type: "work_summary",
+          prompt: "Summarize your 3-act narrative outline and explain how each section leads to the conclusion.",
+          placeholder: "Act 1: Problem... Act 2: Complication... Act 3: Solution...",
+          verificationQuestion: "Does your narrative clearly articulate the transition from challenge to solution?"
+        }
+      },
+      {
+        id: `task-${Date.now()}-4`,
+        dayNumber: 4,
+        title: "Live Rehearsal & Delivery Timing",
+        description: "Deliver a 3-minute pitch with deliberate cadence, controlled pauses, and confidence.",
+        type: "real_world_proof",
+        creatorName: "Sarah Lin",
+        creatorHandle: "@sarah_design",
+        creatorAvatar: "/avatars/avatar-1.svg",
+        estimatedMinutes: minutes,
+        completed: false,
+        producesArtifact: true,
+        artifactTitle: "Delivered Presentation Recording & Notes",
+        artifactType: "summary",
+        sparkGuidance: {
+          overview: "Delivery isn't about speaking fast; it is about deliberate silence. Use pauses to let points land.",
+          keySteps: [
+            "Set a timer for 3 minutes.",
+            "Record your delivery out loud without stopping.",
+            "Note filler words or points where you stumbled.",
+            "Re-run once focusing purely on steady pacing."
+          ],
+          proTip: "Pause for 2 seconds after each key takeaway. Silence projects authority."
+        },
+        resources: [
+          {
+            id: "res-4-1",
+            type: "video",
+            title: "Mastering Pauses and Vocal Modulation",
+            durationOrReadTime: "8 min video",
+            description: "Eliminating filler sounds and commanding physical presence."
+          },
+          {
+            id: "res-4-2",
+            type: "example",
+            title: "Annotated Pitch Delivery Transcript",
+            durationOrReadTime: "Sample script",
+            description: "Markers showing exactly where to pause, slow down, and emphasize."
+          }
+        ],
+        subtasks: [
+          { id: "sub-4-1", title: "Conduct full 3-minute timed trial out loud", completed: false },
+          { id: "sub-4-2", title: "Review recording for pacing and vocal clarity", completed: false },
+          { id: "sub-4-3", title: "Write down 2 personal takeaways for continuous refinement", completed: false }
+        ],
+        evidenceRequirement: {
+          type: "link",
+          prompt: "Provide an audio/video recording link (e.g. Loom, Drive) or your written self-critique.",
+          placeholder: "https://www.loom.com/share/... or your reflection notes",
+          verificationQuestion: "Did you complete the timed 3-minute delivery out loud?"
+        }
+      }
+    ];
+  }
+
+  if (
+    lower.includes("video") ||
+    lower.includes("edit") ||
+    lower.includes("film") ||
+    lower.includes("premiere") ||
+    lower.includes("resolve")
+  ) {
+    return [
+      {
+        id: `task-${Date.now()}-1`,
+        dayNumber: 1,
+        title: "Setup your project & rough cut assembly",
+        description: "Import footage, organize timelines, and make your initial assembly cuts.",
+        type: "build",
+        creatorName: "David Cole",
+        creatorHandle: "@david_media",
+        creatorAvatar: "/avatars/avatar-2.svg",
+        estimatedMinutes: minutes,
+        completed: false,
+        producesArtifact: true,
+        artifactTitle: "Rough Cut Sequence",
+        artifactType: "summary",
+        sparkGuidance: {
+          overview: "Editing is the art of subtraction. Start by removing the dead air before polishing transitions.",
+          keySteps: [
+            "Open the editor.",
+            "Import the footage.",
+            "Cut unnecessary parts.",
+            "Add basic transitions."
+          ],
+          proTip: "Use keyboard shortcuts for blade and ripple delete. It will double your editing speed."
+        },
+        resources: [
+          {
+            id: "res-v1-1",
+            type: "video",
+            title: "Timeline Organization & Fast Rough Cutting",
+            durationOrReadTime: "8 min video",
+            description: "Three-point editing, ripple deletes, and track organization."
+          },
+          {
+            id: "res-v1-2",
+            type: "doc",
+            title: "Standard Editing Keyboard Shortcuts",
+            durationOrReadTime: "3 min read",
+            description: "Essential hotkeys for Premiere Pro, DaVinci Resolve, and Final Cut."
+          },
+          {
+            id: "res-v1-3",
+            type: "tutorial",
+            title: "The J-Cut and L-Cut Technique",
+            durationOrReadTime: "5 min tutorial",
+            description: "Smoothing audio-visual boundaries between adjacent scenes."
+          }
+        ],
+        subtasks: [
+          { id: "sub-v1-1", title: "Create a new project sequence with correct frame rate", completed: false },
+          { id: "sub-v1-2", title: "Review raw footage and select the best takes", completed: false },
+          { id: "sub-v1-3", title: "Perform rough cut eliminating silent pauses and false starts", completed: false }
+        ],
+        evidenceRequirement: {
+          type: "screenshot",
+          prompt: "Upload a screenshot of your timeline showing your organized sequence and edits.",
+          placeholder: "Paste screenshot link or upload your timeline view...",
+          verificationQuestion: "Have you cut the filler content and aligned your sequence?"
+        }
+      },
+      {
+        id: `task-${Date.now()}-2`,
+        dayNumber: 2,
+        title: "Audio cleanup, leveling & ambient sound",
+        description: "Clean voice tracks, apply noise reduction, and balance background music.",
+        type: "build",
+        creatorName: "David Cole",
+        creatorHandle: "@david_media",
+        creatorAvatar: "/avatars/avatar-2.svg",
+        estimatedMinutes: minutes,
+        completed: false,
+        producesArtifact: true,
+        artifactTitle: "Balanced Audio Mix",
+        artifactType: "summary",
+        sparkGuidance: {
+          overview: "Viewers forgive mediocre video, but they will click away immediately from harsh audio.",
+          keySteps: [
+            "Apply high-pass filter at 80Hz.",
+            "Set dialogue peaks to -6dB.",
+            "Duck background music to -24dB under speech.",
+            "Add subtle compression for vocal consistency."
+          ],
+          proTip: "Always test your audio through basic phone speakers or laptop speakers, not just studio headphones."
+        },
+        resources: [
+          {
+            id: "res-v2-1",
+            type: "video",
+            title: "Dialing Dialogue & Ducking Music",
+            durationOrReadTime: "7 min video",
+            description: "Setting proper gain stages and clean noise gates."
+          },
+          {
+            id: "res-v2-2",
+            type: "example",
+            title: "Decibel Levels Reference Chart",
+            durationOrReadTime: "Quick reference",
+            description: "Target loudness standards (LUFS and dBFS) for web video."
+          }
+        ],
+        subtasks: [
+          { id: "sub-v2-1", title: "Normalize voice dialogue peaks", completed: false },
+          { id: "sub-v2-2", title: "Add background audio bed with automated ducking", completed: false },
+          { id: "sub-v2-3", title: "Eliminate low-frequency hum with high-pass filtering", completed: false }
+        ],
+        evidenceRequirement: {
+          type: "link",
+          prompt: "Share an export link or preview snippet demonstrating your balanced audio mix.",
+          placeholder: "https://...",
+          verificationQuestion: "Is dialogue clear and intelligible above background sound?"
+        }
+      },
+      {
+        id: `task-${Date.now()}-3`,
+        dayNumber: 3,
+        title: "Color correction, exposure & mood grading",
+        description: "Correct white balance, match contrast across shots, and apply a cohesive look.",
+        type: "learn",
+        creatorName: "David Cole",
+        creatorHandle: "@david_media",
+        creatorAvatar: "/avatars/avatar-2.svg",
+        estimatedMinutes: minutes,
+        completed: false,
+        producesArtifact: false,
+        sparkGuidance: {
+          overview: "Always balance exposure and skin tones first before applying creative color grades.",
+          keySteps: [
+            "Adjust exposure using waveforms.",
+            "Balance color temperature using vectorscopes.",
+            "Check skin tone line.",
+            "Apply subtle creative LUT or curve contrast."
+          ],
+          proTip: "Trust scopes over your eyes. Monitor ambient light will bias your perception of color."
+        },
+        resources: [
+          {
+            id: "res-v3-1",
+            type: "video",
+            title: "Reading Waveforms & Vectorscopes in 5 Minutes",
+            durationOrReadTime: "6 min video",
+            description: "How to reliably read scopes to achieve consistent exposure."
+          },
+          {
+            id: "res-v3-2",
+            type: "doc",
+            title: "Primary Color Correction Workflow",
+            durationOrReadTime: "4 min read",
+            description: "Luma, chroma, saturation, and contrast adjustment sequencing."
+          }
+        ],
+        subtasks: [
+          { id: "sub-v3-1", title: "Balance black levels and highlights on waveform", completed: false },
+          { id: "sub-v3-2", title: "Match skin tones to the vectorscope indicator line", completed: false }
+        ],
+        evidenceRequirement: {
+          type: "screenshot",
+          prompt: "Submit a before/after screenshot of your color-corrected frame.",
+          placeholder: "Image link or screenshot URL...",
+          verificationQuestion: "Are highlights unclipped and skin tones naturally rendered?"
+        }
+      },
+      {
+        id: `task-${Date.now()}-4`,
+        dayNumber: 4,
+        title: "Final export and delivery package",
+        description: "Encode optimized video deliverables with proper bitrate, codec, and aspect ratios.",
+        type: "real_world_proof",
+        creatorName: "David Cole",
+        creatorHandle: "@david_media",
+        creatorAvatar: "/avatars/avatar-2.svg",
+        estimatedMinutes: minutes,
+        completed: false,
+        producesArtifact: true,
+        artifactTitle: "Final Master Video Export",
+        artifactType: "live_demo",
+        sparkGuidance: {
+          overview: "Exporting with the right bitrate ensures crisp playback without bloated file sizes.",
+          keySteps: [
+            "Select H.264 or ProRes master.",
+            "Set 2-pass VBR or constant rate factor.",
+            "Check audio sample rate is 48kHz.",
+            "Render and verify playback on multiple devices."
+          ],
+          proTip: "Always watch the full exported file once from beginning to end before delivering to clients."
+        },
+        resources: [
+          {
+            id: "res-v4-1",
+            type: "video",
+            title: "Export Settings Guide for YouTube and Web",
+            durationOrReadTime: "5 min video",
+            description: "Bitrates, color space tags, and keyframe intervals."
+          }
+        ],
+        subtasks: [
+          { id: "sub-v4-1", title: "Export final master video file", completed: false },
+          { id: "sub-v4-2", title: "Conduct full visual quality check on mobile/desktop", completed: false }
+        ],
+        evidenceRequirement: {
+          type: "link",
+          prompt: "Provide a link to your exported video (YouTube unlisted, Vimeo, or cloud drive).",
+          placeholder: "https://...",
+          verificationQuestion: "Did you verify smooth playback on your final exported file?"
+        }
+      }
+    ];
+  }
+
+  if (
     lower.includes("next") ||
     lower.includes("react") ||
     lower.includes("front") ||
@@ -1535,15 +2002,58 @@ export const generateTasksForSkill = (
         title: "React Server Components & Component Tree Architecture",
         description: "Understand server vs. client boundaries, serialization boundaries, and Suspense layouts.",
         type: "learn",
-        creatorName: "Marcus Vance",
-        creatorHandle: "@marcus_vance",
+        creatorName: "Tanvir Rahman",
+        creatorHandle: "@tanvir_rahman",
         creatorAvatar: "/avatars/avatar-3.svg",
         estimatedMinutes: minutes,
-        completed: true,
-        completedAt: new Date(Date.now() - 86400000).toISOString(),
+        completed: false,
         producesArtifact: true,
         artifactTitle: "RSC Component Architecture",
         artifactType: "code",
+        sparkGuidance: {
+          overview: "Keep components on the server by default. Only add 'use client' when using state, effects, or browser APIs.",
+          keySteps: [
+            "Identify data-fetching parts of your tree.",
+            "Keep database calls directly in Server Components.",
+            "Pass data down as serializable props to client leaves.",
+            "Wrap async boundaries in React Suspense."
+          ],
+          proTip: "Colocate fetching inside server components to eliminate waterfall network requests."
+        },
+        resources: [
+          {
+            id: "res-r1-1",
+            type: "video",
+            title: "Mental Models for React Server Components",
+            durationOrReadTime: "11 min video",
+            description: "Visualizing the RSC boundary and serialization tree."
+          },
+          {
+            id: "res-r1-2",
+            type: "doc",
+            title: "Next.js App Router Architecture Guide",
+            durationOrReadTime: "6 min read",
+            description: "Server/client composition patterns and edge layout strategies."
+          },
+          {
+            id: "res-r1-3",
+            type: "example",
+            title: "Colocated Async Component Pattern",
+            durationOrReadTime: "Code specimen",
+            description: "Direct async/await components with fallback skeletons."
+          }
+        ],
+        subtasks: [
+          { id: "sub-r1-1", title: "Map server vs client component boundaries", completed: false },
+          { id: "sub-r1-2", title: "Implement async server data retrieval without useEffect", completed: false },
+          { id: "sub-r1-3", title: "Add Suspense boundary with responsive skeleton fallback", completed: false }
+        ],
+        evidenceRequirement: {
+          type: "link",
+          prompt: "Share your GitHub repository link, commit hash, or CodeSandbox showing your RSC architecture.",
+          placeholder: "https://github.com/...",
+          verificationQuestion: "Are data fetches isolated inside server components without client hooks?"
+        }
       },
       {
         id: `task-${Date.now()}-2`,
@@ -1551,14 +2061,51 @@ export const generateTasksForSkill = (
         title: "Optimistic UI Mutations & Server Actions",
         description: "Build zero-latency form mutations with useOptimistic, revalidating tags without full refreshes.",
         type: "build",
-        creatorName: "Elena Rostova",
-        creatorHandle: "@elena_distrib",
+        creatorName: "Sumaiya Kabir",
+        creatorHandle: "@sumaiya_kabir",
         creatorAvatar: "/avatars/avatar-2.svg",
         estimatedMinutes: minutes,
         completed: false,
         producesArtifact: true,
         artifactTitle: "Optimistic Action State Machine",
         artifactType: "code",
+        sparkGuidance: {
+          overview: "Optimistic UI updates immediately reflect user actions before the server responds, handling rollbacks on error.",
+          keySteps: [
+            "Create a Server Action with input validation.",
+            "Use React 19 useOptimistic hook in your form.",
+            "Trigger instant local state mutation on submit.",
+            "Revalidate path/tag upon server confirmation."
+          ],
+          proTip: "Always retain the previous state snapshot so rollbacks feel instantaneous if network calls fail."
+        },
+        resources: [
+          {
+            id: "res-r2-1",
+            type: "doc",
+            title: "Zero-Latency UI with React 19 useOptimistic",
+            durationOrReadTime: "7 min read",
+            description: "Step-by-step guide to instant mutations and rollbacks."
+          },
+          {
+            id: "res-r2-2",
+            type: "example",
+            title: "Server Action State Reducer",
+            durationOrReadTime: "Pattern specimen",
+            description: "Immutable state updates with optimistic pending flags."
+          }
+        ],
+        subtasks: [
+          { id: "sub-r2-1", title: "Set up Server Action for item mutation", completed: false },
+          { id: "sub-r2-2", title: "Wrap state with useOptimistic for instant feedback", completed: false },
+          { id: "sub-r2-3", title: "Implement error handling rollback verification", completed: false }
+        ],
+        evidenceRequirement: {
+          type: "link",
+          prompt: "Submit a link to your form component with useOptimistic implementation.",
+          placeholder: "https://github.com/...",
+          verificationQuestion: "Does the UI immediately update before the server network request completes?"
+        }
       },
       {
         id: `task-${Date.now()}-3`,
@@ -1566,240 +2113,281 @@ export const generateTasksForSkill = (
         title: "Route Handlers & Edge Runtime Caching Strategies",
         description: "Configure incremental static regeneration (ISR) and stale-while-revalidate caching headers.",
         type: "learn",
-        creatorName: "Marcus Vance",
-        creatorHandle: "@marcus_vance",
+        creatorName: "Tanvir Rahman",
+        creatorHandle: "@tanvir_rahman",
         creatorAvatar: "/avatars/avatar-3.svg",
         estimatedMinutes: minutes,
         completed: false,
         producesArtifact: false,
+        sparkGuidance: {
+          overview: "Granular caching headers prevent stale reads while insulating backend databases from excessive traffic.",
+          keySteps: [
+            "Configure fetch cache tags.",
+            "Implement revalidateTag in mutation handlers.",
+            "Inspect Cache-Control headers in network tab.",
+            "Verify edge cache hit ratio."
+          ],
+          proTip: "Use tag-based invalidation instead of time-based invalidation whenever possible for near-instant updates."
+        },
+        resources: [
+          {
+            id: "res-r3-1",
+            type: "video",
+            title: "Edge Runtime & Cache Revalidation Deep Dive",
+            durationOrReadTime: "10 min video",
+            description: "How CDN edge networks store and invalidate dynamic Next.js routes."
+          }
+        ],
+        subtasks: [
+          { id: "sub-r3-1", title: "Add tag-based fetch options to data queries", completed: false },
+          { id: "sub-r3-2", title: "Trigger on-demand revalidation on update", completed: false }
+        ],
+        evidenceRequirement: {
+          type: "link",
+          prompt: "Provide a link to your route handler or commit with caching headers.",
+          placeholder: "https://github.com/...",
+          verificationQuestion: "Did you verify that revalidateTag refreshes the cached data?"
+        }
       },
       {
         id: `task-${Date.now()}-4`,
         dayNumber: 4,
-        title: "State Synchronization & Custom Hook Abstractions",
-        description: "Decouple complex state transitions into reusable, resilient custom React hooks.",
-        type: "build",
-        creatorName: "Elena Rostova",
-        creatorHandle: "@elena_distrib",
-        creatorAvatar: "/avatars/avatar-2.svg",
-        estimatedMinutes: minutes,
-        completed: false,
-        producesArtifact: true,
-        artifactTitle: "Sync Engine Custom Hook",
-        artifactType: "code",
-      },
-      {
-        id: `task-${Date.now()}-5`,
-        dayNumber: 5,
-        title: "Web Performance Profiling & Layout Shift Prevention",
-        description: "Diagnose Core Web Vitals, eliminate cumulative layout shifts, and profile re-render bottlenecks.",
-        type: "learn",
-        creatorName: "Marcus Vance",
-        creatorHandle: "@marcus_vance",
-        creatorAvatar: "/avatars/avatar-3.svg",
-        estimatedMinutes: minutes,
-        completed: false,
-        producesArtifact: false,
-      },
-      {
-        id: `task-${Date.now()}-6`,
-        dayNumber: 6,
         title: "Production Deliverable: End-to-End Feature Verification",
         description: "Ship a complete production-grade feature with error boundaries, tests, and telemetry.",
         type: "real_world_proof",
-        creatorName: "Elena Rostova",
-        creatorHandle: "@elena_distrib",
+        creatorName: "Sumaiya Kabir",
+        creatorHandle: "@sumaiya_kabir",
         creatorAvatar: "/avatars/avatar-2.svg",
         estimatedMinutes: minutes,
         completed: false,
         producesArtifact: true,
         artifactTitle: "Production Next.js Feature PR",
         artifactType: "summary",
-      },
+        sparkGuidance: {
+          overview: "A production-grade feature handles failures gracefully with localized error boundaries and clear recovery actions.",
+          keySteps: [
+            "Add error.tsx boundary component.",
+            "Include reset() button for user retry.",
+            "Add loading.tsx skeleton for fast visual feedback.",
+            "Verify complete workflow manually."
+          ],
+          proTip: "Always isolate error boundaries close to the leaf components that might throw."
+        },
+        resources: [
+          {
+            id: "res-r4-1",
+            type: "doc",
+            title: "Production Readiness Checklist for Next.js",
+            durationOrReadTime: "4 min read",
+            description: "Essential sanity checks for telemetry, boundaries, and metadata."
+          }
+        ],
+        subtasks: [
+          { id: "sub-r4-1", title: "Create localized error.tsx component", completed: false },
+          { id: "sub-r4-2", title: "Add loading.tsx boundary", completed: false },
+          { id: "sub-r4-3", title: "Test error recovery reset action", completed: false }
+        ],
+        evidenceRequirement: {
+          type: "work_summary",
+          prompt: "Summarize your production feature and provide links to your PR or deployment.",
+          placeholder: "Describe the feature, edge cases tested, and production verification...",
+          verificationQuestion: "Did you verify that your error boundaries recover gracefully when errors occur?"
+        }
+      }
     ];
   }
 
-  if (lower.includes("python") || lower.includes("data") || lower.includes("ai") || lower.includes("machine")) {
-    return [
-      {
-        id: `task-${Date.now()}-1`,
-        dayNumber: 1,
-        title: "Python Data Structures & Memory Model Internals",
-        description: "Explore object mutability, reference counting, generators, and memory overhead in Python.",
-        type: "learn",
-        creatorName: "Dr. Aris Thorne",
-        creatorHandle: "@aris_py",
-        creatorAvatar: "/avatars/avatar-1.svg",
-        estimatedMinutes: minutes,
-        completed: true,
-        completedAt: new Date(Date.now() - 86400000).toISOString(),
-        producesArtifact: true,
-        artifactTitle: "Memory Profiling Benchmark",
-        artifactType: "code",
-      },
-      {
-        id: `task-${Date.now()}-2`,
-        dayNumber: 2,
-        title: "Vectorized Operations with NumPy & Pandas",
-        description: "Replace inefficient nested loops with high-throughput vectorized operations.",
-        type: "build",
-        creatorName: "Elena Rostova",
-        creatorHandle: "@elena_distrib",
-        creatorAvatar: "/avatars/avatar-2.svg",
-        estimatedMinutes: minutes,
-        completed: false,
-        producesArtifact: true,
-        artifactTitle: "Vectorized Pipeline Script",
-        artifactType: "code",
-      },
-      {
-        id: `task-${Date.now()}-3`,
-        dayNumber: 3,
-        title: "AsyncIO & Concurrency Patterns",
-        description: "Master event loops, async context managers, and high-throughput concurrent workers.",
-        type: "learn",
-        creatorName: "Dr. Aris Thorne",
-        creatorHandle: "@aris_py",
-        creatorAvatar: "/avatars/avatar-1.svg",
-        estimatedMinutes: minutes,
-        completed: false,
-        producesArtifact: false,
-      },
-      {
-        id: `task-${Date.now()}-4`,
-        dayNumber: 4,
-        title: "Model Prompt Engineering & API Orchestration",
-        description: "Implement structured JSON schema generation and function-calling with LLM APIs.",
-        type: "build",
-        creatorName: "Elena Rostova",
-        creatorHandle: "@elena_distrib",
-        creatorAvatar: "/avatars/avatar-2.svg",
-        estimatedMinutes: minutes,
-        completed: false,
-        producesArtifact: true,
-        artifactTitle: "Prompt Orchestration Pipeline",
-        artifactType: "code",
-      },
-      {
-        id: `task-${Date.now()}-5`,
-        dayNumber: 5,
-        title: "Data Validation & Robust Error Handling",
-        description: "Build robust input validation layers using Pydantic models with custom validators.",
-        type: "learn",
-        creatorName: "Dr. Aris Thorne",
-        creatorHandle: "@aris_py",
-        creatorAvatar: "/avatars/avatar-1.svg",
-        estimatedMinutes: minutes,
-        completed: false,
-        producesArtifact: false,
-      },
-      {
-        id: `task-${Date.now()}-6`,
-        dayNumber: 6,
-        title: "Capstone Pipeline: Production AI Ingestion Microservice",
-        description: "Package and benchmark an automated processing script with logging and test coverage.",
-        type: "real_world_proof",
-        creatorName: "Elena Rostova",
-        creatorHandle: "@elena_distrib",
-        creatorAvatar: "/avatars/avatar-2.svg",
-        estimatedMinutes: minutes,
-        completed: false,
-        producesArtifact: true,
-        artifactTitle: "Production Python Microservice",
-        artifactType: "summary",
-      },
-    ];
-  }
-
-  // Default: System Architecture / General Skill 6-day sprint
   return [
     {
       id: `task-${Date.now()}-1`,
       dayNumber: 1,
-      title: `${skillTitle}: Core Foundations & Architecture Patterns`,
-      description: `Deconstruct the essential primitives and standard conventions of ${skillTitle}.`,
+      title: `${skillTitle}: Core Foundations & Architecture`,
+      description: `Deconstruct ${skillTitle} into foundational principles and establish a disciplined workflow.`,
       type: "learn",
-      creatorName: "Elena Rostova",
-      creatorHandle: "@elena_distrib",
-      creatorAvatar: "/avatars/avatar-2.svg",
+      creatorName: "Tanvir Rahman",
+      creatorHandle: "@tanvir_rahman",
+      creatorAvatar: "/avatars/avatar-3.svg",
       estimatedMinutes: minutes,
-      completed: true,
-      completedAt: new Date(Date.now() - 86400000).toISOString(),
+      completed: false,
       producesArtifact: true,
-      artifactTitle: `${skillTitle} Architectural Foundations`,
-      artifactType: "code",
+      artifactTitle: `${skillTitle} Architecture Spec`,
+      artifactType: "summary",
+      sparkGuidance: {
+        overview: `To build mastery in ${skillTitle}, focus on solid conceptual primitives before jumping into complexity.`,
+        keySteps: [
+          "Understand the primary objective.",
+          "Identify the core inputs and outputs.",
+          "Map out the sequential stages.",
+          "Document initial assumptions."
+        ],
+        proTip: "Mastery begins with clean definitions. Make sure every term is unambiguous."
+      },
+      resources: [
+        {
+          id: "res-g1-1",
+          type: "video",
+          title: `Foundations of ${skillTitle}`,
+          durationOrReadTime: "8 min video",
+          description: `Key principles and high-level architecture overview for ${skillTitle}.`
+        },
+        {
+          id: "res-g1-2",
+          type: "doc",
+          title: "Technical Specification Guidelines",
+          durationOrReadTime: "4 min read",
+          description: "Structuring clean documentation and architectural specifications."
+        }
+      ],
+      subtasks: [
+        { id: "sub-g1-1", title: "Review architectural foundations", completed: false },
+        { id: "sub-g1-2", title: "Draft high-level component boundaries", completed: false },
+        { id: "sub-g1-3", title: "Document 3 primary constraints", completed: false }
+      ],
+      evidenceRequirement: {
+        type: "work_summary",
+        prompt: `Provide your notes, outline, or implementation link for ${skillTitle}.`,
+        placeholder: "Summarize your architectural decisions or paste link...",
+        verificationQuestion: "Did you clearly identify the core inputs, outputs, and constraints?"
+      }
     },
     {
       id: `task-${Date.now()}-2`,
       dayNumber: 2,
-      title: `${skillTitle}: Hands-on Implementation & Core Mechanics`,
-      description: `Implement real-world patterns with testable code and immediate feedback loops.`,
+      title: `${skillTitle}: Practical Hands-on Implementation`,
+      description: `Build the primary functional deliverable for ${skillTitle} using industry best practices.`,
       type: "build",
-      creatorName: "Marcus Vance",
-      creatorHandle: "@marcus_vance",
-      creatorAvatar: "/avatars/avatar-3.svg",
+      creatorName: "Sumaiya Kabir",
+      creatorHandle: "@sumaiya_kabir",
+      creatorAvatar: "/avatars/avatar-2.svg",
       estimatedMinutes: minutes,
       completed: false,
       producesArtifact: true,
-      artifactTitle: `${skillTitle} Prototype Module`,
+      artifactTitle: `${skillTitle} Working Deliverable`,
       artifactType: "code",
+      sparkGuidance: {
+        overview: `Put theory into practice. Build a clean, minimal working implementation for ${skillTitle}.`,
+        keySteps: [
+          "Set up the working environment.",
+          "Implement the core logic step by step.",
+          "Test with realistic sample inputs.",
+          "Refactor for clarity and maintainability."
+        ],
+        proTip: "Make it work first, then make it clean, and finally optimize if necessary."
+      },
+      resources: [
+        {
+          id: "res-g2-1",
+          type: "tutorial",
+          title: `Step-by-Step Implementation Guide for ${skillTitle}`,
+          durationOrReadTime: "10 min guide",
+          description: "Concrete walkthrough from zero to a working prototype."
+        },
+        {
+          id: "res-g2-2",
+          type: "example",
+          title: "Reference Implementation Code",
+          durationOrReadTime: "Sample project",
+          description: "Production-ready structure with annotations."
+        }
+      ],
+      subtasks: [
+        { id: "sub-g2-1", title: "Initialize core project structure", completed: false },
+        { id: "sub-g2-2", title: "Implement key logic functions", completed: false },
+        { id: "sub-g2-3", title: "Execute initial smoke test", completed: false }
+      ],
+      evidenceRequirement: {
+        type: "link",
+        prompt: "Submit a link or screenshot to your completed working code/deliverable.",
+        placeholder: "https://...",
+        verificationQuestion: "Does your implementation successfully run with valid inputs?"
+      }
     },
     {
       id: `task-${Date.now()}-3`,
       dayNumber: 3,
-      title: `${skillTitle}: Edge Cases, Resiliency & Error Handling`,
+      title: `${skillTitle}: Edge Cases & Resilience`,
       description: `Harden implementations against unexpected failures, timeouts, and edge cases.`,
       type: "learn",
-      creatorName: "Elena Rostova",
-      creatorHandle: "@elena_distrib",
+      creatorName: "Sumaiya Kabir",
+      creatorHandle: "@sumaiya_kabir",
       creatorAvatar: "/avatars/avatar-2.svg",
       estimatedMinutes: minutes,
       completed: false,
       producesArtifact: false,
+      sparkGuidance: {
+        overview: "Robust solutions distinguish themselves in how gracefully they handle boundary conditions.",
+        keySteps: [
+          "Enumerate potential failure modes.",
+          "Add input validations and guards.",
+          "Implement deterministic error handling.",
+          "Verify recovery behavior."
+        ],
+        proTip: "Assume anything that can fail eventually will fail. Design clean fallback paths."
+      },
+      resources: [
+        {
+          id: "res-g3-1",
+          type: "doc",
+          title: "Defensive Engineering & Error Strategies",
+          durationOrReadTime: "5 min read",
+          description: "Pattern library for handling boundary conditions and unexpected states."
+        }
+      ],
+      subtasks: [
+        { id: "sub-g3-1", title: "Document top 3 edge cases", completed: false },
+        { id: "sub-g3-2", title: "Implement validation guards", completed: false }
+      ],
+      evidenceRequirement: {
+        type: "work_summary",
+        prompt: "Describe how your implementation handles unexpected inputs or network failures.",
+        placeholder: "Detail edge case handling...",
+        verificationQuestion: "Did you verify that edge cases are safely caught without crashes?"
+      }
     },
     {
       id: `task-${Date.now()}-4`,
       dayNumber: 4,
-      title: `${skillTitle}: Performance Optimization & Scalability`,
-      description: `Measure throughput, locate bottlenecks, and apply targeted performance optimizations.`,
-      type: "build",
-      creatorName: "Dr. Aris Thorne",
-      creatorHandle: "@aris_py",
-      creatorAvatar: "/avatars/avatar-1.svg",
-      estimatedMinutes: minutes,
-      completed: false,
-      producesArtifact: true,
-      artifactTitle: "Benchmark Analysis & Fixes",
-      artifactType: "code",
-    },
-    {
-      id: `task-${Date.now()}-5`,
-      dayNumber: 5,
-      title: `${skillTitle}: Security & Production Hardening`,
-      description: `Apply industry security standards, access controls, and sanitize input boundaries.`,
-      type: "learn",
-      creatorName: "Marcus Vance",
-      creatorHandle: "@marcus_vance",
-      creatorAvatar: "/avatars/avatar-3.svg",
-      estimatedMinutes: minutes,
-      completed: false,
-      producesArtifact: false,
-    },
-    {
-      id: `task-${Date.now()}-6`,
-      dayNumber: 6,
-      title: `Capstone Deliverable: ${skillTitle} Production Portfolio Proof`,
+      title: `Capstone Deliverable: ${skillTitle} Production Proof`,
       description: `Synthesize all sprint concepts into a verified production-ready project deliverable.`,
       type: "real_world_proof",
-      creatorName: "Elena Rostova",
-      creatorHandle: "@elena_distrib",
+      creatorName: "Sumaiya Kabir",
+      creatorHandle: "@sumaiya_kabir",
       creatorAvatar: "/avatars/avatar-2.svg",
       estimatedMinutes: minutes,
       completed: false,
       producesArtifact: true,
-      artifactTitle: `${skillTitle} Production PR & Architecture Docs`,
+      artifactTitle: `${skillTitle} Production Portfolio Proof`,
       artifactType: "summary",
-    },
+      sparkGuidance: {
+        overview: "Assemble your completed work into a portfolio-ready artifact demonstrating mastery.",
+        keySteps: [
+          "Consolidate all project files.",
+          "Write a concise project summary.",
+          "Verify end-to-end functionality.",
+          "Publish or archive the deliverable."
+        ],
+        proTip: "Clear documentation turns good code into a portfolio showcase."
+      },
+      resources: [
+        {
+          id: "res-g4-1",
+          type: "doc",
+          title: "Showcasing Proof of Work Effectively",
+          durationOrReadTime: "4 min read",
+          description: "How to structure portfolio items for maximum technical credibility."
+        }
+      ],
+      subtasks: [
+        { id: "sub-g4-1", title: "Perform final end-to-end audit", completed: false },
+        { id: "sub-g4-2", title: "Publish project link or summary", completed: false }
+      ],
+      evidenceRequirement: {
+        type: "link",
+        prompt: "Submit the final public link, GitHub PR, or artifact evidence for verification.",
+        placeholder: "https://...",
+        verificationQuestion: "Is this deliverable ready for external review and portfolio inclusion?"
+      }
+    }
   ];
 };
 

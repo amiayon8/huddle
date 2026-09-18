@@ -8,7 +8,8 @@ import {
   CheckCircle2,
   Loader2,
   Calendar,
-  Sparkles,
+  AlertCircle,
+  X,
 } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
 import { UserSurveyData } from "../types/huddle";
@@ -40,7 +41,7 @@ export const LandingQuestionnaire: React.FC = () => {
     useHuddle();
 
   const fullIntroText =
-    "Hey, glad you’re here. However you found your way to Huddle. Let’s figure out one small thing worthy building today";
+    "Welcome to Huddle! I’m Spark - your little friend here to help you learn, grow and build the skills you care about. Let’s find the perfect path for you, shall we?";
 
   const [isIntro, setIsIntro] = useState(true);
   const [typedText, setTypedText] = useState("");
@@ -185,6 +186,19 @@ export const LandingQuestionnaire: React.FC = () => {
     useState<DynamicQuestionData | null>(null);
   const [isLoadingDynamic, setIsLoadingDynamic] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (message: string) => {
+    setToastMessage(message);
+  };
+
+  useEffect(() => {
+    if (!toastMessage) return;
+    const timer = setTimeout(() => {
+      setToastMessage(null);
+    }, 3200);
+    return () => clearTimeout(timer);
+  }, [toastMessage]);
 
   const mascotMap: Record<string, string> = {
     idle: "/mascot_idle.svg",
@@ -286,12 +300,18 @@ export const LandingQuestionnaire: React.FC = () => {
           if (json.success && json.data) {
             setDynamicQuestion(json.data);
 
-            if (step === 4 && !selectedProfession && json.data.options?.[0]) {
+            if (
+              step === 4 &&
+              !selectedProfession &&
+              !professionOtherActive &&
+              json.data.options?.[0]
+            ) {
               setSelectedProfession(json.data.options[0].title);
             }
             if (
               step === 5 &&
               selectedSkills.length === 0 &&
+              !skillsOtherActive &&
               json.data.options?.[0]
             ) {
               setSelectedSkills([json.data.options[0].title]);
@@ -312,17 +332,100 @@ export const LandingQuestionnaire: React.FC = () => {
     list: string[],
     setList: (val: string[]) => void,
     item: string,
+    isOtherActive: boolean = false,
   ) => {
     if (list.includes(item)) {
-      if (list.length > 1) {
+      if (list.length > 1 || isOtherActive) {
         setList(list.filter((i) => i !== item));
+      } else {
+        setList([]);
+        showToast(
+          "Please select at least 1 option, or enter a custom one in Other.",
+        );
       }
     } else {
       setList([...list, item]);
     }
   };
 
+  const handleSelectAge = (title: string) => {
+    if (selectedAge === title) {
+      setSelectedAge("");
+      if (!ageOtherActive && !ageInput.trim()) {
+        showToast("Please enter your age or select an experience level.");
+      }
+    } else {
+      setSelectedAge(title);
+      setAgeOtherActive(false);
+    }
+  };
+
+  const handleSelectProfession = (title: string) => {
+    if (selectedProfession === title) {
+      setSelectedProfession("");
+      if (!professionOtherActive) {
+        showToast("Please select a target role, or specify in Other.");
+      }
+    } else {
+      setSelectedProfession(title);
+      setProfessionOtherActive(false);
+    }
+  };
+
   const handleNext = () => {
+    if (step === 1) {
+      const hasSubject =
+        selectedSubjects.length > 0 ||
+        (subjectsOtherActive && subjectsOther.trim().length > 0);
+      if (!hasSubject) {
+        showToast(
+          "Please select at least 1 subject or specify in Other to continue.",
+        );
+        return;
+      }
+    } else if (step === 2) {
+      const hasHobby =
+        selectedHobbies.length > 0 ||
+        (hobbiesOtherActive && hobbiesOther.trim().length > 0);
+      if (!hasHobby) {
+        showToast(
+          "Please select at least 1 interest or specify in Other to continue.",
+        );
+        return;
+      }
+    } else if (step === 3) {
+      const hasAge =
+        (calculatedStage.age !== null && ageInput.trim().length > 0) ||
+        selectedAge.length > 0 ||
+        (ageOtherActive && ageOther.trim().length > 0);
+      if (!hasAge) {
+        showToast(
+          "Please enter your age or select an experience level to continue.",
+        );
+        return;
+      }
+    } else if (step === 4) {
+      const hasProfession =
+        selectedProfession.length > 0 ||
+        (professionOtherActive && professionOther.trim().length > 0);
+      if (!hasProfession) {
+        showToast(
+          "Please select a target role or specify in Other to continue.",
+        );
+        return;
+      }
+    } else if (step === 5) {
+      const hasSkill =
+        selectedSkills.length > 0 ||
+        (skillsOtherActive && skillsOther.trim().length > 0);
+      if (!hasSkill) {
+        showToast(
+          "Please select at least 1 skill or specify in Other to continue.",
+        );
+        return;
+      }
+    }
+
     if (step < totalSteps) {
       setStep((prev) => prev + 1);
     } else {
@@ -403,7 +506,24 @@ export const LandingQuestionnaire: React.FC = () => {
             : "Choose which skill to focus on in your 4-day sprint.");
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-100 flex flex-col justify-between p-4 sm:p-6 lg:p-8 font-sans transition-colors selection:bg-indigo-600 selection:text-white">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-100 flex flex-col justify-between p-4 sm:p-6 lg:p-8 font-sans transition-colors selection:bg-indigo-600 selection:text-white relative">
+      {toastMessage && (
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 pointer-events-auto max-w-md w-[calc(100vw-2rem)] animate-in fade-in slide-in-from-top-3 duration-200">
+          <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-xs font-medium shadow-xl border border-zinc-800 dark:border-zinc-200">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <AlertCircle className="w-4 h-4 text-amber-400 dark:text-amber-500 shrink-0" />
+              <span className="truncate">{toastMessage}</span>
+            </div>
+            <button
+              onClick={() => setToastMessage(null)}
+              className="p-1 text-zinc-400 hover:text-white dark:hover:text-zinc-900 transition-colors shrink-0 cursor-pointer"
+              aria-label="Dismiss message"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
       <header className="max-w-2xl w-full mx-auto flex items-center justify-between py-2">
         <div className="flex items-center gap-2.5">
           <img
@@ -435,11 +555,11 @@ export const LandingQuestionnaire: React.FC = () => {
         </button>
       </header>
 
-      <main className="max-w-xl w-full mx-auto my-auto py-6 sm:py-8">
+      <main className="max-w-2xl w-full mx-auto my-auto py-6 sm:py-8">
         {isIntro ? (
           <div
             onClick={handleFastForwardOrStart}
-            className={`transition-all duration-700 ease-out ${
+            className={`transition-all duration-700 ease-out cursor-pointer select-none ${
               !introFadedIn
                 ? "opacity-0 translate-y-6 scale-95"
                 : isExitingIntro
@@ -447,50 +567,45 @@ export const LandingQuestionnaire: React.FC = () => {
                   : "opacity-100 translate-y-0 scale-100"
             }`}
           >
-            <div className="max-w-lg mx-auto text-center space-y-6">
-              <div className="relative inline-block">
-                <div className="absolute inset-0 bg-indigo-500/25 dark:bg-indigo-500/35 blur-2xl rounded-full scale-150 animate-pulse" />
-                <div className="relative w-20 h-20 sm:w-24 sm:h-24 p-3 rounded-2xl bg-white dark:bg-[#11131e] border border-indigo-200 dark:border-indigo-800/80 shadow-2xl shadow-indigo-500/10 flex items-center justify-center transition-transform hover:scale-105 duration-300">
-                  <img
-                    src="/mascot_encouragement.svg"
-                    alt="Spark"
-                    className="w-full h-full object-contain drop-shadow-md"
-                  />
-                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-zinc-900 animate-pulse" />
-                </div>
+            <div className="flex flex-col items-center text-center space-y-6">
+              <div className="relative w-72 h-72 sm:w-96 sm:h-96 md:w-[28rem] md:h-[28rem] flex items-center justify-center transition-transform hover:scale-102 duration-300">
+                <img
+                  src="/mascot_encouragement.svg"
+                  alt="Spark"
+                  className="w-full h-full object-contain filter drop-shadow-2xl"
+                />
+                <span className="absolute top-6 right-8 sm:top-10 sm:right-14 w-5 h-5 rounded-full bg-emerald-500 ring-4 ring-white dark:ring-[#090a0f] animate-pulse" />
               </div>
 
-              <div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/50 text-xs font-semibold shadow-2xs">
-                  <span>Spark • Your Deliberate Practice Companion</span>
-                </div>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/50 text-xs font-semibold shadow-xs">
+                <span>Spark - Your AI Companion</span>
               </div>
 
-              <div className="relative p-6 sm:p-8 rounded-3xl bg-white/85 dark:bg-[#11131e]/85 backdrop-blur-xl border border-zinc-200/80 dark:border-white/[0.08] shadow-2xl text-left space-y-5">
-                <p className="text-base sm:text-lg md:text-xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100 leading-relaxed font-sans min-h-[5.5rem]">
+              <div className="max-w-xl w-full text-center space-y-5 px-2">
+                <p className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100 leading-relaxed min-h-[5rem]">
                   {typedText}
                   {!isTypingComplete && (
-                    <span className="inline-block w-2 h-5 ml-1 bg-indigo-500 animate-pulse rounded-xs align-middle" />
+                    <span className="inline-block w-2.5 h-6 ml-1.5 bg-indigo-600 animate-pulse rounded-xs align-middle" />
                   )}
                 </p>
 
-                <div className="pt-2 flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800/60">
-                  <span className="text-[11px] text-zinc-400 font-medium">
-                    {isTypingComplete
-                      ? "Click to begin"
-                      : "Tap anywhere to fast-forward"}
-                  </span>
-
+                <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-4">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleStartSurvey();
                     }}
-                    className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs sm:text-sm font-semibold shadow-xs flex items-center gap-1.5 transition-all hover:scale-102 active:scale-98 cursor-pointer"
+                    className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-md flex items-center gap-2 transition-all hover:scale-102 active:scale-98 cursor-pointer"
                   >
-                    <span>Let's begin</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <span>Let's find your path</span>
+                    <ArrowRight className="w-4 h-4" />
                   </button>
+
+                  <span className="text-xs text-zinc-400 font-medium">
+                    {isTypingComplete
+                      ? "Press Enter or spacebar to begin"
+                      : "Click anywhere to fast-forward"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -514,19 +629,19 @@ export const LandingQuestionnaire: React.FC = () => {
               </div>
             </div>
 
-            <div className="mb-6 p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/80 flex items-center gap-4 transition-colors">
-              <div className="relative shrink-0 w-12 h-12 p-1 rounded-lg bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-700 flex items-center justify-center">
+            <div className="mb-6 p-5 rounded-2xl bg-white dark:bg-[#111218] border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs flex items-center gap-5 transition-colors">
+              <div className="relative shrink-0 w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center">
                 <img
                   src={mascotMap[currentMascotEmotion] || "/mascot_idle.svg"}
                   alt="Spark"
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain filter drop-shadow-md"
                 />
               </div>
               <div className="text-xs text-zinc-700 dark:text-zinc-300 flex-1">
-                <div className="font-semibold text-indigo-600 dark:text-indigo-400 text-[11px] uppercase tracking-wider mb-0.5">
-                  Spark Companion
+                <div className="font-semibold text-indigo-600 dark:text-indigo-400 text-xs tracking-wide mb-1">
+                  Spark - Your AI Companion
                 </div>
-                <p className="leading-relaxed text-[12px]">
+                <p className="leading-relaxed text-xs sm:text-sm text-zinc-800 dark:text-zinc-200">
                   {isLoadingDynamic ? (
                     <span className="inline-flex items-center gap-1.5 text-indigo-600 dark:text-indigo-300">
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -544,7 +659,7 @@ export const LandingQuestionnaire: React.FC = () => {
                 <div className="w-16 h-16 p-2 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center">
                   <img
                     src="/mascot_deep_thinking.svg"
-                    alt="Spark AI Thinking"
+                    alt="Spark Thinking"
                     className="w-full h-full object-contain opacity-80"
                   />
                 </div>
@@ -685,6 +800,7 @@ export const LandingQuestionnaire: React.FC = () => {
                               selectedSubjects,
                               setSelectedSubjects,
                               sub.title,
+                              subjectsOtherActive,
                             )
                           }
                           className={`w-full p-3.5 rounded-xl border text-left transition-all flex items-center justify-between group cursor-pointer ${
@@ -740,18 +856,18 @@ export const LandingQuestionnaire: React.FC = () => {
                             selectedHobbies,
                             setSelectedHobbies,
                             opt.title,
+                            hobbiesOtherActive,
                           );
                         } else if (step === 3) {
-                          setSelectedAge(opt.title);
-                          setAgeOtherActive(false);
+                          handleSelectAge(opt.title);
                         } else if (step === 4) {
-                          setSelectedProfession(opt.title);
-                          setProfessionOtherActive(false);
+                          handleSelectProfession(opt.title);
                         } else if (step === 5) {
                           toggleSelection(
                             selectedSkills,
                             setSelectedSkills,
                             opt.title,
+                            skillsOtherActive,
                           );
                         }
                       };
@@ -828,8 +944,14 @@ export const LandingQuestionnaire: React.FC = () => {
                           const checked = e.target.checked;
                           if (step === 1) setSubjectsOtherActive(checked);
                           if (step === 2) setHobbiesOtherActive(checked);
-                          if (step === 3) setAgeOtherActive(checked);
-                          if (step === 4) setProfessionOtherActive(checked);
+                          if (step === 3) {
+                            setAgeOtherActive(checked);
+                            if (checked) setSelectedAge("");
+                          }
+                          if (step === 4) {
+                            setProfessionOtherActive(checked);
+                            if (checked) setSelectedProfession("");
+                          }
                           if (step === 5) setSkillsOtherActive(checked);
                         }}
                         className="w-4 h-4 rounded text-indigo-600 accent-indigo-600 cursor-pointer"
@@ -874,10 +996,12 @@ export const LandingQuestionnaire: React.FC = () => {
                           if (step === 3) {
                             setAgeOther(val);
                             setAgeOtherActive(true);
+                            if (val.trim()) setSelectedAge("");
                           }
                           if (step === 4) {
                             setProfessionOther(val);
                             setProfessionOtherActive(true);
+                            if (val.trim()) setSelectedProfession("");
                           }
                           if (step === 5) {
                             setSkillsOther(val);

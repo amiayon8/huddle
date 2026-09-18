@@ -1,16 +1,34 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { X, ArrowRight, Check, ShieldCheck, Mail, Lock, User as UserIcon, AlertCircle } from 'lucide-react';
-import { useHuddle } from '../context/HuddleContext';
-import { signInUser, signUpUser, resetPasswordUser } from '../lib/supabase';
+import React, { useState } from "react";
+import {
+  X,
+  ArrowRight,
+  Check,
+  Mail,
+  Lock,
+  User as UserIcon,
+  AlertCircle,
+} from "lucide-react";
+import { useHuddle } from "../context/HuddleContext";
+import { signInUser, signUpUser, resetPasswordUser } from "../lib/supabase";
 
 export const AuthModal: React.FC = () => {
-  const { authModalOpen, closeAuthModal, authMode, setOnboardingActive, updateUserProfile, loginDemo, isAuthenticated } = useHuddle();
-  const [mode, setMode] = useState<'welcome' | 'login' | 'signup' | 'forgot'>(authMode || 'welcome');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
+  const {
+    authModalOpen,
+    closeAuthModal,
+    authMode,
+    setOnboardingActive,
+    updateUserProfile,
+    loginDemo,
+    isAuthenticated,
+  } = useHuddle();
+  const [mode, setMode] = useState<"welcome" | "login" | "signup" | "forgot">(
+    authMode || "welcome",
+  );
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -30,7 +48,7 @@ export const AuthModal: React.FC = () => {
     setLoading(true);
 
     try {
-      if (mode === 'signup') {
+      if (mode === "signup") {
         const { user, error } = await signUpUser(email, password, fullName);
         if (error) {
           setErrorMessage(error);
@@ -39,15 +57,15 @@ export const AuthModal: React.FC = () => {
         }
 
         if (user) {
-          updateUserProfile({ name: fullName || 'New Engineer', email });
-          setSuccessMessage('Account created successfully!');
+          updateUserProfile({ name: fullName || "Engineer", email });
+          setSuccessMessage("Account created successfully.");
           setTimeout(() => {
             closeAuthModal();
             setOnboardingActive(true);
             setLoading(false);
-          }, 600);
+          }, 500);
         }
-      } else if (mode === 'login') {
+      } else if (mode === "login") {
         const { user, error } = await signInUser(email, password);
         if (error) {
           setErrorMessage(error);
@@ -56,27 +74,27 @@ export const AuthModal: React.FC = () => {
         }
 
         if (user) {
-          setSuccessMessage('Logged in successfully!');
+          setSuccessMessage("Signed in successfully.");
           setTimeout(() => {
             closeAuthModal();
             setLoading(false);
-          }, 600);
+          }, 500);
         }
-      } else if (mode === 'forgot') {
+      } else if (mode === "forgot") {
         const res = await resetPasswordUser(email);
         if (!res.success) {
-          setErrorMessage(res.error || 'Failed to dispatch password reset email.');
+          setErrorMessage(res.error || "Unable to send password reset email.");
           setLoading(false);
           return;
         }
-        setSuccessMessage(`Password reset instructions sent to ${email}`);
+        setSuccessMessage(`Password reset link sent to ${email}`);
         setTimeout(() => {
-          setMode('login');
+          setMode("login");
           setLoading(false);
         }, 1200);
       }
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Authentication error occurred.');
+    } catch {
+      setErrorMessage("An unexpected authentication error occurred.");
       setLoading(false);
     }
   };
@@ -85,38 +103,42 @@ export const AuthModal: React.FC = () => {
     setLoading(true);
     try {
       await loginDemo();
-      setSuccessMessage('Logged in as Demo Engineer!');
+      setSuccessMessage("Signed in with demo account.");
       setTimeout(() => {
         closeAuthModal();
         setLoading(false);
       }, 400);
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to login demo account.');
+    } catch {
+      setErrorMessage("Unable to open demo account.");
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="relative w-full max-w-md bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl p-5 sm:p-7 transition-colors">
-
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
+      <div className="relative w-full max-w-md bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl p-6 sm:p-7">
         <button
           onClick={closeAuthModal}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+          className="absolute top-4 right-4 p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+          aria-label="Close"
         >
           <X className="w-4 h-4" />
         </button>
 
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-900/40 p-1 flex items-center justify-center shrink-0">
-            <img src="/mascot_encouragement.svg" alt="Spark" className="w-full h-full object-contain" />
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1 flex items-center justify-center shrink-0">
+            <img
+              src="/mascot_idle.svg"
+              alt="Spark"
+              className="w-full h-full object-contain"
+            />
           </div>
           <div>
-            <h2 className="text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-              Huddle • Spark Companion
+            <h2 className="text-base font-semibold text-zinc-950 dark:text-white">
+              Huddle
             </h2>
             <p className="text-xs text-zinc-500">
-              Deliberate practice with zero doomscrolling
+              Hands-on deliberate practice for engineers.
             </p>
           </div>
         </div>
@@ -135,53 +157,46 @@ export const AuthModal: React.FC = () => {
           </div>
         )}
 
-        {mode === 'welcome' && (
+        {mode === "welcome" && (
           <div className="space-y-3.5">
-            <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800 space-y-1 text-xs">
-              <div className="flex items-center gap-1.5 font-semibold text-zinc-900 dark:text-zinc-100">
-                <ShieldCheck className="w-4 h-4 text-indigo-500" />
-                Authentication
-              </div>
-              <p className="text-zinc-500 leading-relaxed">
-                Sign up with your email to sync your 2–5 day sprints, private portfolio artifacts, and micro-squad accountability.
-              </p>
+            <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/70 dark:border-zinc-800 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
+              Sign in or create an account to save your study plans, track your daily progress, and resume anytime.
             </div>
 
             <button
-              onClick={() => setMode('signup')}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-xs transition-colors"
+              onClick={() => setMode("signup")}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors cursor-pointer"
             >
-              <span>Create Account</span>
+              <span>Create an account</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
 
             <button
-              onClick={() => setMode('login')}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-100 text-xs font-medium transition-colors"
+              onClick={() => setMode("login")}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-medium transition-colors cursor-pointer"
             >
-              <span>Log in with existing account</span>
+              <span>Sign in with existing account</span>
             </button>
 
             <button
               onClick={handleDemoLogin}
-              className="w-full py-2 flex items-center justify-center gap-2 text-center text-xs text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors"
+              className="w-full py-2 flex items-center justify-center gap-2 text-center text-xs text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-pointer"
             >
-              <img src="/mascot_idle.svg" alt="Spark" className="w-4 h-4 object-contain" />
-              <span>Continue as Demo Engineer</span>
+              <span>Continue with demo account</span>
             </button>
           </div>
         )}
 
-        {(mode === 'login' || mode === 'signup') && (
-          <form onSubmit={handleAuthSubmit} className="space-y-3.5">
+        {(mode === "login" || mode === "signup") && (
+          <form onSubmit={handleAuthSubmit} className="space-y-4">
             <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              {mode === 'signup' ? 'Create your account' : 'Welcome back'}
+              {mode === "signup" ? "Create your account" : "Welcome back"}
             </h3>
 
-            {mode === 'signup' && (
+            {mode === "signup" && (
               <div className="space-y-1">
                 <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
-                  Full Name
+                  Full name
                 </label>
                 <div className="relative">
                   <UserIcon className="absolute left-3 top-2.5 w-3.5 h-3.5 text-zinc-400" />
@@ -189,9 +204,9 @@ export const AuthModal: React.FC = () => {
                     type="text"
                     required
                     value={fullName}
-                    onChange={e => setFullName(e.target.value)}
+                    onChange={(e) => setFullName(e.target.value)}
                     placeholder="Alex Rivera"
-                    className="w-full pl-9 pr-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                   />
                 </div>
               </div>
@@ -207,9 +222,9 @@ export const AuthModal: React.FC = () => {
                   type="email"
                   required
                   value={email}
-                  onChange={e => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="alex@example.com"
-                  className="w-full pl-9 pr-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
             </div>
@@ -219,13 +234,13 @@ export const AuthModal: React.FC = () => {
                 <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
                   Password
                 </label>
-                {mode === 'login' && (
+                {mode === "login" && (
                   <button
                     type="button"
-                    onClick={() => setMode('forgot')}
-                    className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline"
+                    onClick={() => setMode("forgot")}
+                    className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
                   >
-                    Forgot?
+                    Forgot password?
                   </button>
                 )}
               </div>
@@ -235,9 +250,9 @@ export const AuthModal: React.FC = () => {
                   type="password"
                   required
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-9 pr-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
             </div>
@@ -245,14 +260,14 @@ export const AuthModal: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors mt-2"
+              className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-medium transition-colors cursor-pointer"
             >
               {loading ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : mode === 'signup' ? (
-                'Sign Up & Start Practice'
+                <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin mx-auto" />
+              ) : mode === "signup" ? (
+                "Create account"
               ) : (
-                'Log In'
+                "Sign in"
               )}
             </button>
 
@@ -260,22 +275,24 @@ export const AuthModal: React.FC = () => {
               type="button"
               onClick={() => {
                 setErrorMessage(null);
-                setMode(mode === 'signup' ? 'login' : 'signup');
+                setMode(mode === "signup" ? "login" : "signup");
               }}
-              className="w-full text-center text-xs text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 pt-1"
+              className="w-full text-center text-xs text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 pt-1 cursor-pointer"
             >
-              {mode === 'signup' ? 'Already have an account? Log in' : 'Need an account? Sign up'}
+              {mode === "signup"
+                ? "Already have an account? Sign in"
+                : "Do not have an account? Create one"}
             </button>
           </form>
         )}
 
-        {mode === 'forgot' && (
-          <form onSubmit={handleAuthSubmit} className="space-y-3.5">
+        {mode === "forgot" && (
+          <form onSubmit={handleAuthSubmit} className="space-y-4">
             <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              Reset Password
+              Reset your password
             </h3>
             <p className="text-xs text-zinc-500 leading-relaxed">
-              Enter your account email to receive a password reset link.
+              Enter your email address and we will send you instructions to reset your password.
             </p>
 
             <div className="space-y-1">
@@ -286,30 +303,29 @@ export const AuthModal: React.FC = () => {
                 type="email"
                 required
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="alex@example.com"
-                className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors"
+              className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors cursor-pointer"
             >
-              {loading ? 'Sending...' : 'Send Reset Link'}
+              {loading ? "Sending..." : "Send reset link"}
             </button>
 
             <button
               type="button"
-              onClick={() => setMode('login')}
-              className="w-full text-center text-xs text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 pt-1"
+              onClick={() => setMode("login")}
+              className="w-full text-center text-xs text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 pt-1 cursor-pointer"
             >
-              Back to log in
+              Return to sign in
             </button>
           </form>
         )}
-
       </div>
     </div>
   );

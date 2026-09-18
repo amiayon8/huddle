@@ -130,7 +130,7 @@ function updateDesignTokens(tokens, colors) {
     const c = colors[role];
     if (!c.base) {
       console.warn(
-        `⚠️  No base hex found for ${role} color — skipping its token scale.`,
+        `⚠️  No base hex found for ${role} color - skipping its token scale.`,
       );
       continue;
     }

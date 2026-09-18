@@ -26,18 +26,23 @@ const supabaseAnonKey =
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const avatarMap: Record<string, string> = {
+  "Ayon Sarker": "/avatars/avatar-1.svg",
+  "Sumaiya Kabir": "/avatars/avatar-2.svg",
+  "Tanvir Rahman": "/avatars/avatar-3.svg",
+  "Farhan Ahmed": "/avatars/avatar-4.svg",
+  "Arefin Shuvo": "/avatars/avatar-5.svg",
+  "Sadia Sultana": "/avatars/avatar-6.svg",
+  "Mahmudul Hasan": "/avatars/avatar-7.svg",
+  "Tasnim Sultana": "/avatars/avatar-8.svg",
+  "Shifat Hossain": "/avatars/avatar-5.svg",
+  "Nabila Haque": "/avatars/avatar-4.svg",
+  "Kazi Sakib": "/avatars/avatar-3.svg",
+  "Mehnaz Chowdhury": "/avatars/avatar-2.svg",
+  "Nusrat Jahan": "/avatars/avatar-2.svg",
+  "Rahat Chowdhury": "/avatars/avatar-3.svg",
   "Alex Chen": "/avatars/avatar-1.svg",
   "Elena Rostova": "/avatars/avatar-2.svg",
   "Marcus Vance": "/avatars/avatar-3.svg",
-  "Priya Patel": "/avatars/avatar-4.svg",
-  "Carlos Mendez": "/avatars/avatar-5.svg",
-  "Amina Diallo": "/avatars/avatar-6.svg",
-  "Kenji Sato": "/avatars/avatar-7.svg",
-  "Rachel Rivera": "/avatars/avatar-8.svg",
-  "Liam Chen": "/avatars/avatar-5.svg",
-  "Sarah Jenkins": "/avatars/avatar-4.svg",
-  "David Kim": "/avatars/avatar-3.svg",
-  "Maya Patel": "/avatars/avatar-2.svg",
 };
 
 function sanitizeAvatar(name: string, fallbackIndex: number = 1): string {

@@ -1,10 +1,11 @@
 # Huddle
 
-Huddle is a deliberate practice platform for software engineers. It organizes continuous engineering growth into sequential stepping-stone units, 4-day practice sprints, 4-person accountability squads, and contextual coaching with Pip.
+Huddle is a deliberate practice platform for software engineers. It organizes continuous engineering growth into sequential stepping-stone units, 4-day practice sprints, 4-person accountability squads, and contextual guidance with Spark - Your AI Companion.
 
 ## Overview
 
 Traditional learning platforms focus on passive video consumption or long tutorials. Huddle emphasizes daily deliberate execution:
+
 - **Stepping-Stone Units**: Guided curriculum nodes with clear progression from fundamentals to production implementation.
 - **4-Day Deliberate Sprints**: Focused daily exercises designed to take 15 to 20 minutes and produce tangible engineering artifacts.
 - **Zero-Penalty Reshuffling**: Reschedule sprint timelines anytime without resetting practice progress.
@@ -25,7 +26,7 @@ Traditional learning platforms focus on passive video consumption or long tutori
 ```text
 app/
 ├── api/
-│   ├── mascot/             # Pip coaching conversational endpoint
+│   ├── mascot/             # Spark AI Companion conversational endpoint
 │   └── questionnaire/      # Onboarding survey evaluation endpoint
 ├── auth/
 │   ├── forgot-password/    # Password reset email dispatch
@@ -36,8 +37,8 @@ app/
 │   ├── CommunityView.tsx   # Questions and discussions feed
 │   ├── CreatorView.tsx     # Learning Library of engineering guides
 │   ├── DashboardView.tsx   # Primary Learn tab with stepping-stone path
-│   ├── DuolingoMascot.tsx  # Pip speech bubble and interactive mascot
-│   ├── MascotDrawer.tsx    # Multi-session conversational coaching drawer
+│   ├── DuolingoMascot.tsx  # Spark speech bubble and interactive mascot
+│   ├── MascotDrawer.tsx    # Multi-session conversational companion drawer
 │   ├── PublicProfileView.tsx # 3-tab developer profile with portfolio proofs
 │   ├── SquadView.tsx       # 4-person friend squad & community updates
 │   └── BingeQuizModal.tsx  # Dynamic concept review modal
@@ -85,16 +86,21 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 ## Key Features
 
 ### 1. Learn (Stepping-Stone Path)
+
 Visual stepping-stone units guide engineers through core concepts, code builds, and production architecture proofs. Each day features one clear task with estimated time and artifact deliverables.
 
 ### 2. Friend Squads
+
 Small 4-person squads with shared weekly goals, member milestone tracking, activity pings, and mutual check-ins.
 
 ### 3. Learning Library
+
 Curated engineering lessons with reading times, architecture blueprints, and code examples. Engineers can filter by topic tags or search by keyword.
 
 ### 4. Discussions
+
 Technical Q&A filtered by category with inline reply threads, verified solution markers, and code formatting.
 
 ### 5. Developer Profile
+
 Showcases verified GitHub pull requests, architecture decision records, milestone achievements, and skill health with public/private visibility toggles.

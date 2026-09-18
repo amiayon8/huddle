@@ -14,7 +14,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
         youtubeId: 'D13_8FmKkE0',
         videoUrl: 'https://www.youtube.com/watch?v=D13_8FmKkE0',
         durationMinutes: 14,
-        instructorName: 'Marcus Vance',
+        instructorName: 'Tanvir Rahman',
         instructorTitle: 'Staff Frontend Infrastructure Engineer',
         instructorAvatar: '/avatars/avatar-3.svg',
         chapters: [
@@ -34,7 +34,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
         youtubeId: 'vA8Tox_M_b0',
         videoUrl: 'https://www.youtube.com/watch?v=vA8Tox_M_b0',
         durationMinutes: 16,
-        instructorName: 'Elena Rostova',
+        instructorName: 'Sumaiya Kabir',
         instructorTitle: 'Principal Distributed Systems Architect',
         instructorAvatar: '/avatars/avatar-2.svg',
         chapters: [
@@ -54,7 +54,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
         youtubeId: '3p42Fv9H1-g',
         videoUrl: 'https://www.youtube.com/watch?v=3p42Fv9H1-g',
         durationMinutes: 13,
-        instructorName: 'Marcus Vance',
+        instructorName: 'Tanvir Rahman',
         instructorTitle: 'Staff Frontend Infrastructure Engineer',
         instructorAvatar: '/avatars/avatar-3.svg',
         chapters: [
@@ -74,7 +74,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
         youtubeId: 'W0b3a3qZk2k',
         videoUrl: 'https://www.youtube.com/watch?v=W0b3a3qZk2k',
         durationMinutes: 11,
-        instructorName: 'Elena Rostova',
+        instructorName: 'Sumaiya Kabir',
         instructorTitle: 'Principal Distributed Systems Architect',
         instructorAvatar: '/avatars/avatar-2.svg',
         chapters: [
@@ -100,7 +100,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
         youtubeId: 'dLPgQRKAOzk',
         videoUrl: 'https://www.youtube.com/watch?v=dLPgQRKAOzk',
         durationMinutes: 15,
-        instructorName: 'Marcus Vance',
+        instructorName: 'Tanvir Rahman',
         instructorTitle: 'Staff Frontend Infrastructure Engineer',
         instructorAvatar: '/avatars/avatar-3.svg',
         chapters: [
@@ -120,7 +120,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
         youtubeId: 'r_1-fN_bQ5g',
         videoUrl: 'https://www.youtube.com/watch?v=r_1-fN_bQ5g',
         durationMinutes: 16,
-        instructorName: 'Marcus Vance',
+        instructorName: 'Tanvir Rahman',
         instructorTitle: 'Staff Frontend Infrastructure Engineer',
         instructorAvatar: '/avatars/avatar-3.svg',
         chapters: [
@@ -140,7 +140,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
         youtubeId: '9i38ONaz-AQ',
         videoUrl: 'https://www.youtube.com/watch?v=9i38ONaz-AQ',
         durationMinutes: 14,
-        instructorName: 'Elena Rostova',
+        instructorName: 'Sumaiya Kabir',
         instructorTitle: 'Principal Distributed Systems Architect',
         instructorAvatar: '/avatars/avatar-2.svg',
         chapters: [
@@ -160,7 +160,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
         youtubeId: '5Tz4_iH6W9o',
         videoUrl: 'https://www.youtube.com/watch?v=5Tz4_iH6W9o',
         durationMinutes: 12,
-        instructorName: 'Elena Rostova',
+        instructorName: 'Sumaiya Kabir',
         instructorTitle: 'Principal Distributed Systems Architect',
         instructorAvatar: '/avatars/avatar-2.svg',
         chapters: [
@@ -185,7 +185,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
       youtubeId: 'U3RkCTZ_jzo',
       videoUrl: 'https://www.youtube.com/watch?v=U3RkCTZ_jzo',
       durationMinutes: 15,
-      instructorName: 'Elena Rostova',
+      instructorName: 'Sumaiya Kabir',
       instructorTitle: 'Principal Distributed Systems Architect',
       instructorAvatar: '/avatars/avatar-2.svg',
       chapters: [
@@ -205,7 +205,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
       youtubeId: 'aZ_J467OGgQ',
       videoUrl: 'https://www.youtube.com/watch?v=aZ_J467OGgQ',
       durationMinutes: 17,
-      instructorName: 'Elena Rostova',
+      instructorName: 'Sumaiya Kabir',
       instructorTitle: 'Principal Distributed Systems Architect',
       instructorAvatar: '/avatars/avatar-2.svg',
       chapters: [
@@ -225,7 +225,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
       youtubeId: 'P_XqR7m0y6c',
       videoUrl: 'https://www.youtube.com/watch?v=P_XqR7m0y6c',
       durationMinutes: 14,
-      instructorName: 'Marcus Vance',
+      instructorName: 'Tanvir Rahman',
       instructorTitle: 'Staff Frontend Infrastructure Engineer',
       instructorAvatar: '/avatars/avatar-3.svg',
       chapters: [
@@ -245,7 +245,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
       youtubeId: '8bZ5l5l44Ww',
       videoUrl: 'https://www.youtube.com/watch?v=8bZ5l5l44Ww',
       durationMinutes: 12,
-      instructorName: 'Elena Rostova',
+      instructorName: 'Sumaiya Kabir',
       instructorTitle: 'Principal Distributed Systems Architect',
       instructorAvatar: '/avatars/avatar-2.svg',
       chapters: [

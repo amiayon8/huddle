@@ -2,23 +2,18 @@
 
 import React, { useState, useMemo } from "react";
 import {
-  ClipboardList,
   Search,
   CheckCircle2,
   Clock,
   User,
-  Sparkles,
   Code2,
   Copy,
   Check,
   X,
-  Eye,
-  EyeOff,
-  Filter,
   Briefcase,
   GraduationCap,
   Heart,
-  BookOpen,
+  Zap,
 } from "lucide-react";
 import { UserProfile } from "@/app/types/huddle";
 
@@ -342,7 +337,7 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
                         </div>
                       ) : (
                         <span className="text-zinc-400 italic text-[11px]">
-                          —
+                          -
                         </span>
                       )}
                     </td>
@@ -366,7 +361,7 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
                         </div>
                       ) : (
                         <span className="text-zinc-400 italic text-[11px]">
-                          —
+                          -
                         </span>
                       )}
                     </td>
@@ -390,7 +385,7 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
                         </div>
                       ) : (
                         <span className="text-zinc-400 italic text-[11px]">
-                          —
+                          -
                         </span>
                       )}
                     </td>
@@ -517,7 +512,7 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
 
                 <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 space-y-2">
                   <div className="flex items-center gap-2 text-zinc-800 dark:text-zinc-200 font-bold">
-                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    <Zap className="w-4 h-4 text-amber-500" />
                     <span>Selected Starting Skills & Foundations</span>
                   </div>
                   {selectedUser.surveyData.startingSkills &&

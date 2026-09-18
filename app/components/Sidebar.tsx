@@ -5,15 +5,16 @@ import { useRouter } from "next/navigation";
 import {
   Flame,
   Map as MapIcon,
+  Users,
   Compass,
   User as UserIcon,
   Sun,
   Moon,
   Settings,
-  RotateCcw,
   LogOut,
   X,
-  Sparkles,
+  Shield,
+  Zap,
 } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
 import { ActiveTab } from "../types/huddle";
@@ -31,7 +32,6 @@ export const Sidebar: React.FC = () => {
     toggleTheme,
     setSettingsOpen,
     setMascotOpen,
-    setOnboardingActive,
     logout,
   } = useHuddle();
 
@@ -58,7 +58,6 @@ export const Sidebar: React.FC = () => {
     };
   }, [sidebarOpen]);
 
-  // Exact 4 navigation items in the exact order shown in the design
   const navigationItems: {
     id: ActiveTab;
     label: string;
@@ -73,6 +72,11 @@ export const Sidebar: React.FC = () => {
       id: "growth_map",
       label: "Growth map",
       icon: MapIcon,
+    },
+    {
+      id: "squad",
+      label: "Squad",
+      icon: Users,
     },
     {
       id: "explore",
@@ -91,24 +95,32 @@ export const Sidebar: React.FC = () => {
     setSidebarOpen(false);
   };
 
+  const isAdmin = user?.role?.toLowerCase() === "admin";
+
   const renderNavItems = () => (
     <div className="space-y-1 px-3">
       {navigationItems.map((item) => {
         const Icon = item.icon;
         const isMatch =
-          (item.id === "dashboard" && (activeTab === "dashboard" || activeTab === "sprint" || activeTab === "overview")) ||
-          (item.id === "growth_map" && (activeTab === "growth_map" || activeTab === "journey")) ||
-          (item.id === "explore" && (activeTab === "explore" || activeTab === "creators")) ||
+          (item.id === "dashboard" &&
+            (activeTab === "dashboard" ||
+              activeTab === "sprint" ||
+              activeTab === "overview")) ||
+          (item.id === "growth_map" &&
+            (activeTab === "growth_map" || activeTab === "journey")) ||
+          (item.id === "squad" && activeTab === "squad") ||
+          (item.id === "explore" &&
+            (activeTab === "explore" || activeTab === "creators")) ||
           (item.id === "profile" && activeTab === "profile");
 
         return (
           <button
             key={item.id}
             onClick={() => handleNavClick(item.id)}
-            className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${
+            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer ${
               isMatch
-                ? "bg-[#22242a] text-white shadow-xs font-semibold"
-                : "text-zinc-400 hover:text-zinc-100 hover:bg-[#181a20]"
+                ? "bg-zinc-200/70 dark:bg-zinc-800 text-zinc-950 dark:text-white font-semibold"
+                : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900"
             }`}
           >
             <Icon className="w-4 h-4 shrink-0" />
@@ -116,58 +128,71 @@ export const Sidebar: React.FC = () => {
           </button>
         );
       })}
+
+      {isAdmin && (
+        <div className="pt-2 mt-2 border-t border-zinc-200/60 dark:border-zinc-800/60">
+          <button
+            onClick={() => {
+              setSidebarOpen(false);
+              router.push("/admin");
+            }}
+            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors cursor-pointer bg-red-600 hover:bg-red-700 active:bg-red-800 text-white shadow-xs"
+          >
+            <Shield className="w-4 h-4 shrink-0 text-white" />
+            <span>Admin</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 
   return (
     <>
-      {/* 1. PERSISTENT DESKTOP SIDEBAR (Matches Screenshot Layout) */}
-      <aside className="hidden md:flex flex-col w-60 lg:w-64 fixed inset-y-0 left-0 z-30 bg-[#0f1012] border-r border-zinc-800/80 select-none">
-        {/* Brand Header */}
-        <div className="h-20 px-6 flex items-center">
+      <aside className="hidden md:flex flex-col w-60 lg:w-64 fixed inset-y-0 left-0 z-30 bg-zinc-50/70 dark:bg-[#0c0d12] border-r border-zinc-200/80 dark:border-zinc-800/80 select-none">
+        <div className="h-16 px-6 flex items-center">
           <div
             onClick={() => handleNavClick("dashboard")}
-            className="flex items-center gap-3 cursor-pointer group"
+            className="flex items-center gap-2.5 cursor-pointer group"
           >
-            <div className="w-7 h-7 rounded-lg bg-[#2563eb] shadow-sm flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <span className="w-2.5 h-2.5 rounded-xs bg-white/90" />
+            <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <span className="w-2.5 h-2.5 rounded-xs bg-white" />
             </div>
-            <span className="font-bold text-base text-white tracking-tight">
+            <span className="font-semibold text-base text-zinc-900 dark:text-white tracking-tight">
               Huddle
             </span>
           </div>
         </div>
 
-        {/* Navigation Items List */}
-        <div className="flex-1 py-2 overflow-y-auto">
-          {renderNavItems()}
-        </div>
+        <div className="flex-1 py-3 overflow-y-auto">{renderNavItems()}</div>
 
-        {/* Footer Actions (Subtle & Clean) */}
-        <div className="p-3 border-t border-zinc-800/80 space-y-1">
+        <div className="p-3 border-t border-zinc-200/80 dark:border-zinc-800/80 space-y-1">
           <button
             onClick={() => setMascotOpen(true)}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-indigo-400 hover:bg-[#181a20] transition-colors cursor-pointer"
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 transition-colors cursor-pointer"
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Spark AI</span>
+            <Zap className="w-4 h-4" />
+            <span>Spark - Your AI Companion</span>
           </button>
 
-          <div className="flex items-center justify-between px-2 pt-1 text-zinc-500 text-xs">
+          <div className="flex items-center justify-between px-2 pt-2 text-zinc-500 text-xs">
             <button
               onClick={toggleTheme}
-              className="p-1.5 rounded-lg hover:text-zinc-300 hover:bg-[#181a20] transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer"
               title="Toggle theme"
             >
-              {theme === "dark" ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+              {theme === "dark" ? (
+                <Sun className="w-4 h-4" />
+              ) : (
+                <Moon className="w-4 h-4" />
+              )}
             </button>
 
             <button
               onClick={() => setSettingsOpen(true)}
-              className="p-1.5 rounded-lg hover:text-zinc-300 hover:bg-[#181a20] transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer"
               title="Settings"
             >
-              <Settings className="w-3.5 h-3.5" />
+              <Settings className="w-4 h-4" />
             </button>
 
             {isAuthenticated && (
@@ -176,19 +201,18 @@ export const Sidebar: React.FC = () => {
                   await logout();
                   router.push("/auth/login");
                 }}
-                className="p-1.5 rounded-lg hover:text-rose-400 hover:bg-rose-950/30 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors cursor-pointer"
                 title="Sign out"
               >
-                <LogOut className="w-3.5 h-3.5" />
+                <LogOut className="w-4 h-4" />
               </button>
             )}
           </div>
         </div>
       </aside>
 
-      {/* 2. MOBILE RESPONSIVE SIDEBAR DRAWER */}
       <div
-        className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-xs transition-opacity duration-300 md:hidden ${
+        className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-xs transition-opacity duration-200 md:hidden ${
           sidebarOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
@@ -199,44 +223,42 @@ export const Sidebar: React.FC = () => {
 
       <aside
         ref={mobileSidebarRef}
-        className={`fixed inset-y-0 left-0 z-50 w-64 max-w-[85vw] bg-[#0f1012] border-r border-zinc-800/80 shadow-2xl flex flex-col transition-transform duration-300 ease-out md:hidden ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 max-w-[85vw] bg-white dark:bg-[#0c0d12] border-r border-zinc-200/80 dark:border-zinc-800/80 shadow-xl flex flex-col transition-transform duration-200 ease-out md:hidden ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
-        aria-label="Mobile Sidebar"
+        aria-label="Navigation drawer"
       >
-        <div className="h-16 px-5 border-b border-zinc-800/80 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg bg-[#2563eb] shadow-sm flex items-center justify-center shrink-0">
-              <span className="w-2.5 h-2.5 rounded-xs bg-white/90" />
+        <div className="h-14 px-5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
+              <span className="w-2.5 h-2.5 rounded-xs bg-white" />
             </div>
-            <span className="font-bold text-base text-white tracking-tight">
+            <span className="font-semibold text-base text-zinc-900 dark:text-white tracking-tight">
               Huddle
             </span>
           </div>
 
           <button
             onClick={() => setSidebarOpen(false)}
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors cursor-pointer"
             aria-label="Close menu"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="flex-1 py-4 overflow-y-auto">
-          {renderNavItems()}
-        </div>
+        <div className="flex-1 py-4 overflow-y-auto">{renderNavItems()}</div>
 
-        <div className="p-3 border-t border-zinc-800/80">
+        <div className="p-4 border-t border-zinc-100 dark:border-zinc-800">
           <button
             onClick={() => {
               setMascotOpen(true);
               setSidebarOpen(false);
             }}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-indigo-400 hover:bg-[#181a20] transition-colors cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-colors cursor-pointer"
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Spark AI Assistant</span>
+            <Zap className="w-4 h-4" />
+            <span>Spark - Your AI Companion</span>
           </button>
         </div>
       </aside>
