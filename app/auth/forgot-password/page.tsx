@@ -62,7 +62,7 @@ export default function ForgotPasswordPage() {
         <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 flex items-center gap-3">
           <div className="shrink-0 w-8 h-8 rounded-lg bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-700 p-1 flex items-center justify-center">
             <img
-              src="/mascot_thinking.svg"
+              src="/Huddle SVGs/05_eureka_lightbulb.svg"
               alt="Spark"
               className="w-full h-full object-contain"
             />

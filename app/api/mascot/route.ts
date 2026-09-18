@@ -145,7 +145,7 @@ function getContextualFallback(
     return {
       reply: `Here is a practical solution for your presentation slide:\n\n1. **Lead with an Action Title**: Replace passive topic titles with a direct assertion (for example, "Reduced Latency by 40%" instead of "Performance Review").\n2. **Isolate One Key Visual**: Keep only one chart, diagram, or big stat callout per slide to prevent visual overload.\n3. **Use 3 Supporting Bullets Maximum**: Each bullet should be one line explaining why the data matters.\n\n**Next step**: Draft your action headline first, then remove any graphic elements that do not directly support it. This directly reinforces your storytelling milestone in your growth journey.`,
       emotion: "success",
-      mascotSvg: "/mascot_success.svg",
+      mascotSvg: "/Huddle SVGs/02_laughing.svg",
     };
   }
 
@@ -158,7 +158,7 @@ function getContextualFallback(
     return {
       reply: `Here is the step-by-step editing workflow for this task:\n\n1. **Rough Cut First**: Use ripple delete hotkeys to eliminate pauses and breath pauses before adding transitions.\n2. **Level Your Audio**: Set dialogue to peak between -6dB and -12dB, and duck your background music down to -24dB.\n3. **Add Pacing Transitions**: Use J-cuts and L-cuts so audio leads into visual scene changes naturally.\n\n**Next step**: Complete your assembly pass on the timeline, then test audio playback at 50% device volume to verify clarity. This builds the core media production skills outlined in your roadmap.`,
       emotion: "planning",
-      mascotSvg: "/mascot_planning.svg",
+      mascotSvg: "/Huddle SVGs/06_explaining_two_hands-cropped.svg",
     };
   }
 
@@ -439,7 +439,7 @@ Followed immediately by your actual response on the subsequent lines.
       replyLower.includes("plan") ||
       replyLower.includes("step")
     ) {
-      mascotSvg = "/mascot_planning.svg";
+      mascotSvg = "/Huddle SVGs/06_explaining_two_hands-cropped.svg";
       emotion = "planning";
     } else if (
       replyLower.includes("great") ||
@@ -447,7 +447,7 @@ Followed immediately by your actual response on the subsequent lines.
       replyLower.includes("done") ||
       replyLower.includes("spot on")
     ) {
-      mascotSvg = "/mascot_success.svg";
+      mascotSvg = "/Huddle SVGs/02_laughing.svg";
       emotion = "success";
     } else if (
       replyLower.includes("think") ||
@@ -471,7 +471,7 @@ Followed immediately by your actual response on the subsequent lines.
       reply:
         "Spark here. I am right by your side. What single concept would you like to focus on right now?",
       emotion: "idle",
-      mascotSvg: "/mascot_idle.svg",
+      mascotSvg: "/Huddle SVGs/01_happy.svg",
       chatTitle: "Practice Session",
     });
   }

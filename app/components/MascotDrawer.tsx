@@ -31,12 +31,20 @@ export const MascotDrawer: React.FC = () => {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const mascotMap: Record<string, string> = {
-    idle: "/mascot_idle.svg",
+    idle: "/Huddle SVGs/01_happy.svg",
+    happy: "/Huddle SVGs/01_happy.svg",
     encouragement: "/mascot_encouragement.svg",
-    thinking: "/mascot_thinking.svg",
+    thinking: "/Huddle SVGs/05_eureka_lightbulb.svg",
+    eureka: "/Huddle SVGs/05_eureka_lightbulb.svg",
     deep_thinking: "/mascot_deep_thinking.svg",
-    planning: "/mascot_planning.svg",
-    success: "/mascot_success.svg",
+    planning: "/Huddle SVGs/06_explaining_two_hands-cropped.svg",
+    explaining: "/Huddle SVGs/06_explaining_two_hands-cropped.svg",
+    success: "/Huddle SVGs/02_laughing.svg",
+    laughing: "/Huddle SVGs/02_laughing.svg",
+    crossed_arms: "/Huddle SVGs/03_crossed_arms.svg",
+    announcement: "/Huddle SVGs/04_announcement_megaphone.svg",
+    very_angry: "/Huddle SVGs/07_very_angry.svg",
+    angry: "/Huddle SVGs/07_very_angry.svg",
     error: "/mascot_error.svg",
   };
 
@@ -54,7 +62,7 @@ export const MascotDrawer: React.FC = () => {
         id: `msg-${Date.now()}-1`,
         sender: "spark",
         text: `Hi ${user.name || "there"}! I'm Spark - your AI Companion for **${skill}**.\n\nWhether you need task-specific instructions broken down step by step, help verifying your progress, or advice on your long-term Growth Map, I am right here by your side. What can we tackle today?`,
-        mascotSvg: "/mascot_idle.svg",
+        mascotSvg: "/Huddle SVGs/01_happy.svg",
         timestamp: currentTime,
       },
     ];
@@ -236,7 +244,7 @@ export const MascotDrawer: React.FC = () => {
         id: `msg-${Date.now() + 1}`,
         sender: "spark",
         text: sparkReply,
-        mascotSvg: data.mascotSvg || mascotMap[emotion] || "/mascot_idle.svg",
+        mascotSvg: data.mascotSvg || mascotMap[emotion] || "/Huddle SVGs/01_happy.svg",
         timestamp: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -271,7 +279,7 @@ export const MascotDrawer: React.FC = () => {
         id: `msg-${Date.now() + 1}`,
         sender: "spark",
         text: fallbackReply,
-        mascotSvg: "/mascot_idle.svg",
+        mascotSvg: "/Huddle SVGs/01_happy.svg",
         timestamp: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -310,7 +318,7 @@ export const MascotDrawer: React.FC = () => {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1 flex items-center justify-center shrink-0">
               <img
-                src={mascotMap[currentMascotEmotion] || "/mascot_idle.svg"}
+                src={mascotMap[currentMascotEmotion] || "/Huddle SVGs/01_happy.svg"}
                 alt="Spark"
                 className="w-full h-full object-contain"
               />
@@ -442,7 +450,7 @@ export const MascotDrawer: React.FC = () => {
                 {m.sender === "spark" && (
                   <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 p-1 flex items-center justify-center shrink-0">
                     <img
-                      src={m.mascotSvg || "/mascot_idle.svg"}
+                      src={m.mascotSvg || "/Huddle SVGs/01_happy.svg"}
                       alt="Spark"
                       className="w-full h-full object-contain"
                     />
@@ -480,7 +488,7 @@ export const MascotDrawer: React.FC = () => {
               <div className="flex items-center gap-2.5 text-zinc-500 text-xs py-2">
                 <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 p-1 flex items-center justify-center shrink-0">
                   <img
-                    src="/mascot_thinking.svg"
+                    src="/Huddle SVGs/05_eureka_lightbulb.svg"
                     alt="Thinking"
                     className="w-full h-full object-contain opacity-70"
                   />

@@ -128,7 +128,7 @@ export const AuthModal: React.FC = () => {
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1 flex items-center justify-center shrink-0">
             <img
-              src="/mascot_idle.svg"
+              src="/Huddle SVGs/01_happy.svg"
               alt="Spark"
               className="w-full h-full object-contain"
             />
