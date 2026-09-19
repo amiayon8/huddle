@@ -118,7 +118,7 @@ export default function AppPage() {
           <div className="max-w-7xl w-full mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
             <div className="flex items-center gap-2.5 text-amber-900 dark:text-amber-200">
               <img
-                src="/Huddle SVGs/06_explaining_two_hands-cropped.svg"
+                src="/mascot_planning.svg"
                 alt="Spark"
                 className="w-4 h-4 object-contain shrink-0"
               />

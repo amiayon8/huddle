@@ -13,15 +13,7 @@ interface DuolingoMascotProps {
     | "deep_thinking"
     | "planning"
     | "success"
-    | "error"
-    | "happy"
-    | "laughing"
-    | "crossed_arms"
-    | "announcement"
-    | "eureka"
-    | "explaining"
-    | "very_angry"
-    | "angry";
+    | "error";
   speechText?: string;
   size?: "sm" | "md" | "lg" | "hero";
   showQuickActions?: boolean;
@@ -38,24 +30,16 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
   const { setMascotOpen, sprint, user } = useHuddle();
 
   const mascotMap: Record<string, string> = {
-    idle: "/Huddle SVGs/01_happy.svg",
-    happy: "/Huddle SVGs/01_happy.svg",
+    idle: "/mascot_idle.svg",
     encouragement: "/mascot_encouragement.svg",
-    thinking: "/Huddle SVGs/05_eureka_lightbulb.svg",
-    eureka: "/Huddle SVGs/05_eureka_lightbulb.svg",
+    thinking: "/mascot_thinking.svg",
     deep_thinking: "/mascot_deep_thinking.svg",
-    planning: "/Huddle SVGs/06_explaining_two_hands-cropped.svg",
-    explaining: "/Huddle SVGs/06_explaining_two_hands-cropped.svg",
-    success: "/Huddle SVGs/02_laughing.svg",
-    laughing: "/Huddle SVGs/02_laughing.svg",
-    crossed_arms: "/Huddle SVGs/03_crossed_arms.svg",
-    announcement: "/Huddle SVGs/04_announcement_megaphone.svg",
-    very_angry: "/Huddle SVGs/07_very_angry.svg",
-    angry: "/Huddle SVGs/07_very_angry.svg",
+    planning: "/mascot_planning.svg",
+    success: "/mascot_success.svg",
     error: "/mascot_error.svg",
   };
 
-  const currentSvg = mascotMap[emotion] || "/Huddle SVGs/01_happy.svg";
+  const currentSvg = mascotMap[emotion] || "/mascot_idle.svg";
   const completedTasksCount = sprint.tasks
     ? sprint.tasks.filter((t) => t.completed).length
     : 0;

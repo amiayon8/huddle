@@ -79,7 +79,7 @@ export const CreatorView: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <img
-              src="/Huddle SVGs/01_happy.svg"
+              src="/mascot_idle.svg"
               alt="Spark"
               className="w-10 h-10 object-contain shrink-0"
             />
@@ -217,7 +217,7 @@ export const CreatorView: React.FC = () => {
 
                 <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/70 dark:border-zinc-800 flex items-start gap-3">
                   <img
-                    src="/Huddle SVGs/01_happy.svg"
+                    src="/mascot_idle.svg"
                     alt="Spark"
                     className="w-5 h-5 object-contain shrink-0 mt-0.5"
                   />

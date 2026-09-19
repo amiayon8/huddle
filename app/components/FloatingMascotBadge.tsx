@@ -72,7 +72,7 @@ export const FloatingMascotBadge: React.FC = () => {
         title="Spark - Your AI Companion"
       >
         <img
-          src="/Huddle SVGs/01_happy.svg"
+          src="/mascot_idle.svg"
           alt="Spark"
           className="w-full h-full object-contain transition-transform group-hover:scale-105"
         />

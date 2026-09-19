@@ -80,7 +80,7 @@ export const SquadView: React.FC = () => {
             id: user.id || "user-me",
             name: user.name || "Ayon",
             handle: user.handle || "@sarkerayon",
-            avatar: user.avatar || "/Huddle SVGs/01_happy.svg",
+            avatar: user.avatar || "/mascot_idle.svg",
             role: "lead" as const,
             completedToday: true,
             checkedInToday: true,
@@ -131,7 +131,7 @@ export const SquadView: React.FC = () => {
             id: "ping-2",
             memberId: user.id || "user-me",
             memberName: user.name || "Alex",
-            memberAvatar: user.avatar || "/Huddle SVGs/01_happy.svg",
+            memberAvatar: user.avatar || "/mascot_idle.svg",
             actionText: "checked in for the day",
             timestamp: "Today",
             type: "check_in" as const,
@@ -231,7 +231,7 @@ export const SquadView: React.FC = () => {
                 >
                   <div className="flex items-center gap-3">
                     <img
-                      src={member.avatar || "/Huddle SVGs/01_happy.svg"}
+                      src={member.avatar || "/mascot_idle.svg"}
                       alt={member.name}
                       className="w-9 h-9 rounded-xl object-cover ring-1 ring-zinc-200 dark:ring-zinc-800"
                     />
@@ -310,7 +310,7 @@ export const SquadView: React.FC = () => {
             >
               <div className="flex items-center gap-2.5">
                 <img
-                  src={ping.memberAvatar || "/Huddle SVGs/01_happy.svg"}
+                  src={ping.memberAvatar || "/mascot_idle.svg"}
                   alt={ping.memberName}
                   className="w-6 h-6 rounded-lg object-cover"
                 />

@@ -25,15 +25,7 @@ interface DynamicQuestionData {
     | "deep_thinking"
     | "planning"
     | "success"
-    | "error"
-    | "happy"
-    | "laughing"
-    | "crossed_arms"
-    | "announcement"
-    | "eureka"
-    | "explaining"
-    | "very_angry"
-    | "angry";
+    | "error";
   mascotNote: string;
   isMultiple: boolean;
   options: Array<{
@@ -209,20 +201,12 @@ export const LandingQuestionnaire: React.FC = () => {
   }, [toastMessage]);
 
   const mascotMap: Record<string, string> = {
-    idle: "/Huddle SVGs/01_happy.svg",
-    happy: "/Huddle SVGs/01_happy.svg",
+    idle: "/mascot_idle.svg",
     encouragement: "/mascot_encouragement.svg",
-    thinking: "/Huddle SVGs/05_eureka_lightbulb.svg",
-    eureka: "/Huddle SVGs/05_eureka_lightbulb.svg",
+    thinking: "/mascot_thinking.svg",
     deep_thinking: "/mascot_deep_thinking.svg",
-    planning: "/Huddle SVGs/06_explaining_two_hands-cropped.svg",
-    explaining: "/Huddle SVGs/06_explaining_two_hands-cropped.svg",
-    success: "/Huddle SVGs/02_laughing.svg",
-    laughing: "/Huddle SVGs/02_laughing.svg",
-    crossed_arms: "/Huddle SVGs/03_crossed_arms.svg",
-    announcement: "/Huddle SVGs/04_announcement_megaphone.svg",
-    very_angry: "/Huddle SVGs/07_very_angry.svg",
-    angry: "/Huddle SVGs/07_very_angry.svg",
+    planning: "/mascot_planning.svg",
+    success: "/mascot_success.svg",
     error: "/mascot_error.svg",
   };
 
@@ -648,7 +632,7 @@ export const LandingQuestionnaire: React.FC = () => {
             <div className="mb-6 p-5 rounded-2xl bg-white dark:bg-[#111218] border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs flex items-center gap-5 transition-colors">
               <div className="relative shrink-0 w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center">
                 <img
-                  src={mascotMap[currentMascotEmotion] || "/Huddle SVGs/01_happy.svg"}
+                  src={mascotMap[currentMascotEmotion] || "/mascot_idle.svg"}
                   alt="Spark"
                   className="w-full h-full object-contain filter drop-shadow-md"
                 />
