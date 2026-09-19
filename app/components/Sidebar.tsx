@@ -154,9 +154,11 @@ export const Sidebar: React.FC = () => {
             onClick={() => handleNavClick("dashboard")}
             className="flex items-center gap-2.5 cursor-pointer group"
           >
-            <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <span className="w-2.5 h-2.5 rounded-xs bg-white" />
-            </div>
+            <img
+              src="/logo.svg"
+              alt="Huddle"
+              className="w-7 h-7 rounded-lg object-contain shrink-0 group-hover:scale-105 transition-transform"
+            />
             <span className="font-semibold text-base text-zinc-900 dark:text-white tracking-tight">
               Huddle
             </span>
@@ -230,9 +232,11 @@ export const Sidebar: React.FC = () => {
       >
         <div className="h-14 px-5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
-              <span className="w-2.5 h-2.5 rounded-xs bg-white" />
-            </div>
+            <img
+              src="/logo.svg"
+              alt="Huddle"
+              className="w-7 h-7 rounded-lg object-contain shrink-0"
+            />
             <span className="font-semibold text-base text-zinc-900 dark:text-white tracking-tight">
               Huddle
             </span>

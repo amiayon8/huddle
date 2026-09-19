@@ -527,14 +527,9 @@ export const LandingQuestionnaire: React.FC = () => {
       <header className="max-w-2xl w-full mx-auto flex items-center justify-between py-2">
         <div className="flex items-center gap-2.5">
           <img
-            src="/logo_light.svg"
-            alt="Huddle"
-            className="w-8 h-8 rounded-xl object-contain shadow-xs dark:hidden"
-          />
-          <img
             src="/logo.svg"
             alt="Huddle"
-            className="w-8 h-8 rounded-xl object-contain shadow-xs hidden dark:block"
+            className="w-8 h-8 rounded-xl object-contain shadow-xs"
           />
           <div>
             <span className="font-semibold text-sm tracking-tight text-zinc-900 dark:text-zinc-100">

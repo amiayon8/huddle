@@ -68,9 +68,11 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] flex items-center justify-center p-4 selection:bg-indigo-600 selection:text-white">
       <div className="w-full max-w-md bg-white dark:bg-[#111218] border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl shadow-sm p-7 sm:p-9 space-y-6 animate-in fade-in duration-150">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
-            <span className="w-3 h-3 rounded-xs bg-white" />
-          </div>
+          <img
+            src="/logo.svg"
+            alt="Huddle"
+            className="w-8 h-8 rounded-lg object-contain shrink-0"
+          />
           <div>
             <h1 className="text-lg font-bold tracking-tight text-zinc-950 dark:text-white">
               Welcome back

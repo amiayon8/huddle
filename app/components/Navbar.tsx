@@ -115,9 +115,11 @@ export const Navbar: React.FC = () => {
             className="flex items-center gap-2.5 group focus:outline-none cursor-pointer shrink-0"
             aria-label="Huddle home"
           >
-            <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <span className="w-2.5 h-2.5 rounded-xs bg-white" />
-            </div>
+            <img
+              src="/logo.svg"
+              alt="Huddle"
+              className="w-7 h-7 rounded-lg object-contain shrink-0 group-hover:scale-105 transition-transform"
+            />
             <span className="font-semibold text-base text-zinc-900 dark:text-white tracking-tight">
               Huddle
             </span>

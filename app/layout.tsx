@@ -12,8 +12,7 @@ export const metadata: Metadata = {
     "A calm, focused space for deliberate skill practice with intimate 4-member micro-squads and curated roadmap steps.",
   icons: {
     icon: [
-      { url: "/logo_light.svg", media: "(prefers-color-scheme: light)" },
-      { url: "/logo.svg", media: "(prefers-color-scheme: dark)" },
+      { url: "/logo.svg" },
     ],
   },
 };
