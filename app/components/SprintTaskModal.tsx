@@ -159,7 +159,7 @@ export const SprintTaskModal: React.FC<SprintTaskModalProps> = ({
                 className={`px-3 py-1 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer ${
                   stage === "video"
                     ? "bg-white dark:bg-zinc-900 text-indigo-600 dark:text-indigo-400 shadow-xs"
-                    : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                    : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 "
                 }`}
               >
                 <Video className="w-3.5 h-3.5" />
