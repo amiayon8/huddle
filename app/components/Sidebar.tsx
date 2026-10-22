@@ -15,6 +15,7 @@ import {
   X,
   Shield,
   Zap,
+  Globe,
 } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
 import { ActiveTab } from "../types/huddle";
@@ -75,8 +76,13 @@ export const Sidebar: React.FC = () => {
     },
     {
       id: "squad",
-      label: "Squad",
+      label: "Micro Squad",
       icon: Users,
+    },
+    {
+      id: "community",
+      label: "Communities",
+      icon: Globe,
     },
     {
       id: "explore",
@@ -109,6 +115,8 @@ export const Sidebar: React.FC = () => {
           (item.id === "growth_map" &&
             (activeTab === "growth_map" || activeTab === "journey")) ||
           (item.id === "squad" && activeTab === "squad") ||
+          (item.id === "community" &&
+            (activeTab === "community" || activeTab === "macro_squad")) ||
           (item.id === "explore" &&
             (activeTab === "explore" || activeTab === "creators")) ||
           (item.id === "profile" && activeTab === "profile");
@@ -117,10 +125,10 @@ export const Sidebar: React.FC = () => {
           <button
             key={item.id}
             onClick={() => handleNavClick(item.id)}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer ${
+            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm transition-all cursor-pointer ${
               isMatch
-                ? "bg-zinc-200/70 dark:bg-zinc-800 text-zinc-950 dark:text-white font-semibold"
-                : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900"
+                ? "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold border-2 border-indigo-200 dark:border-indigo-800/80 shadow-xs"
+                : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900 border-2 border-transparent font-medium"
             }`}
           >
             <Icon className="w-4 h-4 shrink-0" />

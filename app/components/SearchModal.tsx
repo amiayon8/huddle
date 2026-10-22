@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Search, X, ArrowRight } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
 import { fetchSearchSuggestions } from "../lib/supabase";
+import { getGravatarUrl } from "../lib/gravatar";
 
 export const SearchModal: React.FC = () => {
   const { searchOpen, setSearchOpen, setActiveTab, creators, posts } =
@@ -134,7 +135,7 @@ export const SearchModal: React.FC = () => {
                       >
                         <div className="flex items-center gap-3">
                           <img
-                            src={c.avatar}
+                            src={c.avatar?.includes("gravatar.com") ? c.avatar : getGravatarUrl(c.handle || c.name, 64)}
                             alt={c.name}
                             className="w-8 h-8 rounded-lg object-cover"
                           />

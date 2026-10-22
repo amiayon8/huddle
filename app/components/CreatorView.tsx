@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
 import { CodeBlock } from "./CodeBlock";
+import { getGravatarUrl } from "../lib/gravatar";
 
 export const CreatorView: React.FC = () => {
   const {
@@ -177,7 +178,7 @@ export const CreatorView: React.FC = () => {
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <img
-                    src={post.creatorAvatar}
+                    src={post.creatorAvatar?.includes("gravatar.com") ? post.creatorAvatar : getGravatarUrl(post.creatorHandle || post.creatorName, 80)}
                     alt={post.creatorName}
                     className="w-10 h-10 rounded-xl object-cover ring-1 ring-zinc-200 dark:ring-zinc-800 shrink-0"
                   />

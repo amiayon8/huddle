@@ -11,6 +11,7 @@ import { CreatorView } from "../components/CreatorView";
 import { LandingQuestionnaire } from "../components/LandingQuestionnaire";
 import { GrowthMapView } from "../components/GrowthMapView";
 import { SquadView } from "../components/SquadView";
+import { CommunityView } from "../components/CommunityView";
 import { ProfileView } from "../components/ProfileView";
 import { AuthModal } from "../components/AuthModal";
 import { MascotDrawer } from "../components/MascotDrawer";
@@ -55,6 +56,8 @@ export default function AppPage() {
       setActiveTab("growth_map");
     } else if (tabParam === "squad") {
       setActiveTab("squad");
+    } else if (tabParam === "community" || tabParam === "macro_squad") {
+      setActiveTab("community");
     } else if (tabParam === "profile") {
       setActiveTab("profile");
     } else {
@@ -102,6 +105,9 @@ export default function AppPage() {
         return <GrowthMapView />;
       case "squad":
         return <SquadView />;
+      case "community":
+      case "macro_squad":
+        return <CommunityView />;
       case "profile":
         return <ProfileView />;
       default:

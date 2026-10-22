@@ -16,6 +16,7 @@ import {
   Zap,
 } from "lucide-react";
 import { UserProfile } from "@/app/types/huddle";
+import { getUserAvatarUrl } from "@/app/lib/gravatar";
 
 interface SurveysViewProps {
   usersList: UserProfile[];
@@ -290,7 +291,7 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2.5">
                         <img
-                          src={u.avatar || "/avatars/avatar-1.svg"}
+                          src={getUserAvatarUrl(u, 64)}
                           alt={u.name}
                           className="w-8 h-8 rounded-xl object-cover bg-zinc-100 dark:bg-zinc-800 shrink-0 ring-1 ring-zinc-200 dark:ring-zinc-700"
                         />
@@ -434,7 +435,7 @@ export const SurveysView: React.FC<SurveysViewProps> = ({
             <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
               <div className="flex items-center gap-3">
                 <img
-                  src={selectedUser.avatar || "/avatars/avatar-1.svg"}
+                  src={getUserAvatarUrl(selectedUser, 80)}
                   alt={selectedUser.name}
                   className="w-10 h-10 rounded-xl object-cover ring-2 ring-indigo-500/30"
                 />

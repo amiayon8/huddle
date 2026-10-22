@@ -36,6 +36,114 @@ interface DynamicQuestionData {
   }>;
 }
 
+interface QuestionnaireAnswersCachePayload {
+  subjects?: string[];
+  subjectsOther?: string;
+  hobbies?: string[];
+  hobbiesOther?: string;
+  age?: string;
+  ageOther?: string;
+  profession?: string;
+  professionOther?: string;
+  skills?: string[];
+  skillsOther?: string;
+}
+
+function getQuestionnaireCacheKey(
+  stepNumber: number,
+  answers: QuestionnaireAnswersCachePayload,
+): string | null {
+  if (stepNumber === 2) {
+    const payload = {
+      step: 2,
+      subjects: [...(answers.subjects || [])].sort(),
+      subjectsOther: answers.subjectsOther?.trim() || "",
+    };
+    return `huddle_survey_cache_step_2_${JSON.stringify(payload)}`;
+  }
+
+  if (stepNumber === 3) {
+    const payload = {
+      step: 3,
+      subjects: [...(answers.subjects || [])].sort(),
+      subjectsOther: answers.subjectsOther?.trim() || "",
+      hobbies: [...(answers.hobbies || [])].sort(),
+      hobbiesOther: answers.hobbiesOther?.trim() || "",
+    };
+    return `huddle_survey_cache_step_3_${JSON.stringify(payload)}`;
+  }
+
+  if (stepNumber === 4) {
+    const payload = {
+      step: 4,
+      subjects: [...(answers.subjects || [])].sort(),
+      subjectsOther: answers.subjectsOther?.trim() || "",
+      hobbies: [...(answers.hobbies || [])].sort(),
+      hobbiesOther: answers.hobbiesOther?.trim() || "",
+      age: answers.age?.trim() || "",
+      ageOther: answers.ageOther?.trim() || "",
+    };
+    return `huddle_survey_cache_step_4_${JSON.stringify(payload)}`;
+  }
+
+  if (stepNumber === 5) {
+    const payload = {
+      step: 5,
+      subjects: [...(answers.subjects || [])].sort(),
+      subjectsOther: answers.subjectsOther?.trim() || "",
+      hobbies: [...(answers.hobbies || [])].sort(),
+      hobbiesOther: answers.hobbiesOther?.trim() || "",
+      age: answers.age?.trim() || "",
+      ageOther: answers.ageOther?.trim() || "",
+      profession: answers.profession?.trim() || "",
+      professionOther: answers.professionOther?.trim() || "",
+    };
+    return `huddle_survey_cache_step_5_${JSON.stringify(payload)}`;
+  }
+
+  return null;
+}
+
+function getCachedDynamicQuestion(
+  cacheKey: string,
+): DynamicQuestionData | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+  try {
+    const serializedData = localStorage.getItem(cacheKey);
+    if (!serializedData) {
+      return null;
+    }
+    const parsedData = JSON.parse(serializedData);
+    if (
+      parsedData &&
+      typeof parsedData.question === "string" &&
+      Array.isArray(parsedData.options) &&
+      parsedData.options.length > 0
+    ) {
+      return parsedData as DynamicQuestionData;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  return null;
+}
+
+function setCachedDynamicQuestion(
+  cacheKey: string,
+  data: DynamicQuestionData,
+): void {
+  if (typeof window === "undefined") {
+    return;
+  }
+  try {
+    localStorage.setItem(cacheKey, JSON.stringify(data));
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export const LandingQuestionnaire: React.FC = () => {
   const { finishOnboarding, setHasSkippedToPreview, setOnboardingActive } =
     useHuddle();
@@ -267,37 +375,84 @@ export const LandingQuestionnaire: React.FC = () => {
   useEffect(() => {
     if (step === 1) {
       setDynamicQuestion(null);
+      setIsLoadingDynamic(false);
       return;
     }
 
+    let isCurrentEffect = true;
+    const abortController = new AbortController();
+
+    const answersPayload = {
+      subjects: selectedSubjects,
+      subjectsOther: subjectsOtherActive ? subjectsOther : undefined,
+      hobbies: selectedHobbies,
+      hobbiesOther: hobbiesOtherActive ? hobbiesOther : undefined,
+      age: selectedAge,
+      ageOther: ageOtherActive ? ageOther : undefined,
+      profession: selectedProfession,
+      professionOther: professionOtherActive ? professionOther : undefined,
+      skills: selectedSkills,
+      skillsOther: skillsOtherActive ? skillsOther : undefined,
+    };
+
+    const cacheKey = getQuestionnaireCacheKey(step, answersPayload);
+
+    if (cacheKey) {
+      const cached = getCachedDynamicQuestion(cacheKey);
+      if (cached) {
+        setDynamicQuestion(cached);
+        setIsLoadingDynamic(false);
+
+        if (
+          step === 4 &&
+          !selectedProfession &&
+          !professionOtherActive &&
+          cached.options?.[0]
+        ) {
+          setSelectedProfession(cached.options[0].title);
+        }
+        if (
+          step === 5 &&
+          selectedSkills.length === 0 &&
+          !skillsOtherActive &&
+          cached.options?.[0]
+        ) {
+          setSelectedSkills([cached.options[0].title]);
+        }
+
+        return () => {
+          isCurrentEffect = false;
+          abortController.abort();
+        };
+      }
+    }
+
+    setDynamicQuestion(null);
+    setIsLoadingDynamic(true);
+
     const fetchDynamicQuestion = async () => {
-      setIsLoadingDynamic(true);
       try {
         const res = await fetch("/api/questionnaire", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             step,
-            answers: {
-              subjects: selectedSubjects,
-              subjectsOther: subjectsOtherActive ? subjectsOther : undefined,
-              hobbies: selectedHobbies,
-              hobbiesOther: hobbiesOtherActive ? hobbiesOther : undefined,
-              age: selectedAge,
-              ageOther: ageOtherActive ? ageOther : undefined,
-              profession: selectedProfession,
-              professionOther: professionOtherActive
-                ? professionOther
-                : undefined,
-              skills: selectedSkills,
-              skillsOther: skillsOtherActive ? skillsOther : undefined,
-            },
+            answers: answersPayload,
           }),
+          signal: abortController.signal,
         });
+
+        if (!isCurrentEffect) return;
 
         if (res.ok) {
           const json = await res.json();
+          if (!isCurrentEffect) return;
+
           if (json.success && json.data) {
+            if (cacheKey) {
+              setCachedDynamicQuestion(cacheKey, json.data);
+            }
+
             setDynamicQuestion(json.data);
 
             if (
@@ -319,13 +474,21 @@ export const LandingQuestionnaire: React.FC = () => {
           }
         }
       } catch (e) {
+        if (!isCurrentEffect) return;
         console.error(e);
       } finally {
-        setIsLoadingDynamic(false);
+        if (isCurrentEffect) {
+          setIsLoadingDynamic(false);
+        }
       }
     };
 
     fetchDynamicQuestion();
+
+    return () => {
+      isCurrentEffect = false;
+      abortController.abort();
+    };
   }, [step]);
 
   const toggleSelection = (

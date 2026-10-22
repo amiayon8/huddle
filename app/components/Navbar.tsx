@@ -15,12 +15,14 @@ import {
   RotateCcw,
   Menu,
   Flame,
+  Zap,
   Map as MapIcon,
   Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useHuddle } from "../context/HuddleContext";
 import { ActiveTab } from "../types/huddle";
+import { getUserAvatarUrl } from "../lib/gravatar";
 
 export const Navbar: React.FC = () => {
   const router = useRouter();
@@ -128,29 +130,35 @@ export const Navbar: React.FC = () => {
 
         <div className="flex items-center gap-2 shrink-0">
           {isAuthenticated && (
-            <div className="hidden sm:flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              <div
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs shrink-0 select-none"
+                title="Current streak"
+              >
+                <Flame className="w-4 h-4 fill-amber-500 text-amber-500" />
+                <span>{user.streak || 1}</span>
+              </div>
+
+              <div
+                className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-bold text-xs shrink-0 select-none"
+                title="Mastery points"
+              >
+                <Zap className="w-4 h-4 fill-indigo-500 text-indigo-500" />
+                <span>{user.reputation || 180} XP</span>
+              </div>
+
               <button
                 onClick={() => setActiveTab("squad")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors cursor-pointer shrink-0 ${
+                className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                   activeTab === "squad"
                     ? "bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 font-semibold"
                     : "bg-zinc-50 dark:bg-zinc-900 border-zinc-200/70 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100"
                 }`}
-                title="Access your accountability squad"
+                title="Accountability squad"
               >
                 <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                 <span>Squad</span>
               </button>
-
-              <div
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium shrink-0"
-                title={`${completedCount} of ${totalTasks} daily milestones completed`}
-              >
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-500" />
-                <span>
-                  {completedCount} of {totalTasks} completed
-                </span>
-              </div>
             </div>
           )}
 
@@ -256,7 +264,7 @@ export const Navbar: React.FC = () => {
                 aria-label="Open user profile menu"
               >
                 <img
-                  src={user.avatar}
+                  src={getUserAvatarUrl(user, 64)}
                   alt={user.name}
                   className="w-7 h-7 rounded-lg object-cover ring-1 ring-zinc-200 dark:ring-zinc-800"
                 />

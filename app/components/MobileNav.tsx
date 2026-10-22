@@ -6,6 +6,7 @@ import {
   Flame,
   Map as MapIcon,
   Users,
+  Globe,
   User as UserIcon,
 } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
@@ -22,7 +23,7 @@ export const MobileNav: React.FC = () => {
     { id: "dashboard", label: "Sprint", icon: Flame },
     { id: "growth_map", label: "Growth", icon: MapIcon },
     { id: "squad", label: "Squad", icon: Users },
-    { id: "explore", label: "Explore", icon: Compass },
+    { id: "community", label: "Forum", icon: Globe },
     { id: "profile", label: "Profile", icon: UserIcon },
   ];
 
@@ -39,8 +40,8 @@ export const MobileNav: React.FC = () => {
             (item.id === "growth_map" &&
               (activeTab === "growth_map" || activeTab === "journey")) ||
             (item.id === "squad" && activeTab === "squad") ||
-            (item.id === "explore" &&
-              (activeTab === "explore" || activeTab === "creators")) ||
+            (item.id === "community" &&
+              (activeTab === "community" || activeTab === "macro_squad")) ||
             (item.id === "profile" && activeTab === "profile");
 
           return (

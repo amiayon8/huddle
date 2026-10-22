@@ -3,6 +3,7 @@ import {
   PracticeCourseSection,
   PracticeKnowledgeQuestion
 } from '../types/huddle';
+import { getGravatarUrl } from './gravatar';
 
 export function getVideoLessonForTask(skillTitle: string, dayNumber: number): PracticeVideoLesson {
   const normalizedSkill = skillTitle.toLowerCase();
@@ -16,7 +17,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
         durationMinutes: 14,
         instructorName: 'Tanvir Rahman',
         instructorTitle: 'Staff Frontend Infrastructure Engineer',
-        instructorAvatar: '/avatars/avatar-3.svg',
+        instructorAvatar: getGravatarUrl('tanvir_rahman@example.com'),
         chapters: [
           { timeSeconds: 0, title: 'Server Components Mental Model' },
           { timeSeconds: 160, title: 'Streaming Wire Protocol & Fiber Trees' },
@@ -36,7 +37,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
         durationMinutes: 16,
         instructorName: 'Sumaiya Kabir',
         instructorTitle: 'Principal Distributed Systems Architect',
-        instructorAvatar: '/avatars/avatar-2.svg',
+        instructorAvatar: getGravatarUrl('sumaiya_kabir@example.com'),
         chapters: [
           { timeSeconds: 0, title: 'Latency Compensation Mechanics' },
           { timeSeconds: 210, title: 'useOptimistic State Transitions' },
@@ -56,7 +57,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
         durationMinutes: 13,
         instructorName: 'Tanvir Rahman',
         instructorTitle: 'Staff Frontend Infrastructure Engineer',
-        instructorAvatar: '/avatars/avatar-3.svg',
+        instructorAvatar: getGravatarUrl('tanvir_rahman@example.com'),
         chapters: [
           { timeSeconds: 0, title: 'Edge Network Architecture' },
           { timeSeconds: 180, title: 'Stale-While-Revalidate Caching Headers' },
@@ -76,7 +77,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
         durationMinutes: 11,
         instructorName: 'Sumaiya Kabir',
         instructorTitle: 'Principal Distributed Systems Architect',
-        instructorAvatar: '/avatars/avatar-2.svg',
+        instructorAvatar: getGravatarUrl('sumaiya_kabir@example.com'),
         chapters: [
           { timeSeconds: 0, title: 'Structuring High-Impact Pull Requests' },
           { timeSeconds: 170, title: 'Automated CI & Assertion Suites' },
@@ -102,7 +103,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
         durationMinutes: 15,
         instructorName: 'Tanvir Rahman',
         instructorTitle: 'Staff Frontend Infrastructure Engineer',
-        instructorAvatar: '/avatars/avatar-3.svg',
+        instructorAvatar: getGravatarUrl('tanvir_rahman@example.com'),
         chapters: [
           { timeSeconds: 0, title: 'Template Literals at the Type Level' },
           { timeSeconds: 190, title: 'Recursive Path Parameter Extraction' },
@@ -122,7 +123,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
         durationMinutes: 16,
         instructorName: 'Tanvir Rahman',
         instructorTitle: 'Staff Frontend Infrastructure Engineer',
-        instructorAvatar: '/avatars/avatar-3.svg',
+        instructorAvatar: getGravatarUrl('tanvir_rahman@example.com'),
         chapters: [
           { timeSeconds: 0, title: 'Conditional Type Algebra' },
           { timeSeconds: 220, title: 'The Infer Keyword Demystified' },
@@ -142,7 +143,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
         durationMinutes: 14,
         instructorName: 'Sumaiya Kabir',
         instructorTitle: 'Principal Distributed Systems Architect',
-        instructorAvatar: '/avatars/avatar-2.svg',
+        instructorAvatar: getGravatarUrl('sumaiya_kabir@example.com'),
         chapters: [
           { timeSeconds: 0, title: 'The Power of Discriminated Unions' },
           { timeSeconds: 180, title: 'Narrowing with Common Tag Fields' },
@@ -162,7 +163,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
         durationMinutes: 12,
         instructorName: 'Sumaiya Kabir',
         instructorTitle: 'Principal Distributed Systems Architect',
-        instructorAvatar: '/avatars/avatar-2.svg',
+        instructorAvatar: getGravatarUrl('sumaiya_kabir@example.com'),
         chapters: [
           { timeSeconds: 0, title: 'SDK Architecture Principles' },
           { timeSeconds: 160, title: 'Dual ESM and CJS Distribution' },
@@ -187,7 +188,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
       durationMinutes: 15,
       instructorName: 'Sumaiya Kabir',
       instructorTitle: 'Principal Distributed Systems Architect',
-      instructorAvatar: '/avatars/avatar-2.svg',
+      instructorAvatar: getGravatarUrl('sumaiya_kabir@example.com'),
       chapters: [
         { timeSeconds: 0, title: 'Multi-Tier Caching Architecture' },
         { timeSeconds: 180, title: 'Cache Stampede & Thundering Herd' },
@@ -207,7 +208,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
       durationMinutes: 17,
       instructorName: 'Sumaiya Kabir',
       instructorTitle: 'Principal Distributed Systems Architect',
-      instructorAvatar: '/avatars/avatar-2.svg',
+      instructorAvatar: getGravatarUrl('sumaiya_kabir@example.com'),
       chapters: [
         { timeSeconds: 0, title: 'Network Retries & Double Billing Disasters' },
         { timeSeconds: 230, title: 'Idempotency Key Lifecycle & State Table' },
@@ -227,7 +228,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
       durationMinutes: 14,
       instructorName: 'Tanvir Rahman',
       instructorTitle: 'Staff Frontend Infrastructure Engineer',
-      instructorAvatar: '/avatars/avatar-3.svg',
+      instructorAvatar: getGravatarUrl('tanvir_rahman@example.com'),
       chapters: [
         { timeSeconds: 0, title: 'Postgres Connection Architecture' },
         { timeSeconds: 190, title: 'PgBouncer Transaction Pooling Mode' },
@@ -247,7 +248,7 @@ export function getVideoLessonForTask(skillTitle: string, dayNumber: number): Pr
       durationMinutes: 12,
       instructorName: 'Sumaiya Kabir',
       instructorTitle: 'Principal Distributed Systems Architect',
-      instructorAvatar: '/avatars/avatar-2.svg',
+      instructorAvatar: getGravatarUrl('sumaiya_kabir@example.com'),
       chapters: [
         { timeSeconds: 0, title: 'The Anatomy of a Senior ADR' },
         { timeSeconds: 170, title: 'Framing Constraints & Non-Functional Goals' },

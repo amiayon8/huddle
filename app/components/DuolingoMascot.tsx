@@ -93,7 +93,7 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
               </span>
             </div>
             <span className="text-[11px] font-medium text-zinc-500">
-              Day {sprint.currentDay || 1} • {progressPercent}% progress
+              Lesson {sprint.currentDay || 1} • {progressPercent}% progress
             </span>
           </div>
 

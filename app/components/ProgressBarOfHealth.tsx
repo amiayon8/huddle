@@ -1,11 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  CheckCircle2,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+import { CheckCircle2, ChevronDown, ChevronUp } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
 
 export const ProgressBarOfHealth: React.FC = () => {
@@ -136,11 +132,9 @@ export const ProgressBarOfHealth: React.FC = () => {
               >
                 <div className="min-w-0">
                   <span className="text-[10px] text-zinc-400 font-mono block">
-                    Day {t.dayNumber}
+                    Lesson {t.dayNumber}
                   </span>
-                  <span className="truncate font-medium block">
-                    {t.title}
-                  </span>
+                  <span className="truncate font-medium block">{t.title}</span>
                 </div>
                 {t.completed ? (
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />

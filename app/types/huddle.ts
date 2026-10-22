@@ -15,7 +15,6 @@ export interface UserSurveyData {
   level?: "Beginner" | "Intermediate" | "Advanced" | string;
   dailyTime?: string;
   learningPreference?: string;
-  // Legacy optional fields for backward compatibility
   subjects?: string[];
   subjectsOther?: string;
   hobbies?: string[];
@@ -289,6 +288,16 @@ export interface SquadProject {
   deliverables?: SquadProjectDeliverable[];
 }
 
+export interface SquadDiscussionMessage {
+  id: string;
+  senderId: string;
+  senderName: string;
+  senderAvatar: string;
+  message: string;
+  timestamp: string;
+  type?: "standup" | "blocker" | "message" | "celebration";
+}
+
 export interface MicroSquad {
   id: string;
   name: string;
@@ -300,6 +309,7 @@ export interface MicroSquad {
   inviteCode: string;
   activityPings: SquadActivityPing[];
   activeProject?: SquadProject;
+  discussions?: SquadDiscussionMessage[];
 }
 
 export interface SquadCreatePayload {
@@ -307,6 +317,17 @@ export interface SquadCreatePayload {
   skillFocus: string;
   sharedGoal: string;
   targetProgress: number;
+}
+
+export interface Community {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  category: string;
+  memberCount: number;
+  isJoined?: boolean;
+  tags: string[];
 }
 
 export interface MacroSquadMember {
@@ -532,16 +553,20 @@ export interface CommunityPost {
   authorName: string;
   authorHandle: string;
   authorAvatar: string;
+  authorRole?: string;
   authorReputation: number;
   title: string;
   content: string;
-  category: "question" | "discussion" | "code-review" | "tip";
+  category: "question" | "discussion" | "code-review" | "tip" | "idea" | "showcase";
   upvotes: number;
   userUpvoted: boolean;
   repliesCount: number;
   isSolved?: boolean;
   createdAt: string;
   replies?: CommunityReply[];
+  communityId?: string;
+  communityName?: string;
+  tags?: string[];
 }
 
 export interface BingeQuizQuestion {

@@ -4,12 +4,9 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Shield,
   Users,
   Layers,
-  FileCheck,
   AlertTriangle,
-  History,
   Lock,
   Eye,
   EyeOff,
@@ -17,41 +14,24 @@ import {
   RefreshCw,
   Search,
   ArrowLeft,
-  ExternalLink,
   Edit2,
   Check,
   X,
   Activity,
-  Sliders,
   AlertCircle,
   Clock,
   BookOpen,
   Plus,
   Trash2,
   MessageSquare,
-  Filter,
   UserPlus,
   FolderPlus,
-  Share2,
-  Tag,
   ThumbsUp,
   MessageCircle,
-  Zap,
   Copy,
-  CheckCheck,
-  TrendingUp,
-  BarChart3,
-  ChevronRight,
-  ShieldAlert,
-  Terminal,
-  ArrowUpRight,
-  Radio,
-  Key,
   ClipboardList,
   Database,
-  Download,
-  Code2,
-  Table,
+  History,
 } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
 import {
@@ -68,7 +48,6 @@ import {
   createUserAdmin,
   updateUserFullAdmin,
   deleteUserAdmin,
-  updateUserRoleAndStatusAdmin,
   fetchAllSquadsAdmin,
   createSquadAdmin,
   updateSquadAdmin,
@@ -88,6 +67,7 @@ import {
 } from "../lib/supabase";
 import { SurveysView } from "./components/SurveysView";
 import { DatabaseExplorerView } from "./components/DatabaseExplorerView";
+import { getUserAvatarUrl } from "../lib/gravatar";
 
 type AdminTab =
   | "overview"
@@ -250,32 +230,20 @@ export default function AdminDashboardPage() {
     return `${id.slice(0, 3)}••••${id.slice(-3)}`;
   };
 
-  const maskCode = (code: string, id?: string) => {
-    if (!code) return "••••";
-    if (id && isRevealed(id)) return code;
-    if (!privacySafeMode) return code;
-    if (code.includes("-")) {
-      const parts = code.split("-");
-      return `${parts[0]}-••••`;
-    }
-    return "••••••••";
+  const maskCode = (code: string, id: string) => {
+    if (!code) return "••••••";
+    if (isRevealed(id) || !privacySafeMode) return code;
+    return "••••••";
   };
 
   const maskDetails = (details: any) => {
-    if (!privacySafeMode) return JSON.stringify(details || {});
-    const copy = { ...(details || {}) };
-    for (const key of Object.keys(copy)) {
-      const lowerKey = key.toLowerCase();
-      if (
-        lowerKey.includes("email") ||
-        lowerKey.includes("password") ||
-        lowerKey.includes("token") ||
-        lowerKey.includes("targetid")
-      ) {
-        copy[key] = "••••••••";
-      }
-    }
-    return JSON.stringify(copy);
+    if (!details) return "";
+    if (!privacySafeMode) return JSON.stringify(details);
+    const serialized = JSON.stringify(details);
+    return serialized.replace(
+      /[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+/g,
+      "[email protected]",
+    );
   };
 
   const loadAllAdminData = async () => {
@@ -283,34 +251,34 @@ export default function AdminDashboardPage() {
     setStatusMessage(null);
     try {
       const [
-        loadedStats,
-        loadedUsers,
-        loadedSquads,
-        loadedReports,
-        loadedTasks,
-        loadedDiscussions,
-        loadedLogs,
+        statsData,
+        usersData,
+        squadsData,
+        tasksData,
+        discussionsData,
+        reportsData,
+        auditData,
       ] = await Promise.all([
         fetchAdminStats(),
         fetchAllUsersAdmin(),
         fetchAllSquadsAdmin(),
-        fetchAllSquadReportsAdmin(),
         fetchAllTaskTemplatesAdmin(),
         fetchAllDiscussionsAdmin(),
+        fetchAllSquadReportsAdmin(),
         fetchAdminAuditLogs(),
       ]);
 
-      setStats(loadedStats);
-      setUsersList(loadedUsers);
-      setSquadsList(loadedSquads);
-      setReportsList(loadedReports);
-      setTasksList(loadedTasks);
-      setDiscussionsList(loadedDiscussions);
-      setAuditLogs(loadedLogs);
+      setStats(statsData);
+      setUsersList(usersData);
+      setSquadsList(squadsData);
+      setTasksList(tasksData);
+      setDiscussionsList(discussionsData);
+      setReportsList(reportsData);
+      setAuditLogs(auditData);
     } catch {
       setStatusMessage({
         type: "error",
-        text: "Failed to load admin data from database. Check connection.",
+        text: "Failed to load admin data from Supabase.",
       });
     } finally {
       setLoading(false);
@@ -325,16 +293,29 @@ export default function AdminDashboardPage() {
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userForm.name.trim() || !userForm.email.trim()) return;
+    if (!userForm.name || !userForm.email) return;
     setActionLoading(true);
     setStatusMessage(null);
 
     try {
-      const res = await createUserAdmin(user.id, user.name, userForm);
+      const generatedHandle =
+        userForm.handle.trim() ||
+        `@${userForm.name.toLowerCase().replace(/\s+/g, ".")}`;
+
+      const res = await createUserAdmin(user.id, user.name, {
+        name: userForm.name,
+        email: userForm.email,
+        handle: generatedHandle,
+        role: userForm.role,
+        status: userForm.status,
+        primaryGoal: userForm.primaryGoal,
+        careerMilestone: userForm.careerMilestone,
+      });
+
       if (res.success && res.user) {
         setStatusMessage({
           type: "success",
-          text: `User account "${res.user.name}" created successfully.`,
+          text: `User ${res.user.name} created successfully.`,
         });
         setUsersList((prev) => [res.user!, ...prev]);
         setShowCreateUserModal(false);
@@ -354,13 +335,13 @@ export default function AdminDashboardPage() {
       } else {
         setStatusMessage({
           type: "error",
-          text: res.error || "Failed to create user account.",
+          text: res.error || "Failed to create user profile.",
         });
       }
     } catch (err: any) {
       setStatusMessage({
         type: "error",
-        text: err.message || "Network error while creating user.",
+        text: err.message || "Network error creating user profile.",
       });
     } finally {
       setActionLoading(false);
@@ -378,22 +359,23 @@ export default function AdminDashboardPage() {
         user.id,
         user.name,
         selectedUserForEdit.id,
-        userForm,
+        {
+          name: userForm.name,
+          role: userForm.role,
+          status: userForm.status,
+          primaryGoal: userForm.primaryGoal,
+          careerMilestone: userForm.careerMilestone,
+        },
       );
 
       if (success) {
         setStatusMessage({
           type: "success",
-          text: `User "${userForm.name}" updated successfully.`,
+          text: `Profile for ${userForm.name} updated.`,
         });
         setUsersList((prev) =>
           prev.map((u) =>
-            u.id === selectedUserForEdit.id
-              ? {
-                  ...u,
-                  ...userForm,
-                }
-              : u,
+            u.id === selectedUserForEdit.id ? { ...u, ...userForm } : u,
           ),
         );
         setSelectedUserForEdit(null);
@@ -402,30 +384,30 @@ export default function AdminDashboardPage() {
       } else {
         setStatusMessage({
           type: "error",
-          text: "Database rejected user update.",
+          text: "Database error while updating user record.",
         });
       }
     } catch {
       setStatusMessage({
         type: "error",
-        text: "Network error updating user.",
+        text: "Network error updating user record.",
       });
     } finally {
       setActionLoading(false);
     }
   };
 
-  const handleDeleteUser = async (targetUserId: string) => {
+  const handleDeleteUser = async (userId: string) => {
     setActionLoading(true);
     setStatusMessage(null);
     try {
-      const success = await deleteUserAdmin(user.id, user.name, targetUserId);
+      const success = await deleteUserAdmin(user.id, user.name, userId);
       if (success) {
         setStatusMessage({
           type: "success",
-          text: "User account deleted successfully.",
+          text: "User profile deleted from database.",
         });
-        setUsersList((prev) => prev.filter((u) => u.id !== targetUserId));
+        setUsersList((prev) => prev.filter((u) => u.id !== userId));
         setDeleteConfirmModal(null);
         const updatedStats = await fetchAdminStats();
         setStats(updatedStats);
@@ -434,7 +416,7 @@ export default function AdminDashboardPage() {
       } else {
         setStatusMessage({
           type: "error",
-          text: "Failed to delete user account.",
+          text: "Database error while deleting user profile.",
         });
       }
     } catch {
@@ -454,11 +436,20 @@ export default function AdminDashboardPage() {
     setStatusMessage(null);
 
     try {
-      const res = await createSquadAdmin(user.id, user.name, squadForm);
+      const res = await createSquadAdmin(user.id, user.name, {
+        name: squadForm.name,
+        skillFocus: squadForm.skillFocus,
+        sharedGoal: squadForm.sharedGoal,
+        targetProgress: squadForm.targetProgress,
+        inviteCode:
+          squadForm.inviteCode ||
+          `HUDDLE-${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
+      });
+
       if (res.success && res.squad) {
         setStatusMessage({
           type: "success",
-          text: `Squad "${res.squad.name}" created successfully.`,
+          text: `Squad "${res.squad.name}" created.`,
         });
         setSquadsList((prev) => [res.squad, ...prev]);
         setShowCreateSquadModal(false);
@@ -494,6 +485,7 @@ export default function AdminDashboardPage() {
     if (!editingSquad) return;
     setActionLoading(true);
     setStatusMessage(null);
+
     try {
       const success = await updateSquadAdmin(
         user.id,
@@ -660,7 +652,7 @@ export default function AdminDashboardPage() {
       if (success) {
         setStatusMessage({
           type: "success",
-          text: "Task template deleted from curriculum.",
+          text: "Task template deleted.",
         });
         setTasksList((prev) => prev.filter((t) => t.id !== taskId));
         setDeleteConfirmModal(null);
@@ -671,7 +663,7 @@ export default function AdminDashboardPage() {
       } else {
         setStatusMessage({
           type: "error",
-          text: "Failed to delete curriculum task template.",
+          text: "Database error deleting task template.",
         });
       }
     } catch {
@@ -691,18 +683,19 @@ export default function AdminDashboardPage() {
     setStatusMessage(null);
 
     try {
-      const res = await createDiscussionAdmin(
-        user.id,
-        user.name,
-        discussionForm,
-      );
+      const res = await createDiscussionAdmin(user.id, user.name, {
+        title: discussionForm.title,
+        content: discussionForm.content,
+        category: discussionForm.category,
+        skillTitle: discussionForm.skillTitle,
+      });
+
       if (res.success && res.post) {
-        const newPost = res.post;
         setStatusMessage({
           type: "success",
-          text: `Discussion post "${newPost.title}" published.`,
+          text: "Discussion broadcast published.",
         });
-        setDiscussionsList((prev) => [newPost, ...prev]);
+        setDiscussionsList((prev) => [res.post!, ...prev]);
         setShowCreateDiscussionModal(false);
         setDiscussionForm({
           title: "",
@@ -723,7 +716,7 @@ export default function AdminDashboardPage() {
     } catch (err: any) {
       setStatusMessage({
         type: "error",
-        text: err.message || "Network error creating discussion.",
+        text: err.message || "Network error publishing discussion.",
       });
     } finally {
       setActionLoading(false);
@@ -751,18 +744,11 @@ export default function AdminDashboardPage() {
       if (success) {
         setStatusMessage({
           type: "success",
-          text: `Discussion "${discussionForm.title}" updated.`,
+          text: "Discussion post updated.",
         });
         setDiscussionsList((prev) =>
           prev.map((d) =>
-            d.id === editingDiscussion.id
-              ? {
-                  ...d,
-                  title: discussionForm.title,
-                  content: discussionForm.content,
-                  category: discussionForm.category,
-                }
-              : d,
+            d.id === editingDiscussion.id ? { ...d, ...discussionForm } : d,
           ),
         );
         setEditingDiscussion(null);
@@ -771,7 +757,7 @@ export default function AdminDashboardPage() {
       } else {
         setStatusMessage({
           type: "error",
-          text: "Database error updating discussion post.",
+          text: "Database error updating discussion.",
         });
       }
     } catch {
@@ -784,17 +770,21 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleDeleteDiscussion = async (postId: string) => {
+  const handleDeleteDiscussion = async (discussionId: string) => {
     setActionLoading(true);
     setStatusMessage(null);
     try {
-      const success = await deleteDiscussionAdmin(user.id, user.name, postId);
+      const success = await deleteDiscussionAdmin(
+        user.id,
+        user.name,
+        discussionId,
+      );
       if (success) {
         setStatusMessage({
           type: "success",
-          text: "Discussion post deleted permanently.",
+          text: "Discussion post removed from community.",
         });
-        setDiscussionsList((prev) => prev.filter((p) => p.id !== postId));
+        setDiscussionsList((prev) => prev.filter((d) => d.id !== discussionId));
         setDeleteConfirmModal(null);
         const updatedStats = await fetchAdminStats();
         setStats(updatedStats);
@@ -908,15 +898,10 @@ export default function AdminDashboardPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#07080c] flex items-center justify-center p-4">
-        <div className="flex flex-col items-center gap-3">
-          <div className="relative">
-            <div className="w-10 h-10 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
-            <Shield className="w-4 h-4 text-indigo-400 absolute inset-0 m-auto animate-pulse" />
-          </div>
-          <span className="text-xs font-semibold text-zinc-400 tracking-wider uppercase">
-            Verifying Governance Credentials...
-          </span>
+      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center p-4">
+        <div className="flex items-center gap-2 text-xs text-zinc-500 font-medium">
+          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+          <span>Verifying access...</span>
         </div>
       </div>
     );
@@ -924,34 +909,32 @@ export default function AdminDashboardPage() {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-[#07080c] flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-[#10121a] border border-white/[0.08] rounded-2xl p-7 space-y-6 shadow-2xl text-center backdrop-blur-xl">
-          <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-400 shadow-lg shadow-rose-500/10">
-            <Lock className="w-6 h-6" />
+      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center p-4">
+        <div className="w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 space-y-4">
+          <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300">
+            <Lock className="w-5 h-5" />
           </div>
-          <div className="space-y-2">
-            <h1 className="text-lg font-bold text-white">
-              Privilege Level Insufficient
+          <div className="space-y-1">
+            <h1 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              Access Restricted
             </h1>
-            <p className="text-xs text-zinc-400 leading-relaxed">
-              This executive cockpit requires platform administrator privileges.
-              Signed-in identity ({maskEmail(user?.email || "anonymous")}) lacks
-              role: <span className="font-mono text-amber-400">admin</span>.
+            <p className="text-xs text-zinc-500 leading-relaxed">
+              This area requires administrator permissions. Signed in as{" "}
+              <span className="font-mono">{maskEmail(user?.email || "")}</span>.
             </p>
           </div>
-          <div className="pt-2 flex flex-col sm:flex-row gap-2.5 justify-center">
+          <div className="pt-2 flex gap-2">
             <Link
               href="/app"
-              className="px-4 py-2 rounded-xl bg-white text-zinc-900 text-xs font-semibold hover:bg-zinc-100 transition-colors inline-flex items-center justify-center gap-1.5 shadow-xs"
+              className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Return to App</span>
+              Return to App
             </Link>
             <Link
               href="/auth/login"
-              className="px-4 py-2 rounded-xl border border-white/[0.1] text-zinc-300 hover:bg-white/[0.05] text-xs font-semibold transition-colors inline-flex items-center justify-center"
+              className="px-3 py-1.5 rounded bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-medium hover:opacity-90 transition-opacity"
             >
-              Authenticate as Admin
+              Change Account
             </Link>
           </div>
         </div>
@@ -995,133 +978,54 @@ export default function AdminDashboardPage() {
     return true;
   });
 
-  return (
-    <div className="min-h-screen bg-[#f8fafd] dark:bg-[#07080c] text-zinc-900 dark:text-zinc-100 selection:bg-indigo-600 selection:text-white font-sans antialiased relative">
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute -top-40 left-1/4 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-600/10 rounded-full blur-3xl" />
-        <div className="absolute top-80 -right-40 w-96 h-96 bg-purple-500/10 dark:bg-purple-600/10 rounded-full blur-3xl" />
-      </div>
+  const pendingReportsList = reportsList.filter((r) => r.status === "pending");
 
-      <header className="sticky top-0 z-40 border-b border-zinc-200/80 dark:border-white/[0.07] bg-white/80 dark:bg-[#07080c]/85 backdrop-blur-2xl px-4 sm:px-6 py-3 transition-colors">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+  return (
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans antialiased">
+      <header className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 sm:px-6 py-2.5 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link
               href="/app"
-              className="p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/80 transition-all cursor-pointer shadow-xs"
-              title="Return to user app"
+              className="p-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              title="Return to App"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-3.5 h-3.5" />
             </Link>
-
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 ring-1 ring-white/20">
-                <Shield className="w-4.5 h-4.5" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold tracking-tight text-zinc-950 dark:text-white">
-                    Huddle Control Plane
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10.5px] font-medium bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400">
-                    <span className="relative flex h-1.5 w-1.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                    </span>
-                    Operational
-                  </span>
-                </div>
-                <div className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium">
-                  Platform Governance & Data Administration
-                </div>
-              </div>
-            </div>
+            <span className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+              Huddle Admin
+            </span>
           </div>
 
-          <div className="flex items-center gap-2.5 flex-wrap">
+          <div className="flex items-center gap-2 text-xs">
             <button
               onClick={() => {
                 setPrivacySafeMode(!privacySafeMode);
                 setRevealedItemIds(new Set());
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium border flex items-center gap-2 transition-all cursor-pointer shadow-2xs ${
+              className={`px-2.5 py-1 rounded border text-xs font-mono transition-colors cursor-pointer ${
                 privacySafeMode
-                  ? "bg-white dark:bg-[#111218] border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
-                  : "bg-amber-500/10 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200 hover:bg-amber-500/15"
+                  ? "border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
+                  : "border-amber-400 bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
               }`}
-              title={
-                privacySafeMode
-                  ? "Sensitive data (emails, UUIDs, invite codes) is currently masked. Click to reveal plaintext."
-                  : "Sensitive data is currently revealed in plaintext. Click to mask."
-              }
+              title="Toggle masking for sensitive emails and IDs"
             >
-              {privacySafeMode ? (
-                <>
-                  <div className="w-5 h-5 rounded-md bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                    <EyeOff className="w-3 h-3" />
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-xs">
-                      Privacy Shield
-                    </span>
-                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                      Masked
-                    </span>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="w-5 h-5 rounded-md bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-                    <Eye className="w-3 h-3" />
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-xs text-amber-900 dark:text-amber-200">
-                      Privacy Shield
-                    </span>
-                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30 flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
-                      Revealed
-                    </span>
-                  </div>
-                </>
-              )}
+              Privacy: {privacySafeMode ? "Masked" : "Revealed"}
             </button>
 
             <button
               onClick={loadAllAdminData}
               disabled={loading}
-              className="p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/80 transition-colors cursor-pointer shadow-xs"
-              title="Sync latest records from Supabase"
+              className="p-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              title="Refresh dataset"
             >
               <RefreshCw
-                className={`w-4 h-4 ${loading ? "animate-spin text-indigo-600 dark:text-indigo-400" : ""}`}
+                className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`}
               />
             </button>
 
-            <div
-              className="hidden md:flex items-center gap-2.5 pl-2 border-l border-zinc-200 dark:border-zinc-800"
-              title={`Logged in as ${user?.name || "Admin"} (${user?.email || "admin@huddle.team"})\nUser ID: ${user?.id || ""}`}
-            >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 flex items-center justify-center font-bold text-white text-xs shadow-xs ring-1 ring-black/5 dark:ring-white/10 shrink-0">
-                {user?.name
-                  ? user.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .slice(0, 2)
-                      .toUpperCase()
-                  : "SA"}
-              </div>
-              <div className="leading-tight">
-                <div className="font-semibold text-zinc-900 dark:text-zinc-100 text-xs flex items-center gap-1.5">
-                  <span>{user?.name || "Sarker Ayon"}</span>
-                </div>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/60">
-                    <span className="w-1 h-1 rounded-full bg-indigo-500" />
-                    Super Admin
-                  </span>
-                </div>
-              </div>
+            <div className="text-zinc-500 font-mono text-[11px] pl-2 border-l border-zinc-200 dark:border-zinc-800 hidden sm:block">
+              {user?.email || "admin"}
             </div>
           </div>
         </div>
@@ -1129,18 +1033,18 @@ export default function AdminDashboardPage() {
 
       {statusMessage && (
         <div
-          className={`border-b text-xs px-4 sm:px-6 py-2.5 flex items-center justify-between animate-in fade-in duration-200 z-30 relative ${
+          className={`border-b text-xs px-4 sm:px-6 py-2 flex items-center justify-between ${
             statusMessage.type === "success"
-              ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-300"
-              : "bg-rose-500/10 border-rose-500/20 text-rose-700 dark:text-rose-300"
+              ? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200"
+              : "bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200"
           }`}
         >
           <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
             <div className="flex items-center gap-2 font-medium">
               {statusMessage.type === "success" ? (
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
               ) : (
-                <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
               )}
               <span>{statusMessage.text}</span>
             </div>
@@ -1154,86 +1058,56 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6 relative z-10">
-        <nav className="flex items-center gap-1.5 p-1 rounded-2xl bg-zinc-100/80 dark:bg-[#0f111a]/80 border border-zinc-200/70 dark:border-white/[0.06] overflow-x-auto backdrop-blur-md">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4">
+        <nav className="flex items-center gap-1 border-b border-zinc-200 dark:border-zinc-800 overflow-x-auto text-xs">
           {[
-            { id: "overview", label: "Overview", icon: Activity, count: null },
-            {
-              id: "users",
-              label: "Engineers",
-              icon: Users,
-              count: stats.totalUsers,
-            },
+            { id: "overview", label: "Overview" },
+            { id: "users", label: "Users", count: stats.totalUsers },
             {
               id: "surveys",
-              label: "Intake Surveys",
-              icon: ClipboardList,
+              label: "Surveys",
               count: usersList.filter(
                 (u) => u.surveyData && u.onboardingCompleted,
               ).length,
             },
-            {
-              id: "squads",
-              label: "Micro-Squads",
-              icon: Layers,
-              count: stats.totalSquads,
-            },
+            { id: "squads", label: "Squads", count: stats.totalSquads },
             {
               id: "curriculum",
               label: "Curriculum",
-              icon: BookOpen,
               count: stats.totalCurriculumTasks,
             },
             {
               id: "discussions",
               label: "Discussions",
-              icon: MessageSquare,
               count: stats.totalDiscussions,
             },
             {
               id: "reports",
               label: "Safety Reports",
-              icon: AlertTriangle,
               count: stats.pendingReports,
-              alert: stats.pendingReports > 0,
+              urgent: stats.pendingReports > 0,
             },
-            {
-              id: "database",
-              label: "Database Explorer",
-              icon: Database,
-              count: 26,
-            },
-            {
-              id: "audit",
-              label: "Audit Logs",
-              icon: History,
-              count: auditLogs.length,
-            },
+            { id: "database", label: "Database" },
+            { id: "audit", label: "Audit Logs", count: auditLogs.length },
           ].map((tab) => {
-            const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as AdminTab)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-2 font-medium border-b-2 transition-colors whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
                   isActive
-                    ? "bg-white dark:bg-[#181a26] text-zinc-950 dark:text-white shadow-sm border border-zinc-200/80 dark:border-white/[0.1]"
-                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-200/50 dark:hover:bg-white/[0.04]"
+                    ? "border-zinc-900 text-zinc-900 dark:border-zinc-100 dark:text-zinc-100 font-semibold"
+                    : "border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300"
                 }`}
               >
-                <Icon
-                  className={`w-3.5 h-3.5 ${isActive ? "text-indigo-600 dark:text-indigo-400" : ""}`}
-                />
                 <span>{tab.label}</span>
-                {tab.count !== null && (
+                {tab.count !== undefined && tab.count !== null && (
                   <span
-                    className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full tabular-nums ${
-                      tab.alert
-                        ? "bg-amber-500 text-white animate-pulse"
-                        : isActive
-                          ? "bg-zinc-100 dark:bg-white/[0.1] text-zinc-900 dark:text-zinc-200"
-                          : "bg-zinc-200/70 dark:bg-white/[0.06] text-zinc-500 dark:text-zinc-400"
+                    className={`font-mono text-[10px] px-1.5 py-0.2 rounded tabular-nums ${
+                      tab.urgent
+                        ? "bg-rose-600 text-white font-bold"
+                        : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
                     }`}
                   >
                     {tab.count}
@@ -1243,283 +1117,275 @@ export default function AdminDashboardPage() {
             );
           })}
         </nav>
+      </div>
 
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-5">
         {activeTab === "overview" && (
-          <div className="space-y-6 animate-in fade-in duration-200">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
-              <div className="p-4 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] space-y-2 shadow-sm hover:border-indigo-500/40 transition-all">
+          <div className="space-y-5">
+            {pendingReportsList.length > 0 ? (
+              <div className="border border-amber-300 dark:border-amber-800/80 bg-amber-50/50 dark:bg-amber-950/20 rounded-lg p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                    Total Engineers
-                  </span>
-                  <div className="w-6 h-6 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-                    <Users className="w-3.5 h-3.5" />
+                  <div className="flex items-center gap-2 text-amber-900 dark:text-amber-200 font-semibold text-xs uppercase tracking-wider">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                    <span>
+                      Action Required: {pendingReportsList.length} Pending
+                      Safety Report
+                      {pendingReportsList.length > 1 ? "s" : ""}
+                    </span>
                   </div>
+                  <button
+                    onClick={() => setActiveTab("reports")}
+                    className="text-xs font-medium text-amber-800 dark:text-amber-300 hover:underline cursor-pointer"
+                  >
+                    Open Safety Queue
+                  </button>
                 </div>
-                <div className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white tabular-nums">
+                <div className="space-y-2">
+                  {pendingReportsList.slice(0, 3).map((report) => {
+                    const reportId = report.id || "";
+                    return (
+                      <div
+                        key={reportId || Math.random()}
+                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-900/40 rounded-md text-xs"
+                      >
+                        <div className="space-y-0.5">
+                          <span className="font-semibold text-zinc-900 dark:text-zinc-100 capitalize">
+                            {report.reasonCategory || "Safety Issue"}:{" "}
+                          </span>
+                          <span className="text-zinc-600 dark:text-zinc-400">
+                            "{report.details || "No details provided"}"
+                          </span>
+                          <div className="text-[11px] text-zinc-400 font-mono">
+                            Report ID: {maskId(reportId)} • Squad:{" "}
+                            {report.squadId || "Unassigned"}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            onClick={() =>
+                              handleResolveReport(reportId, "reviewed")
+                            }
+                            className="px-2.5 py-1 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-medium text-xs transition-colors cursor-pointer"
+                          >
+                            Mark Reviewed
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleResolveReport(reportId, "dismissed")
+                            }
+                            className="px-2.5 py-1 rounded border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium text-xs transition-colors cursor-pointer"
+                          >
+                            Dismiss
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg px-4 py-3 bg-white dark:bg-zinc-900 flex items-center justify-between text-xs text-zinc-500">
+                <span>
+                  All systems normal. No pending safety reports or actions
+                  required.
+                </span>
+                <span className="font-mono text-[11px] text-zinc-400">
+                  Queue clear
+                </span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              <div className="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                <div className="text-xs text-zinc-500 font-medium">
+                  Engineers
+                </div>
+                <div className="text-xl font-semibold font-mono tabular-nums text-zinc-900 dark:text-zinc-100 mt-1">
                   {stats.totalUsers}
                 </div>
-                <div className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                  <TrendingUp className="w-3 h-3" />
-                  <span>+14% this sprint</span>
-                </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] space-y-2 shadow-sm hover:border-indigo-500/40 transition-all">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                    Micro-Squads
-                  </span>
-                  <div className="w-6 h-6 rounded-lg bg-purple-50 dark:bg-purple-950/60 flex items-center justify-center text-purple-600 dark:text-purple-400">
-                    <Layers className="w-3.5 h-3.5" />
-                  </div>
+              <div className="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                <div className="text-xs text-zinc-500 font-medium">
+                  Micro-Squads
                 </div>
-                <div className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white tabular-nums">
+                <div className="text-xl font-semibold font-mono tabular-nums text-zinc-900 dark:text-zinc-100 mt-1">
                   {stats.totalSquads}
                 </div>
-                <div className="text-[10px] font-medium text-zinc-500">
-                  Avg 4 members/squad
-                </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] space-y-2 shadow-sm hover:border-indigo-500/40 transition-all">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                    Active Sprints
-                  </span>
-                  <div className="w-6 h-6 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                    <Activity className="w-3.5 h-3.5" />
-                  </div>
+              <div className="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                <div className="text-xs text-zinc-500 font-medium">
+                  Active Sprints
                 </div>
-                <div className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white tabular-nums">
+                <div className="text-xl font-semibold font-mono tabular-nums text-zinc-900 dark:text-zinc-100 mt-1">
                   {stats.totalSprints}
                 </div>
-                <div className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
-                  4-Day Cadence Live
-                </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] space-y-2 shadow-sm hover:border-indigo-500/40 transition-all">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                    Task Templates
-                  </span>
-                  <div className="w-6 h-6 rounded-lg bg-amber-50 dark:bg-amber-950/60 flex items-center justify-center text-amber-600 dark:text-amber-400">
-                    <BookOpen className="w-3.5 h-3.5" />
-                  </div>
+              <div className="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                <div className="text-xs text-zinc-500 font-medium">
+                  Curriculum Tasks
                 </div>
-                <div className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white tabular-nums">
+                <div className="text-xl font-semibold font-mono tabular-nums text-zinc-900 dark:text-zinc-100 mt-1">
                   {stats.totalCurriculumTasks}
                 </div>
-                <div className="text-[10px] font-medium text-zinc-500">
-                  4 Curriculum tracks
-                </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] space-y-2 shadow-sm hover:border-indigo-500/40 transition-all">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                    Discussions
-                  </span>
-                  <div className="w-6 h-6 rounded-lg bg-sky-50 dark:bg-sky-950/60 flex items-center justify-center text-sky-600 dark:text-sky-400">
-                    <MessageSquare className="w-3.5 h-3.5" />
-                  </div>
+              <div className="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                <div className="text-xs text-zinc-500 font-medium">
+                  Discussions
                 </div>
-                <div className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white tabular-nums">
+                <div className="text-xl font-semibold font-mono tabular-nums text-zinc-900 dark:text-zinc-100 mt-1">
                   {stats.totalDiscussions}
                 </div>
-                <div className="text-[10px] font-medium text-sky-600 dark:text-sky-400">
-                  Community active
-                </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] space-y-2 shadow-sm hover:border-indigo-500/40 transition-all">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                    Pending Reports
-                  </span>
-                  <div
-                    className={`w-6 h-6 rounded-lg flex items-center justify-center ${
-                      stats.pendingReports > 0
-                        ? "bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400"
-                        : "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
-                    }`}
-                  >
-                    <AlertTriangle className="w-3.5 h-3.5" />
-                  </div>
+              <div
+                className={`p-3.5 rounded-lg border ${
+                  stats.pendingReports > 0
+                    ? "border-rose-300 dark:border-rose-900/80 bg-rose-50/50 dark:bg-rose-950/20"
+                    : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"
+                }`}
+              >
+                <div
+                  className={`text-xs font-medium ${
+                    stats.pendingReports > 0
+                      ? "text-rose-700 dark:text-rose-400 font-semibold"
+                      : "text-zinc-500"
+                  }`}
+                >
+                  Pending Reports
                 </div>
                 <div
-                  className={`text-2xl font-bold tracking-tight tabular-nums ${
+                  className={`text-xl font-semibold font-mono tabular-nums mt-1 ${
                     stats.pendingReports > 0
-                      ? "text-amber-600 dark:text-amber-400"
-                      : "text-zinc-950 dark:text-white"
+                      ? "text-rose-700 dark:text-rose-400"
+                      : "text-zinc-900 dark:text-zinc-100"
                   }`}
                 >
                   {stats.pendingReports}
                 </div>
-                <div
-                  className={`text-[10px] font-semibold ${
-                    stats.pendingReports > 0
-                      ? "text-amber-600 dark:text-amber-400"
-                      : "text-emerald-600 dark:text-emerald-400"
-                  }`}
-                >
-                  {stats.pendingReports > 0 ? "Action Required" : "All Clear"}
-                </div>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-zinc-200/70 dark:border-white/[0.07] bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl p-5 space-y-3 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-indigo-500" />
-                  <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">
-                    Governance Quick Actions
-                  </h3>
-                </div>
-                <span className="text-[11px] text-zinc-400">
-                  Instant administrative triggers
-                </span>
+            <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 bg-white dark:bg-zinc-900 space-y-2.5">
+              <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+                Quick Operations
               </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="flex items-center gap-2 flex-wrap">
                 <button
                   onClick={() => setShowCreateUserModal(true)}
-                  className="p-3 rounded-xl border border-zinc-200/80 dark:border-white/[0.06] bg-zinc-50/60 dark:bg-white/[0.02] hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 hover:border-indigo-200 dark:hover:border-indigo-800 transition-all text-left flex items-center gap-3 cursor-pointer group"
+                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-105 transition-transform">
-                    <UserPlus className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
-                      Register User
-                    </div>
-                    <div className="text-[10px] text-zinc-400">
-                      Provision profile
-                    </div>
-                  </div>
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Register User</span>
                 </button>
-
                 <button
                   onClick={() => setShowCreateSquadModal(true)}
-                  className="p-3 rounded-xl border border-zinc-200/80 dark:border-white/[0.06] bg-zinc-50/60 dark:bg-white/[0.02] hover:bg-purple-50/50 dark:hover:bg-purple-950/30 hover:border-purple-200 dark:hover:border-purple-800 transition-all text-left flex items-center gap-3 cursor-pointer group"
+                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 flex items-center justify-center text-purple-600 dark:text-purple-400 group-hover:scale-105 transition-transform">
-                    <FolderPlus className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
-                      Assemble Squad
-                    </div>
-                    <div className="text-[10px] text-zinc-400">
-                      New cohort unit
-                    </div>
-                  </div>
+                  <FolderPlus className="w-3.5 h-3.5" />
+                  <span>Create Squad</span>
                 </button>
-
                 <button
                   onClick={() => setShowCreateTaskModal(true)}
-                  className="p-3 rounded-xl border border-zinc-200/80 dark:border-white/[0.06] bg-zinc-50/60 dark:bg-white/[0.02] hover:bg-amber-50/50 dark:hover:bg-amber-950/30 hover:border-amber-200 dark:hover:border-amber-800 transition-all text-left flex items-center gap-3 cursor-pointer group"
+                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform">
-                    <BookOpen className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
-                      Add Drill Template
-                    </div>
-                    <div className="text-[10px] text-zinc-400">
-                      Curriculum module
-                    </div>
-                  </div>
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>Add Task Template</span>
                 </button>
-
                 <button
                   onClick={() => setShowCreateDiscussionModal(true)}
-                  className="p-3 rounded-xl border border-zinc-200/80 dark:border-white/[0.06] bg-zinc-50/60 dark:bg-white/[0.02] hover:bg-sky-50/50 dark:hover:bg-sky-950/30 hover:border-sky-200 dark:hover:border-sky-800 transition-all text-left flex items-center gap-3 cursor-pointer group"
+                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 flex items-center justify-center text-sky-600 dark:text-sky-400 group-hover:scale-105 transition-transform">
-                    <MessageSquare className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
-                      Post Announcement
-                    </div>
-                    <div className="text-[10px] text-zinc-400">
-                      Broadcast update
-                    </div>
-                  </div>
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  <span>Post Announcement</span>
                 </button>
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] space-y-4 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <History className="w-4 h-4 text-indigo-500" />
-                  <h2 className="text-sm font-bold text-zinc-950 dark:text-white">
-                    Recent Administrative Events
-                  </h2>
-                </div>
+            <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 overflow-hidden">
+              <div className="px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+                <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+                  Recent Administrative Events
+                </span>
                 <button
                   onClick={() => setActiveTab("audit")}
-                  className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 font-medium cursor-pointer"
+                  className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer"
                 >
-                  <span>View all events</span>
-                  <ArrowUpRight className="w-3.5 h-3.5" />
+                  View full audit log →
                 </button>
               </div>
-
-              <div className="space-y-2.5">
-                {auditLogs.slice(0, 4).map((log) => (
-                  <div
-                    key={log.id}
-                    className="p-3 rounded-xl bg-zinc-50/70 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 flex items-center justify-between text-xs"
-                  >
-                    <div className="space-y-0.5">
-                      <div className="font-semibold text-zinc-950 dark:text-zinc-100 flex items-center gap-2">
-                        <span className="font-mono text-[11px] px-1.5 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
+              <table className="w-full text-left text-xs font-mono">
+                <thead className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 text-zinc-500 text-[11px]">
+                  <tr>
+                    <th className="py-2.5 px-4 font-medium">Timestamp</th>
+                    <th className="py-2.5 px-4 font-medium">Admin</th>
+                    <th className="py-2.5 px-4 font-medium">Action</th>
+                    <th className="py-2.5 px-4 font-medium">Target</th>
+                    <th className="py-2.5 px-4 font-medium">Target ID</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800 text-[11px]">
+                  {auditLogs.slice(0, 5).map((log) => (
+                    <tr
+                      key={log.id}
+                      className="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/30 transition-colors"
+                    >
+                      <td className="py-2 px-4 text-zinc-400">
+                        {new Date(log.createdAt).toLocaleTimeString()}
+                      </td>
+                      <td className="py-2 px-4 font-sans font-medium text-zinc-900 dark:text-zinc-100">
+                        {log.adminName}
+                      </td>
+                      <td className="py-2 px-4">
+                        <span className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-mono text-[10px]">
                           {log.action}
                         </span>
-                      </div>
-                      <div className="text-[11px] text-zinc-500">
-                        Target: {log.targetType}{" "}
-                        {log.targetId ? `(${maskId(log.targetId)})` : ""}
-                      </div>
-                    </div>
-                    <div className="text-[10px] text-zinc-400 font-mono">
-                      {new Date(log.createdAt).toLocaleTimeString()}
-                    </div>
-                  </div>
-                ))}
-                {auditLogs.length === 0 && (
-                  <div className="py-8 text-center text-xs text-zinc-400">
-                    No administrative transactions logged yet.
-                  </div>
-                )}
-              </div>
+                      </td>
+                      <td className="py-2 px-4 font-sans capitalize text-zinc-500">
+                        {log.targetType}
+                      </td>
+                      <td className="py-2 px-4 text-zinc-400">
+                        {log.targetId ? maskId(log.targetId) : "-"}
+                      </td>
+                    </tr>
+                  ))}
+                  {auditLogs.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={5}
+                        className="py-6 text-center text-zinc-400 font-sans text-xs"
+                      >
+                        No administrative transactions logged yet.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
 
         {activeTab === "users" && (
-          <div className="space-y-4 animate-in fade-in duration-200">
+          <div className="space-y-4">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2 flex-1 max-w-md">
                 <div className="relative flex-1">
-                  <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
-                    placeholder="Search users by name, handle, or email..."
+                    placeholder="Search by name, handle, or email..."
                     value={userSearchQuery}
                     onChange={(e) => setUserSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#0e1019] text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                    className="w-full pl-8 pr-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-400"
                   />
                 </div>
                 <select
                   value={userRoleFilter}
                   onChange={(e) => setUserRoleFilter(e.target.value)}
-                  className="p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#0e1019] text-xs text-zinc-700 dark:text-zinc-300 focus:outline-none"
+                  className="p-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-700 dark:text-zinc-300 focus:outline-none"
                 >
                   <option value="all">All Roles</option>
                   <option value="user">User</option>
@@ -1528,48 +1394,46 @@ export default function AdminDashboardPage() {
                 </select>
               </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setShowCreateUserModal(true)}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all flex items-center gap-1.5 cursor-pointer"
-                >
-                  <UserPlus className="w-3.5 h-3.5" />
-                  <span>Create User</span>
-                </button>
-              </div>
+              <button
+                onClick={() => setShowCreateUserModal(true)}
+                className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>Register User</span>
+              </button>
             </div>
 
-            <div className="rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl overflow-hidden shadow-sm">
+            <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="border-b border-zinc-200/80 dark:border-white/[0.07] bg-zinc-50/80 dark:bg-zinc-900/60 text-zinc-500 font-semibold uppercase tracking-wider text-[10px]">
+                  <thead className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 text-zinc-500 font-medium text-[11px]">
                     <tr>
-                      <th className="py-3 px-4">User</th>
-                      <th className="py-3 px-4">Email (Masked)</th>
-                      <th className="py-3 px-4">User ID</th>
-                      <th className="py-3 px-4">Role</th>
-                      <th className="py-3 px-4">Status</th>
-                      <th className="py-3 px-4">Goal</th>
-                      <th className="py-3 px-4 text-right">Actions</th>
+                      <th className="py-2.5 px-4">User</th>
+                      <th className="py-2.5 px-4">Email</th>
+                      <th className="py-2.5 px-4 font-mono">User ID</th>
+                      <th className="py-2.5 px-4">Role</th>
+                      <th className="py-2.5 px-4">Status</th>
+                      <th className="py-2.5 px-4">Focus Goal</th>
+                      <th className="py-2.5 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-200/60 dark:divide-zinc-800/60">
+                  <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
                     {filteredUsers.map((u) => {
                       const revealed = isRevealed(u.id);
                       return (
                         <tr
                           key={u.id}
-                          className="hover:bg-zinc-50/60 dark:hover:bg-white/[0.02] transition-colors"
+                          className="hover:bg-zinc-50/60 dark:hover:bg-zinc-800/30 transition-colors"
                         >
-                          <td className="py-3 px-4">
+                          <td className="py-2.5 px-4">
                             <div className="flex items-center gap-2.5">
                               <img
-                                src={u.avatar || "/avatars/avatar-1.svg"}
+                                src={getUserAvatarUrl(u, 64)}
                                 alt={u.name}
-                                className="w-8 h-8 rounded-xl object-cover bg-zinc-100 dark:bg-zinc-800 shrink-0 ring-1 ring-zinc-200 dark:ring-zinc-700"
+                                className="w-7 h-7 rounded-md object-cover bg-zinc-100 dark:bg-zinc-800 shrink-0 border border-zinc-200 dark:border-zinc-800"
                               />
                               <div>
-                                <div className="font-semibold text-zinc-900 dark:text-zinc-100">
+                                <div className="font-medium text-zinc-900 dark:text-zinc-100">
                                   {u.name}
                                 </div>
                                 <div className="text-[11px] text-zinc-400 font-mono">
@@ -1579,42 +1443,37 @@ export default function AdminDashboardPage() {
                             </div>
                           </td>
 
-                          <td className="py-3 px-4">
-                            <div className="flex items-center gap-1.5 font-mono text-zinc-600 dark:text-zinc-400">
+                          <td className="py-2.5 px-4 font-mono text-zinc-600 dark:text-zinc-400">
+                            <div className="flex items-center gap-1.5">
                               <span>{maskEmail(u.email, u.id)}</span>
                               <button
                                 onClick={() => toggleRevealItem(u.id)}
-                                className="p-1 rounded-md text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                                className="p-0.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer"
                                 title={revealed ? "Hide Email" : "Reveal Email"}
                               >
                                 {revealed ? (
-                                  <EyeOff className="w-3.5 h-3.5 text-amber-500" />
+                                  <EyeOff className="w-3 h-3 text-amber-500" />
                                 ) : (
-                                  <Eye className="w-3.5 h-3.5" />
+                                  <Eye className="w-3 h-3" />
                                 )}
                               </button>
                             </div>
                           </td>
 
-                          <td className="py-3 px-4 font-mono text-zinc-500 text-[11px]">
-                            <div
-                              className="flex items-center gap-1.5"
-                              title={`User ID: ${u.id}`}
-                            >
-                              <span className="tabular-nums font-mono">
+                          <td className="py-2.5 px-4 font-mono text-zinc-500 text-[11px]">
+                            <div className="flex items-center gap-1.5">
+                              <span className="tabular-nums">
                                 {maskId(u.id, u.id)}
                               </span>
                               <button
                                 onClick={() => toggleRevealItem(u.id)}
-                                className="p-1 rounded text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-                                title={
-                                  revealed ? "Hide ID" : "Reveal Truncated ID"
-                                }
+                                className="p-0.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer"
+                                title={revealed ? "Hide ID" : "Reveal ID"}
                               >
                                 {revealed ? (
-                                  <EyeOff className="w-3.5 h-3.5 text-amber-500" />
+                                  <EyeOff className="w-3 h-3 text-amber-500" />
                                 ) : (
-                                  <Eye className="w-3.5 h-3.5" />
+                                  <Eye className="w-3 h-3" />
                                 )}
                               </button>
                               <button
@@ -1623,62 +1482,45 @@ export default function AdminDashboardPage() {
                                     navigator.clipboard.writeText(u.id);
                                     setStatusMessage({
                                       type: "success",
-                                      text: `Copied full User ID (${truncateId(u.id)}) to clipboard`,
+                                      text: `Copied ID (${truncateId(u.id)}) to clipboard`,
                                     });
                                   }
                                 }}
-                                className="p-1 rounded text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-                                title={`Copy Full ID: ${u.id}`}
+                                className="p-0.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer"
+                                title="Copy full ID"
                               >
-                                <Copy className="w-3.5 h-3.5" />
+                                <Copy className="w-3 h-3" />
                               </button>
                             </div>
                           </td>
 
-                          <td className="py-3 px-4">
-                            <span
-                              className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                                u.role === "admin"
-                                  ? "bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300"
-                                  : u.role === "moderator"
-                                    ? "bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300"
-                                    : "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
-                              }`}
-                            >
+                          <td className="py-2.5 px-4">
+                            <span className="capitalize text-zinc-700 dark:text-zinc-300">
                               {u.role || "user"}
                             </span>
                           </td>
 
-                          <td className="py-3 px-4">
-                            <span
-                              className={`inline-flex items-center gap-1.5 text-[11px] font-semibold ${
-                                u.status === "suspended"
-                                  ? "text-rose-600 dark:text-rose-400"
-                                  : u.status === "flagged"
-                                    ? "text-amber-600 dark:text-amber-400"
-                                    : "text-emerald-600 dark:text-emerald-400"
-                              }`}
-                            >
-                              <span
-                                className={`w-1.5 h-1.5 rounded-full ${
-                                  u.status === "suspended"
-                                    ? "bg-rose-500"
-                                    : u.status === "flagged"
-                                      ? "bg-amber-500"
-                                      : "bg-emerald-500"
-                                }`}
-                              />
-                              <span className="capitalize">
-                                {u.status || "active"}
+                          <td className="py-2.5 px-4">
+                            {u.status === "suspended" ? (
+                              <span className="px-1.5 py-0.5 rounded bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-medium font-mono text-[11px]">
+                                suspended
                               </span>
-                            </span>
+                            ) : u.status === "flagged" ? (
+                              <span className="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-medium font-mono text-[11px]">
+                                flagged
+                              </span>
+                            ) : (
+                              <span className="text-zinc-400 font-mono text-[11px]">
+                                active
+                              </span>
+                            )}
                           </td>
 
-                          <td className="py-3 px-4 text-zinc-600 dark:text-zinc-400 max-w-xs truncate">
+                          <td className="py-2.5 px-4 text-zinc-600 dark:text-zinc-400 max-w-xs truncate">
                             {u.primaryGoal || "Master System Architecture"}
                           </td>
 
-                          <td className="py-3 px-4 text-right">
+                          <td className="py-2.5 px-4 text-right">
                             <div className="flex items-center justify-end gap-1.5">
                               <button
                                 onClick={() => {
@@ -1696,10 +1538,9 @@ export default function AdminDashboardPage() {
                                       u.careerMilestone || "Software Engineer",
                                   });
                                 }}
-                                className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-medium transition-colors cursor-pointer"
-                                title="Edit user profile"
+                                className="px-2 py-1 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs transition-colors cursor-pointer"
                               >
-                                <Edit2 className="w-3.5 h-3.5" />
+                                Edit
                               </button>
                               <button
                                 onClick={() =>
@@ -1709,10 +1550,9 @@ export default function AdminDashboardPage() {
                                     name: u.name,
                                   })
                                 }
-                                className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-medium transition-colors cursor-pointer"
-                                title="Delete user"
+                                className="px-2 py-1 rounded border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs transition-colors cursor-pointer"
                               >
-                                <Trash2 className="w-3.5 h-3.5" />
+                                Delete
                               </button>
                             </div>
                           </td>
@@ -1739,43 +1579,43 @@ export default function AdminDashboardPage() {
         )}
 
         {activeTab === "squads" && (
-          <div className="space-y-4 animate-in fade-in duration-200">
+          <div className="space-y-4">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <div className="relative flex-1 max-w-md">
-                <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Search squads by name or skill focus..."
                   value={squadSearchQuery}
                   onChange={(e) => setSquadSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#0e1019] text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                  className="w-full pl-8 pr-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-400"
                 />
               </div>
 
               <button
                 onClick={() => setShowCreateSquadModal(true)}
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Create Micro-Squad</span>
+                <span>Create Squad</span>
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {filteredSquads.map((sq) => {
                 const revealed = isRevealed(sq.id);
                 return (
                   <div
                     key={sq.id}
-                    className="p-5 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] space-y-4 shadow-sm hover:border-indigo-500/40 transition-all flex flex-col justify-between"
+                    className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col justify-between space-y-3"
                   >
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 uppercase tracking-wider">
+                          <div className="text-[11px] font-mono text-zinc-500">
                             {sq.skillFocus}
-                          </span>
-                          <h4 className="text-base font-bold text-zinc-950 dark:text-white mt-1.5">
+                          </div>
+                          <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-0.5">
                             {sq.name}
                           </h4>
                         </div>
@@ -1791,10 +1631,10 @@ export default function AdminDashboardPage() {
                                 inviteCode: sq.inviteCode,
                               });
                             }}
-                            className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                            className="p-1 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white cursor-pointer"
                             title="Edit squad"
                           >
-                            <Edit2 className="w-3.5 h-3.5" />
+                            <Edit2 className="w-3 h-3" />
                           </button>
                           <button
                             onClick={() =>
@@ -1804,10 +1644,10 @@ export default function AdminDashboardPage() {
                                 name: sq.name,
                               })
                             }
-                            className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer"
+                            className="p-1 rounded border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer"
                             title="Delete squad"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-3 h-3" />
                           </button>
                         </div>
                       </div>
@@ -1817,25 +1657,23 @@ export default function AdminDashboardPage() {
                       </p>
                     </div>
 
-                    <div className="space-y-3 pt-3 border-t border-zinc-100 dark:border-white/[0.06]">
-                      <div className="flex items-center justify-between text-[11px] text-zinc-500">
-                        <span>Weekly Target</span>
-                        <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                    <div className="pt-2.5 border-t border-zinc-100 dark:border-zinc-800 space-y-1.5 text-[11px]">
+                      <div className="flex items-center justify-between text-zinc-500">
+                        <span>Target</span>
+                        <span className="font-mono text-zinc-900 dark:text-zinc-100">
                           {sq.currentProgress || 0} / {sq.targetProgress}{" "}
                           Milestones
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between text-xs pt-1">
-                        <span className="text-[11px] text-zinc-400 font-mono">
-                          Invite Code:
-                        </span>
-                        <div className="flex items-center gap-1.5 font-mono text-zinc-700 dark:text-zinc-300">
+                      <div className="flex items-center justify-between text-zinc-500">
+                        <span>Invite Code</span>
+                        <div className="flex items-center gap-1 font-mono text-zinc-800 dark:text-zinc-200">
                           <span>{maskCode(sq.inviteCode, sq.id)}</span>
                           <button
                             onClick={() => toggleRevealItem(sq.id)}
-                            className="p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
-                            title={revealed ? "Hide Code" : "Reveal Code"}
+                            className="p-0.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+                            title={revealed ? "Hide code" : "Reveal code"}
                           >
                             {revealed ? (
                               <EyeOff className="w-3 h-3 text-amber-500" />
@@ -1854,15 +1692,15 @@ export default function AdminDashboardPage() {
         )}
 
         {activeTab === "curriculum" && (
-          <div className="space-y-4 animate-in fade-in duration-200">
+          <div className="space-y-4">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <select
                   value={taskCategoryFilter}
                   onChange={(e) => setTaskCategoryFilter(e.target.value)}
-                  className="p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#0e1019] text-xs text-zinc-700 dark:text-zinc-300 focus:outline-none"
+                  className="p-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-700 dark:text-zinc-300 focus:outline-none"
                 >
-                  <option value="all">All Curriculum Tracks</option>
+                  <option value="all">All Tracks</option>
                   <option value="System Architecture">
                     System Architecture
                   </option>
@@ -1876,38 +1714,34 @@ export default function AdminDashboardPage() {
                     API Design & Performance
                   </option>
                 </select>
-                <span className="text-xs text-zinc-500 font-medium">
-                  {filteredTasks.length} task templates
+                <span className="text-xs text-zinc-500 font-mono">
+                  {filteredTasks.length} templates
                 </span>
               </div>
 
               <button
                 onClick={() => setShowCreateTaskModal(true)}
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Task Template</span>
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {filteredTasks.map((t) => (
                 <div
                   key={t.id}
-                  className="p-5 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] space-y-4 shadow-sm flex flex-col justify-between hover:border-indigo-500/40 transition-all"
+                  className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col justify-between space-y-3"
                 >
-                  <div className="space-y-2.5">
+                  <div className="space-y-2">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 uppercase tracking-wider">
-                            Day {t.dayNumber} • {t.taskType}
-                          </span>
-                          <span className="text-[11px] text-zinc-400 font-medium">
-                            {t.skillCategory}
-                          </span>
+                        <div className="text-[11px] font-mono text-zinc-500">
+                          Lesson {t.dayNumber} • {t.taskType} •{" "}
+                          {t.skillCategory}
                         </div>
-                        <h4 className="text-sm font-bold text-zinc-950 dark:text-white mt-1.5">
+                        <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-0.5">
                           {t.title}
                         </h4>
                       </div>
@@ -1928,10 +1762,10 @@ export default function AdminDashboardPage() {
                               artifactTitle: t.artifactTitle || "",
                             });
                           }}
-                          className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                          className="p-1 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white cursor-pointer"
                           title="Edit template"
                         >
-                          <Edit2 className="w-3.5 h-3.5" />
+                          <Edit2 className="w-3 h-3" />
                         </button>
                         <button
                           onClick={() =>
@@ -1941,27 +1775,22 @@ export default function AdminDashboardPage() {
                               name: t.title,
                             })
                           }
-                          className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer"
+                          className="p-1 rounded border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer"
                           title="Delete template"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-3 h-3" />
                         </button>
                       </div>
                     </div>
 
-                    <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed line-clamp-3">
+                    <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed line-clamp-2">
                       {t.description}
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] text-zinc-500 pt-3 border-t border-zinc-100 dark:border-white/[0.06]">
-                    <span className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-indigo-500" />
-                      <span>{t.estimatedMinutes} mins deliberate drill</span>
-                    </span>
-                    <span className="font-mono text-zinc-400">
-                      Author: {t.creatorName}
-                    </span>
+                  <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[11px] text-zinc-400 font-mono">
+                    <span>{t.estimatedMinutes} mins</span>
+                    <span>{t.creatorName}</span>
                   </div>
                 </div>
               ))}
@@ -1970,57 +1799,55 @@ export default function AdminDashboardPage() {
         )}
 
         {activeTab === "discussions" && (
-          <div className="space-y-4 animate-in fade-in duration-200">
+          <div className="space-y-4">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-              <div className="text-xs text-zinc-500">
-                Manage community posts, technical announcements, and code
-                reviews.
-              </div>
+              <span className="text-xs text-zinc-500">
+                Community announcements and technical discussions
+              </span>
 
               <button
                 onClick={() => setShowCreateDiscussionModal(true)}
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-500/20 transition-all flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Post Announcement</span>
               </button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {filteredDiscussions.map((post) => (
                 <div
                   key={post.id}
-                  className="p-5 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:border-indigo-500/40 transition-all"
+                  className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
                 >
-                  <div className="space-y-2 flex-1">
+                  <div className="space-y-1 flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300">
+                      <span className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-mono text-[10px] uppercase">
                         {post.category || "discussion"}
                       </span>
-                      <h4 className="text-sm font-bold text-zinc-950 dark:text-white">
+                      <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">
                         {post.title}
                       </h4>
                     </div>
 
-                    <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2">
+                    <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-1">
                       {post.content}
                     </p>
 
-                    <div className="flex items-center gap-4 text-[11px] text-zinc-400">
+                    <div className="flex items-center gap-3 text-[11px] text-zinc-400">
                       <span>By {post.authorName}</span>
                       <span>•</span>
-                      <span className="flex items-center gap-1">
-                        <ThumbsUp className="w-3 h-3 text-indigo-500" />{" "}
-                        {post.upvotes || 0}
+                      <span className="flex items-center gap-1 font-mono">
+                        <ThumbsUp className="w-3 h-3" /> {post.upvotes || 0}
                       </span>
-                      <span className="flex items-center gap-1">
-                        <MessageCircle className="w-3 h-3 text-sky-500" />{" "}
+                      <span className="flex items-center gap-1 font-mono">
+                        <MessageCircle className="w-3 h-3" />{" "}
                         {post.repliesCount || 0}
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <button
                       onClick={() => {
                         setEditingDiscussion(post);
@@ -2031,10 +1858,9 @@ export default function AdminDashboardPage() {
                           skillTitle: post.skillTitle || "System Architecture",
                         });
                       }}
-                      className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
-                      title="Edit discussion"
+                      className="px-2 py-1 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs transition-colors cursor-pointer"
                     >
-                      <Edit2 className="w-3.5 h-3.5" />
+                      Edit
                     </button>
                     <button
                       onClick={() =>
@@ -2044,17 +1870,16 @@ export default function AdminDashboardPage() {
                           name: post.title,
                         })
                       }
-                      className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer"
-                      title="Delete discussion"
+                      className="px-2 py-1 rounded border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs transition-colors cursor-pointer"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      Delete
                     </button>
                   </div>
                 </div>
               ))}
 
               {filteredDiscussions.length === 0 && (
-                <div className="p-12 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 text-center text-xs text-zinc-500">
+                <div className="p-8 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-800 text-center text-xs text-zinc-500">
                   No community posts recorded yet.
                 </div>
               )}
@@ -2063,20 +1888,18 @@ export default function AdminDashboardPage() {
         )}
 
         {activeTab === "reports" && (
-          <div className="space-y-4 animate-in fade-in duration-200">
+          <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-zinc-500">
-                Filter status:
-              </span>
-              <div className="flex items-center gap-1.5">
+              <span className="text-xs text-zinc-500 font-medium">Filter:</span>
+              <div className="flex items-center gap-1">
                 {(["pending", "resolved", "all"] as const).map((st) => (
                   <button
                     key={st}
                     onClick={() => setReportFilter(st)}
-                    className={`px-3 py-1 rounded-xl text-xs font-semibold capitalize transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded text-xs font-mono capitalize transition-colors cursor-pointer ${
                       reportFilter === st
-                        ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
-                        : "bg-zinc-100 dark:bg-zinc-800/80 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900"
+                        ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 font-semibold"
+                        : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900"
                     }`}
                   >
                     {st}
@@ -2085,43 +1908,47 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {filteredReports.map((rep) => {
                 const repId = rep.id || "";
                 return (
                   <div
                     key={repId || Math.random()}
-                    className="p-5 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] space-y-3 shadow-sm hover:border-indigo-500/40 transition-all"
+                    className={`p-4 rounded-lg border bg-white dark:bg-zinc-900 space-y-2.5 ${
+                      rep.status === "pending"
+                        ? "border-amber-300 dark:border-amber-800/70"
+                        : "border-zinc-200 dark:border-zinc-800"
+                    }`}
                   >
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start justify-between gap-3">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <span
-                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            className={`px-1.5 py-0.5 rounded font-mono text-[10px] uppercase font-semibold ${
                               rep.status === "pending"
-                                ? "bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300"
-                                : "bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300"
+                                ? "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-200"
+                                : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
                             }`}
                           >
                             {rep.status}
                           </span>
-                          <span className="text-xs font-semibold text-zinc-950 dark:text-white capitalize">
-                            Reason: {rep.reasonCategory || "unspecified"}
+                          <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 capitalize">
+                            Reason: {rep.reasonCategory || "Unspecified"}
                           </span>
                         </div>
-                        <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed pt-1">
+                        <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
                           "{rep.details || "No details provided"}"
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-1.5 shrink-0">
                         {rep.status === "pending" && repId && (
                           <>
                             <button
                               onClick={() =>
                                 handleResolveReport(repId, "reviewed")
                               }
-                              className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors cursor-pointer"
+                              className="px-2.5 py-1 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
                             >
                               Mark Reviewed
                             </button>
@@ -2129,7 +1956,7 @@ export default function AdminDashboardPage() {
                               onClick={() =>
                                 handleResolveReport(repId, "dismissed")
                               }
-                              className="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-semibold transition-colors cursor-pointer"
+                              className="px-2.5 py-1 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-medium transition-colors cursor-pointer"
                             >
                               Dismiss
                             </button>
@@ -2144,7 +1971,7 @@ export default function AdminDashboardPage() {
                                 name: `Report #${repId.slice(0, 6)}`,
                               })
                             }
-                            className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer"
+                            className="p-1 rounded border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer"
                             title="Delete safety report"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -2153,7 +1980,7 @@ export default function AdminDashboardPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between text-[11px] text-zinc-400 pt-2 border-t border-zinc-100 dark:border-white/[0.06]">
+                    <div className="flex items-center justify-between text-[11px] text-zinc-400 font-mono pt-1 border-t border-zinc-100 dark:border-zinc-800">
                       <span>Squad: {rep.squadId || "Unassigned"}</span>
                       <span>Report ID: {maskId(repId)}</span>
                     </div>
@@ -2162,7 +1989,7 @@ export default function AdminDashboardPage() {
               })}
 
               {filteredReports.length === 0 && (
-                <div className="p-12 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 text-center text-xs text-zinc-500">
+                <div className="p-8 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-800 text-center text-xs text-zinc-500">
                   No moderation reports matching filter.
                 </div>
               )}
@@ -2182,54 +2009,49 @@ export default function AdminDashboardPage() {
         )}
 
         {activeTab === "audit" && (
-          <div className="space-y-4 animate-in fade-in duration-200">
-            <div className="flex items-center justify-between">
-              <div className="text-xs text-zinc-500">
-                Immutable record of administrative actions and schema
-                alterations.
-              </div>
-              <span className="text-xs font-mono text-zinc-400">
-                {auditLogs.length} events recorded
-              </span>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between text-xs text-zinc-500">
+              <span>Audit record of administrative modifications</span>
+              <span className="font-mono">{auditLogs.length} events</span>
             </div>
 
-            <div className="rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl overflow-hidden shadow-sm">
+            <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="border-b border-zinc-200/80 dark:border-white/[0.07] bg-zinc-50/80 dark:bg-zinc-900/60 text-zinc-500 font-semibold uppercase tracking-wider text-[10px]">
+                <table className="w-full text-left text-xs font-mono">
+                  <thead className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 text-zinc-500 text-[11px]">
                     <tr>
-                      <th className="py-3 px-4">Timestamp</th>
-                      <th className="py-3 px-4">Admin</th>
-                      <th className="py-3 px-4">Action</th>
-                      <th className="py-3 px-4">Target Type</th>
-                      <th className="py-3 px-4">Target ID</th>
-                      <th className="py-3 px-4">Parameters (Masked)</th>
+                      <th className="py-2.5 px-4 font-medium">Timestamp</th>
+                      <th className="py-2.5 px-4 font-medium">Admin</th>
+                      <th className="py-2.5 px-4 font-medium">Action</th>
+                      <th className="py-2.5 px-4 font-medium">Target</th>
+                      <th className="py-2.5 px-4 font-medium">Target ID</th>
+                      <th className="py-2.5 px-4 font-medium">Parameters</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-200/60 dark:divide-zinc-800/60 font-mono text-[11px]">
+                  <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800 text-[11px]">
                     {auditLogs.map((log) => (
                       <tr
                         key={log.id}
-                        className="hover:bg-zinc-50/60 dark:hover:bg-white/[0.02] transition-colors"
+                        className="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/30 transition-colors"
                       >
-                        <td className="py-3 px-4 text-zinc-500">
+                        <td className="py-2 px-4 text-zinc-400">
                           {new Date(log.createdAt).toLocaleString()}
                         </td>
-                        <td className="py-3 px-4 font-semibold text-zinc-900 dark:text-zinc-100">
+                        <td className="py-2 px-4 font-sans font-medium text-zinc-900 dark:text-zinc-100">
                           {log.adminName}
                         </td>
-                        <td className="py-3 px-4">
-                          <span className="px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-semibold text-[10px]">
+                        <td className="py-2 px-4">
+                          <span className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold text-[10px]">
                             {log.action}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-zinc-500 capitalize">
+                        <td className="py-2 px-4 font-sans capitalize text-zinc-500">
                           {log.targetType}
                         </td>
-                        <td className="py-3 px-4 text-zinc-400">
+                        <td className="py-2 px-4 text-zinc-400">
                           {maskId(log.targetId || "", log.targetId)}
                         </td>
-                        <td className="py-3 px-4 text-zinc-500 max-w-xs truncate">
+                        <td className="py-2 px-4 text-zinc-500 max-w-xs truncate">
                           {maskDetails(log.details)}
                         </td>
                       </tr>
@@ -2243,28 +2065,23 @@ export default function AdminDashboardPage() {
       </main>
 
       {showCreateUserModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
-          <div className="w-full max-w-md bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-                  <UserPlus className="w-4 h-4" />
-                </div>
-                <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
-                  Create New User Profile
-                </h3>
-              </div>
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                Register User
+              </h3>
               <button
                 onClick={() => setShowCreateUserModal(false)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateUser} className="space-y-3.5 text-xs">
+            <form onSubmit={handleCreateUser} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
                   Full Name
                 </label>
                 <input
@@ -2274,14 +2091,14 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setUserForm({ ...userForm, name: e.target.value })
                   }
-                  placeholder="Sarah Jenkins"
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                  placeholder="e.g. Sarah Jenkins"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-400"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
-                  Email Address
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  Email
                 </label>
                 <input
                   type="email"
@@ -2290,14 +2107,14 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setUserForm({ ...userForm, email: e.target.value })
                   }
-                  placeholder="sarah@example.com"
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                  placeholder="e.g. sarah@example.com"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-400"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                  <label className="font-medium text-zinc-700 dark:text-zinc-300">
                     Role
                   </label>
                   <select
@@ -2308,7 +2125,7 @@ export default function AdminDashboardPage() {
                         role: e.target.value as any,
                       })
                     }
-                    className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                    className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                   >
                     <option value="user">User</option>
                     <option value="moderator">Moderator</option>
@@ -2317,7 +2134,7 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                  <label className="font-medium text-zinc-700 dark:text-zinc-300">
                     Status
                   </label>
                   <select
@@ -2328,7 +2145,7 @@ export default function AdminDashboardPage() {
                         status: e.target.value as any,
                       })
                     }
-                    className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                    className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                   >
                     <option value="active">Active</option>
                     <option value="flagged">Flagged</option>
@@ -2338,7 +2155,7 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
                   Primary Goal
                 </label>
                 <input
@@ -2347,29 +2164,24 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setUserForm({ ...userForm, primaryGoal: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setShowCreateUserModal(false)}
-                  className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-md shadow-indigo-500/20"
+                  className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
                 >
-                  {actionLoading ? (
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Check className="w-3.5 h-3.5" />
-                  )}
-                  <span>Create User</span>
+                  {actionLoading ? "Registering..." : "Register User"}
                 </button>
               </div>
             </form>
@@ -2378,28 +2190,23 @@ export default function AdminDashboardPage() {
       )}
 
       {selectedUserForEdit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
-          <div className="w-full max-w-md bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-                  <Edit2 className="w-4 h-4" />
-                </div>
-                <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
-                  Update User Profile
-                </h3>
-              </div>
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                Update User Profile
+              </h3>
               <button
                 onClick={() => setSelectedUserForEdit(null)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveUser} className="space-y-3.5 text-xs">
+            <form onSubmit={handleSaveUser} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
                   Full Name
                 </label>
                 <input
@@ -2409,13 +2216,13 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setUserForm({ ...userForm, name: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                  <label className="font-medium text-zinc-700 dark:text-zinc-300">
                     Role
                   </label>
                   <select
@@ -2426,7 +2233,7 @@ export default function AdminDashboardPage() {
                         role: e.target.value as any,
                       })
                     }
-                    className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                    className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                   >
                     <option value="user">User</option>
                     <option value="moderator">Moderator</option>
@@ -2435,7 +2242,7 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                  <label className="font-medium text-zinc-700 dark:text-zinc-300">
                     Status
                   </label>
                   <select
@@ -2446,7 +2253,7 @@ export default function AdminDashboardPage() {
                         status: e.target.value as any,
                       })
                     }
-                    className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                    className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                   >
                     <option value="active">Active</option>
                     <option value="flagged">Flagged</option>
@@ -2456,41 +2263,33 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
-                  Career Milestone Target
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  Primary Goal
                 </label>
                 <input
                   type="text"
-                  value={userForm.careerMilestone}
+                  value={userForm.primaryGoal}
                   onChange={(e) =>
-                    setUserForm({
-                      ...userForm,
-                      careerMilestone: e.target.value,
-                    })
+                    setUserForm({ ...userForm, primaryGoal: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setSelectedUserForEdit(null)}
-                  className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-md shadow-indigo-500/20"
+                  className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
                 >
-                  {actionLoading ? (
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Check className="w-3.5 h-3.5" />
-                  )}
-                  <span>Save Changes</span>
+                  {actionLoading ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>
@@ -2499,28 +2298,23 @@ export default function AdminDashboardPage() {
       )}
 
       {showCreateSquadModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
-          <div className="w-full max-w-md bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 flex items-center justify-center text-purple-600 dark:text-purple-400">
-                  <FolderPlus className="w-4 h-4" />
-                </div>
-                <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
-                  Assemble New Micro-Squad
-                </h3>
-              </div>
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                Create Squad
+              </h3>
               <button
                 onClick={() => setShowCreateSquadModal(false)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateSquad} className="space-y-3.5 text-xs">
+            <form onSubmit={handleCreateSquad} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
                   Squad Name
                 </label>
                 <input
@@ -2530,13 +2324,13 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setSquadForm({ ...squadForm, name: e.target.value })
                   }
-                  placeholder="Distributed Systems Guild"
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                  placeholder="e.g. Distributed Systems Cohort A"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
                   Skill Focus
                 </label>
                 <input
@@ -2546,43 +2340,57 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setSquadForm({ ...squadForm, skillFocus: e.target.value })
                   }
-                  placeholder="System Architecture"
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
                   Shared Weekly Goal
                 </label>
-                <textarea
+                <input
+                  type="text"
                   value={squadForm.sharedGoal}
                   onChange={(e) =>
                     setSquadForm({ ...squadForm, sharedGoal: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white min-h-[64px]"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="space-y-1">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  Target Milestones
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={50}
+                  value={squadForm.targetProgress}
+                  onChange={(e) =>
+                    setSquadForm({
+                      ...squadForm,
+                      targetProgress: parseInt(e.target.value, 10) || 12,
+                    })
+                  }
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setShowCreateSquadModal(false)}
-                  className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-md shadow-indigo-500/20"
+                  className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
                 >
-                  {actionLoading ? (
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Check className="w-3.5 h-3.5" />
-                  )}
-                  <span>Create Squad</span>
+                  {actionLoading ? "Creating..." : "Create Squad"}
                 </button>
               </div>
             </form>
@@ -2591,28 +2399,23 @@ export default function AdminDashboardPage() {
       )}
 
       {editingSquad && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
-          <div className="w-full max-w-md bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 flex items-center justify-center text-purple-600 dark:text-purple-400">
-                  <Layers className="w-4 h-4" />
-                </div>
-                <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
-                  Update Squad Settings
-                </h3>
-              </div>
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                Edit Squad Settings
+              </h3>
               <button
                 onClick={() => setEditingSquad(null)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveSquad} className="space-y-3.5 text-xs">
+            <form onSubmit={handleSaveSquad} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
                   Squad Name
                 </label>
                 <input
@@ -2622,12 +2425,12 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setSquadForm({ ...squadForm, name: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
                   Skill Focus
                 </label>
                 <input
@@ -2637,42 +2440,57 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setSquadForm({ ...squadForm, skillFocus: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
                   Shared Weekly Goal
                 </label>
-                <textarea
+                <input
+                  type="text"
                   value={squadForm.sharedGoal}
                   onChange={(e) =>
                     setSquadForm({ ...squadForm, sharedGoal: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white min-h-[64px]"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="space-y-1">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  Target Milestones
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={50}
+                  value={squadForm.targetProgress}
+                  onChange={(e) =>
+                    setSquadForm({
+                      ...squadForm,
+                      targetProgress: parseInt(e.target.value, 10) || 12,
+                    })
+                  }
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setEditingSquad(null)}
-                  className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-md shadow-indigo-500/20"
+                  className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
                 >
-                  {actionLoading ? (
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Check className="w-3.5 h-3.5" />
-                  )}
-                  <span>Save Squad</span>
+                  {actionLoading ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>
@@ -2681,78 +2499,23 @@ export default function AdminDashboardPage() {
       )}
 
       {showCreateTaskModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
-          <div className="w-full max-w-lg bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-                  <BookOpen className="w-4 h-4" />
-                </div>
-                <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
-                  Create Curriculum Task Template
-                </h3>
-              </div>
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                Add Task Template
+              </h3>
               <button
                 onClick={() => setShowCreateTaskModal(false)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateTask} className="space-y-3.5 text-xs">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">
-                    Track Category
-                  </label>
-                  <select
-                    value={taskForm.skillCategory}
-                    onChange={(e) =>
-                      setTaskForm({
-                        ...taskForm,
-                        skillCategory: e.target.value,
-                      })
-                    }
-                    className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
-                  >
-                    <option value="System Architecture">
-                      System Architecture
-                    </option>
-                    <option value="Next.js 15 & React 19">
-                      Next.js 15 & React 19
-                    </option>
-                    <option value="Advanced TypeScript Patterns">
-                      Advanced TypeScript
-                    </option>
-                    <option value="API Design & Performance">
-                      API Design & Performance
-                    </option>
-                  </select>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">
-                    Day Number (1-4)
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="4"
-                    value={taskForm.dayNumber}
-                    onChange={(e) =>
-                      setTaskForm({
-                        ...taskForm,
-                        dayNumber: parseInt(e.target.value) || 1,
-                      })
-                    }
-                    className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
-                  />
-                </div>
-              </div>
-
+            <form onSubmit={handleCreateTask} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
                   Task Title
                 </label>
                 <input
@@ -2762,83 +2525,106 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setTaskForm({ ...taskForm, title: e.target.value })
                   }
-                  placeholder="Build Zero-Downtime Event Queue Pipeline"
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                  placeholder="e.g. Design Event-Driven Architecture"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">
-                    Duration (Minutes)
+                  <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                    Day Number
                   </label>
                   <input
                     type="number"
-                    value={taskForm.estimatedMinutes}
+                    min={1}
+                    max={4}
+                    value={taskForm.dayNumber}
                     onChange={(e) =>
                       setTaskForm({
                         ...taskForm,
-                        estimatedMinutes: parseInt(e.target.value) || 20,
+                        dayNumber: parseInt(e.target.value, 10) || 1,
                       })
                     }
-                    className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                    className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">
-                    Task Type
+                  <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                    Duration (mins)
                   </label>
-                  <select
-                    value={taskForm.taskType}
+                  <input
+                    type="number"
+                    min={5}
+                    max={60}
+                    value={taskForm.estimatedMinutes}
                     onChange={(e) =>
                       setTaskForm({
                         ...taskForm,
-                        taskType: e.target.value as any,
+                        estimatedMinutes: parseInt(e.target.value, 10) || 20,
                       })
                     }
-                    className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
-                  >
-                    <option value="learn">Learn</option>
-                    <option value="build">Build</option>
-                    <option value="real_world_proof">Real World Proof</option>
-                  </select>
+                    className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
-                  Instruction & Acceptance Criteria
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  Skill Category
+                </label>
+                <select
+                  value={taskForm.skillCategory}
+                  onChange={(e) =>
+                    setTaskForm({ ...taskForm, skillCategory: e.target.value })
+                  }
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                >
+                  <option value="System Architecture">
+                    System Architecture
+                  </option>
+                  <option value="Next.js 15 & React 19">
+                    Next.js 15 & React 19
+                  </option>
+                  <option value="Advanced TypeScript Patterns">
+                    Advanced TypeScript Patterns
+                  </option>
+                  <option value="API Design & Performance">
+                    API Design & Performance
+                  </option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  Description
                 </label>
                 <textarea
+                  rows={3}
                   required
                   value={taskForm.description}
                   onChange={(e) =>
                     setTaskForm({ ...taskForm, description: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white min-h-[80px]"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setShowCreateTaskModal(false)}
-                  className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-md shadow-indigo-500/20"
+                  className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
                 >
-                  {actionLoading ? (
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Check className="w-3.5 h-3.5" />
-                  )}
-                  <span>Create Drill</span>
+                  {actionLoading ? "Adding..." : "Add Task Template"}
                 </button>
               </div>
             </form>
@@ -2847,29 +2633,24 @@ export default function AdminDashboardPage() {
       )}
 
       {editingTask && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
-          <div className="w-full max-w-lg bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-                  <Edit2 className="w-4 h-4" />
-                </div>
-                <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
-                  Edit Curriculum Drill
-                </h3>
-              </div>
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                Edit Task Template
+              </h3>
               <button
                 onClick={() => setEditingTask(null)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveTask} className="space-y-3.5 text-xs">
+            <form onSubmit={handleSaveTask} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
-                  Drill Title
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  Task Title
                 </label>
                 <input
                   type="text"
@@ -2878,82 +2659,105 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setTaskForm({ ...taskForm, title: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">
-                    Estimated Minutes
+                  <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                    Day Number
                   </label>
                   <input
                     type="number"
-                    value={taskForm.estimatedMinutes}
+                    min={1}
+                    max={4}
+                    value={taskForm.dayNumber}
                     onChange={(e) =>
                       setTaskForm({
                         ...taskForm,
-                        estimatedMinutes: parseInt(e.target.value) || 20,
+                        dayNumber: parseInt(e.target.value, 10) || 1,
                       })
                     }
-                    className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                    className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-zinc-700 dark:text-zinc-300">
-                    Task Type
+                  <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                    Duration (mins)
                   </label>
-                  <select
-                    value={taskForm.taskType}
+                  <input
+                    type="number"
+                    min={5}
+                    max={60}
+                    value={taskForm.estimatedMinutes}
                     onChange={(e) =>
                       setTaskForm({
                         ...taskForm,
-                        taskType: e.target.value as any,
+                        estimatedMinutes: parseInt(e.target.value, 10) || 20,
                       })
                     }
-                    className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
-                  >
-                    <option value="learn">Learn</option>
-                    <option value="build">Build</option>
-                    <option value="real_world_proof">Real World Proof</option>
-                  </select>
+                    className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
-                  Instruction & Acceptance Criteria
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  Skill Category
+                </label>
+                <select
+                  value={taskForm.skillCategory}
+                  onChange={(e) =>
+                    setTaskForm({ ...taskForm, skillCategory: e.target.value })
+                  }
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                >
+                  <option value="System Architecture">
+                    System Architecture
+                  </option>
+                  <option value="Next.js 15 & React 19">
+                    Next.js 15 & React 19
+                  </option>
+                  <option value="Advanced TypeScript Patterns">
+                    Advanced TypeScript Patterns
+                  </option>
+                  <option value="API Design & Performance">
+                    API Design & Performance
+                  </option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  Description
                 </label>
                 <textarea
+                  rows={3}
                   required
                   value={taskForm.description}
                   onChange={(e) =>
                     setTaskForm({ ...taskForm, description: e.target.value })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white min-h-[96px]"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setEditingTask(null)}
-                  className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-md shadow-indigo-500/20"
+                  className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
                 >
-                  {actionLoading ? (
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Check className="w-3.5 h-3.5" />
-                  )}
-                  <span>Save Template</span>
+                  {actionLoading ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>
@@ -2962,20 +2766,15 @@ export default function AdminDashboardPage() {
       )}
 
       {showCreateDiscussionModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
-          <div className="w-full max-w-md bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-sky-50 dark:bg-sky-950/60 flex items-center justify-center text-sky-600 dark:text-sky-400">
-                  <MessageSquare className="w-4 h-4" />
-                </div>
-                <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
-                  Post Technical Discussion
-                </h3>
-              </div>
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                Post Community Announcement
+              </h3>
               <button
                 onClick={() => setShowCreateDiscussionModal(false)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2983,11 +2782,11 @@ export default function AdminDashboardPage() {
 
             <form
               onSubmit={handleCreateDiscussion}
-              className="space-y-3.5 text-xs"
+              className="space-y-3 text-xs"
             >
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
-                  Title
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  Headline
                 </label>
                 <input
                   type="text"
@@ -2999,13 +2798,13 @@ export default function AdminDashboardPage() {
                       title: e.target.value,
                     })
                   }
-                  placeholder="RFC: Architectural Sprint Updates"
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                  placeholder="e.g. Sprint 14 Retrospective & Technical Updates"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
                   Category
                 </label>
                 <select
@@ -3016,20 +2815,21 @@ export default function AdminDashboardPage() {
                       category: e.target.value as any,
                     })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 >
-                  <option value="discussion">Discussion</option>
-                  <option value="question">Question</option>
+                  <option value="discussion">General Discussion</option>
+                  <option value="question">Technical Question</option>
                   <option value="code-review">Code Review</option>
-                  <option value="tip">Tip</option>
+                  <option value="tip">Engineering Tip</option>
                 </select>
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
                   Content
                 </label>
                 <textarea
+                  rows={4}
                   required
                   value={discussionForm.content}
                   onChange={(e) =>
@@ -3038,29 +2838,25 @@ export default function AdminDashboardPage() {
                       content: e.target.value,
                     })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white min-h-[96px]"
+                  placeholder="Write clear announcement content..."
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setShowCreateDiscussionModal(false)}
-                  className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-md shadow-indigo-500/20"
+                  className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
                 >
-                  {actionLoading ? (
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Check className="w-3.5 h-3.5" />
-                  )}
-                  <span>Publish</span>
+                  {actionLoading ? "Publishing..." : "Publish Post"}
                 </button>
               </div>
             </form>
@@ -3069,32 +2865,24 @@ export default function AdminDashboardPage() {
       )}
 
       {editingDiscussion && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
-          <div className="w-full max-w-md bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-sky-50 dark:bg-sky-950/60 flex items-center justify-center text-sky-600 dark:text-sky-400">
-                  <Edit2 className="w-4 h-4" />
-                </div>
-                <h3 className="text-sm font-bold text-zinc-950 dark:text-white">
-                  Edit Discussion
-                </h3>
-              </div>
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                Edit Discussion Post
+              </h3>
               <button
                 onClick={() => setEditingDiscussion(null)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form
-              onSubmit={handleSaveDiscussion}
-              className="space-y-3.5 text-xs"
-            >
+            <form onSubmit={handleSaveDiscussion} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
-                  Title
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  Headline
                 </label>
                 <input
                   type="text"
@@ -3106,12 +2894,12 @@ export default function AdminDashboardPage() {
                       title: e.target.value,
                     })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
                   Category
                 </label>
                 <select
@@ -3122,20 +2910,21 @@ export default function AdminDashboardPage() {
                       category: e.target.value as any,
                     })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 >
-                  <option value="discussion">Discussion</option>
-                  <option value="question">Question</option>
+                  <option value="discussion">General Discussion</option>
+                  <option value="question">Technical Question</option>
                   <option value="code-review">Code Review</option>
-                  <option value="tip">Tip</option>
+                  <option value="tip">Engineering Tip</option>
                 </select>
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-zinc-700 dark:text-zinc-300">
                   Content
                 </label>
                 <textarea
+                  rows={4}
                   required
                   value={discussionForm.content}
                   onChange={(e) =>
@@ -3144,29 +2933,24 @@ export default function AdminDashboardPage() {
                       content: e.target.value,
                     })
                   }
-                  className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0a0b10] text-xs text-zinc-950 dark:text-white min-h-[96px]"
+                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
                 <button
                   type="button"
                   onClick={() => setEditingDiscussion(null)}
-                  className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer shadow-md shadow-indigo-500/20"
+                  className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
                 >
-                  {actionLoading ? (
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Check className="w-3.5 h-3.5" />
-                  )}
-                  <span>Save Changes</span>
+                  {actionLoading ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>
@@ -3175,46 +2959,31 @@ export default function AdminDashboardPage() {
       )}
 
       {deleteConfirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
-          <div className="w-full max-w-sm bg-white dark:bg-[#11131e] border border-rose-200 dark:border-rose-900/60 rounded-2xl shadow-2xl p-6 space-y-4 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-500 flex items-center justify-center mx-auto shadow-lg shadow-rose-500/10">
-              <Trash2 className="w-6 h-6" />
-            </div>
-
-            <div className="space-y-1">
-              <h3 className="text-base font-bold text-zinc-950 dark:text-white">
-                Confirm Permanent Deletion
-              </h3>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                Are you sure you want to delete{" "}
-                <span className="font-semibold text-zinc-950 dark:text-white">
-                  "{deleteConfirmModal.name}"
-                </span>
-                ? This action will be permanently recorded in the admin audit
-                log.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 pt-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-3">
+            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              Confirm Deletion
+            </h3>
+            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              Are you sure you want to delete{" "}
+              <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                "{deleteConfirmModal.name}"
+              </span>
+              ? This action cannot be reversed.
+            </p>
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
               <button
-                type="button"
                 onClick={() => setDeleteConfirmModal(null)}
-                className="flex-1 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
               >
                 Cancel
               </button>
               <button
-                type="button"
                 onClick={executeDelete}
                 disabled={actionLoading}
-                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-md shadow-rose-600/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 rounded bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium transition-colors cursor-pointer"
               >
-                {actionLoading ? (
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                ) : (
-                  <Trash2 className="w-3.5 h-3.5" />
-                )}
-                <span>Delete</span>
+                {actionLoading ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>

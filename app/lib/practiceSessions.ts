@@ -9,6 +9,7 @@ import {
   getCourseSectionsForTask,
   getKnowledgeCheckForTask
 } from './practiceCourseContent';
+import { getGravatarUrl } from './gravatar';
 
 export type ExerciseType = 'code_workbench' | 'architecture_decision' | 'rfc_audit';
 
@@ -1275,7 +1276,9 @@ export function getPracticeSessionForTask(task: SprintTask, skillTitle: string):
     skillTitle,
     taskTitle: task.title,
     creatorName: task.creatorName || 'Sumaiya Kabir',
-    creatorAvatar: task.creatorAvatar || '/avatars/avatar-2.svg',
+    creatorAvatar: task.creatorAvatar && task.creatorAvatar.includes("gravatar.com")
+      ? task.creatorAvatar
+      : getGravatarUrl(task.creatorAvatar || task.creatorHandle || task.creatorName || "instructor"),
     creatorHandle: task.creatorHandle || '@sumaiya_kabir',
     videoLesson: getVideoLessonForTask(skillTitle, task.dayNumber),
     courseSections: getCourseSectionsForTask(skillTitle, task.dayNumber),

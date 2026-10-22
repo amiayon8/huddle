@@ -10,6 +10,7 @@ import {
   Check,
 } from "lucide-react";
 import { useHuddle } from "../context/HuddleContext";
+import { getUserAvatarUrl } from "../lib/gravatar";
 
 export const ProfileView: React.FC = () => {
   const { user, sprint, setActiveTab } = useHuddle();
@@ -111,7 +112,7 @@ export const ProfileView: React.FC = () => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <img
-              src={user.avatar || "/avatars/avatar-1.svg"}
+              src={getUserAvatarUrl(user, 160)}
               alt={user.name}
               className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl object-cover ring-1 ring-zinc-200 dark:ring-zinc-800"
             />

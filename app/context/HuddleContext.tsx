@@ -44,7 +44,15 @@ import {
   CelebrationData,
   SparkChatMessage,
   SparkChatSession,
+  Community,
+  SquadDiscussionMessage,
 } from "../types/huddle";
+
+import {
+  defaultCommunities,
+  defaultCommunityPosts,
+  defaultSquadDiscussions,
+} from "../lib/defaultCommunityData";
 
 import {
   supabase,
@@ -100,6 +108,7 @@ import {
   logFocusSessionToDb,
   fetchPublicProfile,
 } from "../lib/supabase";
+import { getGravatarUrl, getUserAvatarUrl } from "../lib/gravatar";
 
 interface HuddleContextType {
   user: UserProfile;
@@ -108,7 +117,9 @@ interface HuddleContextType {
   squad: MicroSquad;
   availableSquads: MicroSquad[];
   macroSquad: MacroSquad;
+  communities: Community[];
   posts: CommunityPost[];
+  squadDiscussions: SquadDiscussionMessage[];
   creators: CreatorProfile[];
   creatorPosts: CreatorPost[];
   notifications: NotificationItem[];
@@ -226,6 +237,12 @@ interface HuddleContextType {
   checkInSquad: (encouragement?: string) => void;
   sendSquadNudge: (memberId: string) => void;
   sendSquadCheer: (memberId: string) => void;
+  sendSquadDiscussionMessage: (
+    message: string,
+    type?: "standup" | "blocker" | "message" | "celebration",
+  ) => void;
+  joinCommunity: (communityId: string) => void;
+  leaveCommunity: (communityId: string) => void;
   submitSquadProject: (title: string, notes: string, link?: string) => void;
   joinSquadByCode: (code: string) => boolean;
   createCustomSquad: (payload: SquadCreatePayload) => void;
@@ -255,6 +272,9 @@ interface HuddleContextType {
     content: string,
     skillId: string,
     category: CommunityPost["category"],
+    communityId?: string,
+    communityName?: string,
+    tags?: string[],
   ) => void;
   toggleUpvotePost: (postId: string) => void;
   addReplyToPost: (postId: string, content: string) => void;
@@ -354,7 +374,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     name: "Alex Chen",
     handle: "@alexchen.dev",
     email: "hello@thenicedev.xyz",
-    avatar: "/avatars/avatar-1.svg",
+    avatar: getGravatarUrl("hello@thenicedev.xyz"),
     bio: "Staff Software Engineer exploring distributed systems, caching hierarchies, and resilient microservices.",
     streak: 8,
     maxStreak: 12,
@@ -410,7 +430,11 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
     members: [],
     milestoneUpdates: [],
   });
-  const [posts, setPosts] = useState<CommunityPost[]>([]);
+  const [communities, setCommunities] = useState<Community[]>(defaultCommunities);
+  const [posts, setPosts] = useState<CommunityPost[]>(defaultCommunityPosts);
+  const [squadDiscussions, setSquadDiscussions] = useState<SquadDiscussionMessage[]>(
+    defaultSquadDiscussions,
+  );
   const [creators, setCreators] = useState<CreatorProfile[]>([]);
   const [creatorPosts, setCreatorPosts] = useState<CreatorPost[]>([]);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -524,7 +548,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
       id: "friend-1",
       name: "Liam Zhang",
       handle: "@liamz",
-      avatar: "/avatars/avatar-2.svg",
+      avatar: getGravatarUrl("liamz@example.com"),
       currentSkill: "Redis In-Memory Caching",
       streak: 7,
       dayNumber: 3,
@@ -539,7 +563,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
       id: "friend-2",
       name: "Maya Patel",
       handle: "@mayap",
-      avatar: "/avatars/avatar-3.svg",
+      avatar: getGravatarUrl("mayap@example.com"),
       currentSkill: "Kafka Event Streaming",
       streak: 14,
       dayNumber: 4,
@@ -554,7 +578,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
       id: "friend-3",
       name: "Leo Tanaka",
       handle: "@leot",
-      avatar: "/avatars/avatar-4.svg",
+      avatar: getGravatarUrl("leot@example.com"),
       currentSkill: "Kubernetes Operator Design",
       streak: 5,
       dayNumber: 2,
@@ -569,7 +593,7 @@ export const HuddleProvider: React.FC<{ children: React.ReactNode }> = ({
       id: "friend-4",
       name: "Sofia Rodriguez",
       handle: "@sofiar",
-      avatar: "/avatars/avatar-5.svg",
+      avatar: getGravatarUrl("sofiar@example.com"),
       currentSkill: "GraphQL Federation Architecture",
       streak: 9,
       dayNumber: 1,
@@ -736,7 +760,10 @@ CREATE TABLE outbox_messages (
       ]);
 
       if (dbProfile) {
-        setUser(dbProfile);
+        setUser({
+          ...dbProfile,
+          avatar: getUserAvatarUrl(dbProfile),
+        });
         const today = new Date().toISOString().split("T")[0];
         if (dbProfile.lastFocusDate === today) {
           if (typeof dbProfile.focusSecondsToday === "number") {
@@ -842,7 +869,10 @@ CREATE TABLE outbox_messages (
           setIsAuthenticated(true);
           const profile = await fetchUserProfile(session.user.id);
           if (profile) {
-            setUser(profile);
+            setUser({
+              ...profile,
+              avatar: getUserAvatarUrl(profile),
+            });
             const userSprint = await fetchCurrentSprint(session.user.id);
             if (userSprint) setSprint(userSprint);
             const userPort = await fetchPortfolioItems(session.user.id);
@@ -1628,7 +1658,7 @@ CREATE TABLE outbox_messages (
         .replace(/\./g, " ")
         .replace(/\b\w/g, (l) => l.toUpperCase()),
       handle: cleanHandle,
-      avatar: `/avatars/avatar-${(friends.length % 5) + 1}.svg`,
+      avatar: getGravatarUrl(`${cleanHandle.replace("@", "")}@example.com`),
       currentSkill: sprint.skillTitle || "System Architecture",
       streak: 3,
       dayNumber: 1,
@@ -1852,7 +1882,7 @@ CREATE TABLE outbox_messages (
       type: "build",
       creatorName: creatorName,
       creatorHandle: `@${creatorName.toLowerCase().replace(/\s+/g, "")}`,
-      creatorAvatar: "/avatars/avatar-2.svg",
+      creatorAvatar: getGravatarUrl(`creator-${creatorName.toLowerCase().replace(/\s+/g, "")}@example.com`),
       estimatedMinutes: durationMinutes || 15,
       completed: false,
       producesArtifact: true,
@@ -2517,11 +2547,53 @@ CREATE TABLE outbox_messages (
     toggleMacroMilestoneCongratsInDb(updateId, nextCongratulated);
   };
 
+  const joinCommunity = (communityId: string) => {
+    setCommunities((prev) =>
+      prev.map((c) =>
+        c.id === communityId
+          ? { ...c, isJoined: true, memberCount: c.memberCount + 1 }
+          : c,
+      ),
+    );
+  };
+
+  const leaveCommunity = (communityId: string) => {
+    setCommunities((prev) =>
+      prev.map((c) =>
+        c.id === communityId
+          ? { ...c, isJoined: false, memberCount: Math.max(0, c.memberCount - 1) }
+          : c,
+      ),
+    );
+  };
+
+  const sendSquadDiscussionMessage = (
+    message: string,
+    type: "standup" | "blocker" | "message" | "celebration" = "message",
+  ) => {
+    if (!message.trim()) return;
+
+    const newMsg: SquadDiscussionMessage = {
+      id: `disc-${Date.now()}`,
+      senderId: user.id || "user-me",
+      senderName: user.name || "Ayon",
+      senderAvatar: getUserAvatarUrl(user, 72),
+      message,
+      timestamp: "Just now",
+      type,
+    };
+
+    setSquadDiscussions((prev) => [...prev, newMsg]);
+  };
+
   const createCommunityPost = (
     title: string,
     content: string,
     skillId: string,
     category: CommunityPost["category"],
+    communityId?: string,
+    communityName?: string,
+    tags?: string[],
   ) => {
     if (!ensureSurveyDone("create community posts")) return;
     const newPost: CommunityPost = {
@@ -2540,6 +2612,9 @@ CREATE TABLE outbox_messages (
       repliesCount: 0,
       createdAt: "Just now",
       replies: [],
+      communityId,
+      communityName,
+      tags,
     };
     setPosts((prev) => [newPost, ...prev]);
     addCommunityPostToDb(newPost);
@@ -2720,8 +2795,15 @@ CREATE TABLE outbox_messages (
 
   const updateUserProfile = (updates: Partial<UserProfile>) => {
     setUser((prev) => {
-      const next = { ...prev, ...updates };
-      updateProfileInDb(user.id, updates);
+      const merged = { ...prev, ...updates };
+      const next = {
+        ...merged,
+        avatar: getUserAvatarUrl(merged),
+      };
+      updateProfileInDb(user.id, {
+        ...updates,
+        avatar: next.avatar,
+      });
       return next;
     });
   };
@@ -2822,7 +2904,7 @@ CREATE TABLE outbox_messages (
             name: squadMember.name,
             handle: squadMember.handle,
             email: "",
-            avatar: squadMember.avatar,
+            avatar: getUserAvatarUrl(squadMember),
             bio: "Practicing deliberate software engineering craft in squad.",
             streak: squadMember.streak || 5,
             maxStreak: (squadMember.streak || 5) + 3,
@@ -2878,7 +2960,9 @@ CREATE TABLE outbox_messages (
         squad,
         availableSquads,
         macroSquad,
+        communities,
         posts,
+        squadDiscussions,
         creators,
         creatorPosts,
         notifications,
@@ -2955,6 +3039,9 @@ CREATE TABLE outbox_messages (
         checkInSquad,
         sendSquadNudge,
         sendSquadCheer,
+        sendSquadDiscussionMessage,
+        joinCommunity,
+        leaveCommunity,
         submitSquadProject,
         joinSquadByCode,
         createCustomSquad,
