@@ -18,6 +18,7 @@ import {
   Layers,
   ShieldCheck,
   ChevronRight,
+  ChevronLeft,
   Info,
   FileText,
   BrainCircuit,
@@ -90,6 +91,8 @@ export const GrowthMapView: React.FC = () => {
   const [loadingActivity, setLoadingActivity] = useState<boolean>(true);
   const [selectedActivityDay, setSelectedActivityDay] =
     useState<UserActivityDay | null>(null);
+  const [calendarMonthOffset, setCalendarMonthOffset] = useState<number>(0);
+  const [velocityViewMode, setVelocityViewMode] = useState<"calendar" | "grid">("calendar");
 
   // Goal Editor Modal state
   const [isEditingGoals, setIsEditingGoals] = useState<boolean>(false);
@@ -163,6 +166,132 @@ export const GrowthMapView: React.FC = () => {
     96,
     Math.max(38, Math.round(taskProgressWeight + consistencyWeight + focusDepthWeight)),
   );
+
+  // Practice Rhythm date formatting & calendar generation
+  const formatFullDate = (dateStr: string) => {
+    try {
+      const [year, month, day] = dateStr.split("-").map(Number);
+      const d = new Date(year, month - 1, day);
+      return d.toLocaleDateString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const calendarMonthDate = useMemo(() => {
+    const d = new Date();
+    d.setDate(1);
+    d.setMonth(d.getMonth() + calendarMonthOffset);
+    return d;
+  }, [calendarMonthOffset]);
+
+  const monthlyCalendarData = useMemo(() => {
+    const year = calendarMonthDate.getFullYear();
+    const month = calendarMonthDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+
+    // Monday as start of week: 0 = Mon, ..., 6 = Sun
+    const leadingBlanks = (firstDay.getDay() + 6) % 7;
+
+    const dayMap = new Map<string, UserActivityDay>();
+    activityDays.forEach((d) => dayMap.set(d.date, d));
+
+    const todayObj = new Date();
+    const todayStr = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, "0")}-${String(todayObj.getDate()).padStart(2, "0")}`;
+
+    const cells: {
+      dateStr: string;
+      dayNum: number | null;
+      isToday: boolean;
+      isFuture: boolean;
+      data?: UserActivityDay;
+    }[] = [];
+
+    for (let i = 0; i < leadingBlanks; i++) {
+      cells.push({
+        dateStr: `blank-${i}`,
+        dayNum: null,
+        isToday: false,
+        isFuture: false,
+      });
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const monthStr = String(month + 1).padStart(2, "0");
+      const dayStr = String(d).padStart(2, "0");
+      const fullDateStr = `${year}-${monthStr}-${dayStr}`;
+      const cellDate = new Date(year, month, d);
+      const isToday = fullDateStr === todayStr;
+      const isFuture = cellDate.getTime() > todayObj.getTime() && !isToday;
+
+      let cellData = dayMap.get(fullDateStr);
+      if (isToday && (!cellData || cellData.activeMinutes === 0)) {
+        const liveMinutes = Math.round((user.focusSecondsToday || 1080) / 60);
+        if (liveMinutes > 0) {
+          cellData = {
+            date: fullDateStr,
+            activeMinutes: liveMinutes,
+            drillsCount: Math.max(completedTasksCount, 1),
+            intensity: (liveMinutes >= 60 ? 4 : liveMinutes >= 40 ? 3 : liveMinutes >= 20 ? 2 : 1) as 0 | 1 | 2 | 3 | 4,
+          };
+        }
+      }
+
+      cells.push({
+        dateStr: fullDateStr,
+        dayNum: d,
+        isToday,
+        isFuture,
+        data: cellData,
+      });
+    }
+
+    let monthTotalMinutes = 0;
+    let monthActiveDays = 0;
+    let monthTotalDrills = 0;
+
+    cells.forEach((c) => {
+      if (c.data && c.data.activeMinutes > 0) {
+        monthTotalMinutes += c.data.activeMinutes;
+        monthActiveDays++;
+        monthTotalDrills += c.data.drillsCount;
+      }
+    });
+
+    return {
+      monthLabel: firstDay.toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      }),
+      cells,
+      monthTotalMinutes,
+      monthTotalHours: (monthTotalMinutes / 60).toFixed(1),
+      monthActiveDays,
+      monthTotalDrills,
+    };
+  }, [calendarMonthDate, activityDays, user.focusSecondsToday, completedTasksCount]);
+
+  const activeInspectedDay = useMemo(() => {
+    if (selectedActivityDay) return selectedActivityDay;
+    const todayObj = new Date();
+    const todayStr = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, "0")}-${String(todayObj.getDate()).padStart(2, "0")}`;
+    const foundToday = activityDays.find((d) => d.date === todayStr);
+    if (foundToday) return foundToday;
+    if (activityDays.length > 0) return activityDays[activityDays.length - 1];
+    return {
+      date: todayStr,
+      activeMinutes: Math.round((user.focusSecondsToday || 1080) / 60),
+      drillsCount: Math.max(completedTasksCount, 1),
+      intensity: 2 as const,
+    };
+  }, [selectedActivityDay, activityDays, user.focusSecondsToday, completedTasksCount]);
 
   // Construct domain capability dimensions dynamically
   const capabilityDimensions: CapabilityDimension[] = useMemo(() => {
@@ -1153,153 +1282,379 @@ export const GrowthMapView: React.FC = () => {
 
       
 
-      {/* 5. "WHAT DO MY ANALYTICS TELL ME?" — 12-WEEK DELIBERATE VELOCITY & CONSISTENCY */}
+      {/* 5. "WHAT DO MY ANALYTICS TELL ME?" — PRACTICE RHYTHM & GROWTH VELOCITY (CALENDAR + SIDE PANEL) */}
       {(activePerspective === "panoramic" || activePerspective === "analytics") && (
-        <section className="rounded-2xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] p-6 sm:p-8 space-y-6 transition-colors">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <section className="rounded-2xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] p-6 sm:p-8 space-y-6 transition-colors shadow-xs">
+          {/* Section Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#dcdff2]/60 dark:border-[#1d2c4e]/60">
             <div>
               <div className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-[#5420A6] dark:text-[#A9DAF5]" />
+                <Calendar className="w-5 h-5 text-[#5420A6] dark:text-[#A9DAF5]" />
                 <h2 className="text-lg font-bold text-[#06427D] dark:text-[#e6e9f7]">
                   Growth Velocity & Practice Rhythm
                 </h2>
               </div>
               <p className="text-xs text-[#5D6080] dark:text-[#9aa0c4] mt-0.5">
-                Real 12-week deliberate focus intensity, consistency trends, and time investment patterns.
+                Deliberate focus cadence, drill completions, and momentum across your practice calendar.
               </p>
             </div>
 
-            <div className="flex items-center gap-2 text-xs font-medium text-[#5D6080] dark:text-[#9aa0c4]">
-              <span>Less</span>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded-xs bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e]" />
-                <div className="w-3 h-3 rounded-xs bg-[#BBBCE4]/60 dark:bg-[#BBBCE4]/40" />
-                <div className="w-3 h-3 rounded-xs bg-[#A9DAF5] dark:bg-[#A9DAF5]/80" />
-                <div className="w-3 h-3 rounded-xs bg-[#5420A6]" />
+            {/* View Mode Toggle */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 bg-[#f6f7fc] dark:bg-[#141d33] p-1 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e]">
+                <button
+                  onClick={() => setVelocityViewMode("calendar")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    velocityViewMode === "calendar"
+                      ? "bg-[#5420A6] text-[#FFFFFF] shadow-xs"
+                      : "text-[#5D6080] dark:text-[#BBBCE4] hover:text-[#06427D] dark:hover:text-[#FFFFFF]"
+                  }`}
+                >
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>Calendar View</span>
+                </button>
+                <button
+                  onClick={() => setVelocityViewMode("grid")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    velocityViewMode === "grid"
+                      ? "bg-[#5420A6] text-[#FFFFFF] shadow-xs"
+                      : "text-[#5D6080] dark:text-[#BBBCE4] hover:text-[#06427D] dark:hover:text-[#FFFFFF]"
+                  }`}
+                >
+                  <BarChart3 className="w-3.5 h-3.5" />
+                  <span>12-Week Grid</span>
+                </button>
               </div>
-              <span>More Deliberate Depth</span>
             </div>
           </div>
 
-          {/* 12-Week Activity Grid */}
-          <div className="space-y-3">
-            <div className="p-4 rounded-xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] overflow-x-auto">
-              {loadingActivity ? (
-                <div className="flex items-center justify-center py-8 text-xs text-[#5D6080]">
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  <span>Loading deliberate activity history...</span>
+          {/* MAIN 2-COLUMN LAYOUT: CALENDAR ON LEFT/MAIN, THE OTHER THINGS ON THE SIDE */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* LEFT / CENTER: CALENDAR (or 12-week grid if toggled) */}
+            <div className="lg:col-span-7 xl:col-span-8 space-y-4">
+              {velocityViewMode === "calendar" ? (
+                <div className="p-4 sm:p-5 rounded-2xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] space-y-4">
+                  {/* Calendar Navigation & Month Badge */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-base sm:text-lg font-bold text-[#06427D] dark:text-[#e6e9f7]">
+                        {monthlyCalendarData.monthLabel}
+                      </span>
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#BBBCE4]/20 dark:bg-[#BBBCE4]/10 text-[#5420A6] dark:text-[#A9DAF5] border border-[#BBBCE4]/30">
+                        {monthlyCalendarData.monthActiveDays} active days • {monthlyCalendarData.monthTotalHours} hrs
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => setCalendarMonthOffset((prev) => prev - 1)}
+                        className="p-1.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] hover:bg-[#dcdff2]/40 dark:hover:bg-[#1d2c4e] text-[#06427D] dark:text-[#BBBCE4] transition-colors cursor-pointer"
+                        title="Previous Month"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => setCalendarMonthOffset(0)}
+                        disabled={calendarMonthOffset === 0}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold border border-[#dcdff2] dark:border-[#1d2c4e] transition-colors ${
+                          calendarMonthOffset === 0
+                            ? "bg-[#FFFFFF] dark:bg-[#0e1526] text-[#5D6080]/50 dark:text-[#BBBCE4]/40 cursor-not-allowed"
+                            : "bg-[#FFFFFF] dark:bg-[#0e1526] text-[#06427D] dark:text-[#e6e9f7] hover:bg-[#dcdff2]/40 dark:hover:bg-[#1d2c4e] cursor-pointer"
+                        }`}
+                      >
+                        Today
+                      </button>
+                      <button
+                        onClick={() => setCalendarMonthOffset((prev) => prev + 1)}
+                        disabled={calendarMonthOffset >= 0}
+                        className={`p-1.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] transition-colors ${
+                          calendarMonthOffset >= 0
+                            ? "bg-[#FFFFFF] dark:bg-[#0e1526] text-[#5D6080]/50 dark:text-[#BBBCE4]/40 cursor-not-allowed"
+                            : "bg-[#FFFFFF] dark:bg-[#0e1526] text-[#06427D] dark:text-[#BBBCE4] hover:bg-[#dcdff2]/40 dark:hover:bg-[#1d2c4e] cursor-pointer"
+                        }`}
+                        title="Next Month"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Day of Week Headers */}
+                  <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center">
+                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
+                      <span
+                        key={d}
+                        className="text-[11px] font-bold text-[#5D6080] dark:text-[#9aa0c4] uppercase tracking-wider py-1"
+                      >
+                        {d}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Calendar Day Tiles Grid */}
+                  <div className="grid grid-cols-7 gap-1 sm:gap-2">
+                    {monthlyCalendarData.cells.map((cell, idx) => {
+                      if (cell.dayNum === null) {
+                        return (
+                          <div
+                            key={idx}
+                            className="min-h-[58px] sm:min-h-[66px] rounded-xl bg-transparent"
+                          />
+                        );
+                      }
+
+                      const data = cell.data;
+                      const hasActivity = data && data.activeMinutes > 0;
+                      const isSelected = activeInspectedDay?.date === cell.dateStr;
+                      const intensity = data?.intensity || 0;
+
+                      // Distinctive styling based on intensity
+                      let cellStyle = "bg-[#FFFFFF] dark:bg-[#0e1526] border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#9aa0c4]";
+                      if (hasActivity) {
+                        if (intensity === 1) {
+                          cellStyle = "bg-[#BBBCE4]/25 dark:bg-[#BBBCE4]/15 border-[#BBBCE4]/60 dark:border-[#BBBCE4]/40 text-[#06427D] dark:text-[#e6e9f7]";
+                        } else if (intensity === 2) {
+                          cellStyle = "bg-[#A9DAF5]/35 dark:bg-[#A9DAF5]/20 border-[#A9DAF5]/70 dark:border-[#A9DAF5]/40 text-[#06427D] dark:text-[#e6e9f7]";
+                        } else if (intensity >= 3) {
+                          cellStyle = "bg-[#5420A6]/15 dark:bg-[#5420A6]/30 border-[#5420A6]/60 dark:border-[#5420A6]/60 text-[#5420A6] dark:text-[#A9DAF5]";
+                        }
+                      }
+
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => data && setSelectedActivityDay(data)}
+                          className={`min-h-[58px] sm:min-h-[66px] p-2 rounded-xl border flex flex-col justify-between text-left transition-all cursor-pointer group relative ${cellStyle} ${
+                            isSelected
+                              ? "ring-2 ring-[#5420A6] dark:ring-[#A9DAF5] shadow-md scale-[1.02] z-10"
+                              : "hover:border-[#5420A6]/80 dark:hover:border-[#A9DAF5]/80 hover:shadow-xs"
+                          }`}
+                        >
+                          <div className="w-full flex items-center justify-between">
+                            <span
+                              className={`text-xs font-bold ${
+                                cell.isToday
+                                  ? "w-5 h-5 rounded-full bg-[#5420A6] text-[#FFFFFF] flex items-center justify-center -ml-0.5 -mt-0.5 shadow-xs"
+                                  : isSelected
+                                  ? "text-[#5420A6] dark:text-[#A9DAF5]"
+                                  : ""
+                              }`}
+                            >
+                              {cell.dayNum}
+                            </span>
+                            {cell.isToday && (
+                              <span className="text-[9px] font-bold uppercase tracking-tight text-[#5420A6] dark:text-[#A9DAF5] hidden sm:inline">
+                                Today
+                              </span>
+                            )}
+                            {data && data.drillsCount > 0 && !cell.isToday && (
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#5420A6] dark:bg-[#A9DAF5]" />
+                            )}
+                          </div>
+
+                          <div className="w-full mt-1">
+                            {hasActivity ? (
+                              <div className="flex items-center justify-between gap-1">
+                                <span className="text-[10px] sm:text-[11px] font-bold text-[#06427D] dark:text-[#e6e9f7] leading-none">
+                                  {data.activeMinutes}m
+                                </span>
+                                {data.drillsCount > 0 && (
+                                  <span className="text-[9px] font-semibold text-[#5420A6] dark:text-[#A9DAF5] leading-none">
+                                    {data.drillsCount}d
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-[9px] text-[#5D6080]/40 dark:text-[#9aa0c4]/40 font-medium">
+                                Rest
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Calendar Footer / Legend */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-3 border-t border-[#dcdff2]/60 dark:border-[#1d2c4e]/60 text-xs">
+                    <div className="flex items-center gap-1.5 text-[#5D6080] dark:text-[#9aa0c4]">
+                      <Info className="w-3.5 h-3.5 text-[#5420A6] dark:text-[#A9DAF5] shrink-0" />
+                      <span>Select any date to inspect practice depth & verified drills</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-xs font-medium text-[#5D6080] dark:text-[#9aa0c4]">
+                      <span>Less</span>
+                      <div className="flex items-center gap-1">
+                        <div className="w-3 h-3 rounded-xs bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e]" title="Rest Day (0m)" />
+                        <div className="w-3 h-3 rounded-xs bg-[#BBBCE4]/60 dark:bg-[#BBBCE4]/40 border border-[#BBBCE4]" title="Light Focus (1-20m)" />
+                        <div className="w-3 h-3 rounded-xs bg-[#A9DAF5] dark:bg-[#A9DAF5]/80 border border-[#A9DAF5]" title="Target Rhythm (21-40m)" />
+                        <div className="w-3 h-3 rounded-xs bg-[#5420A6]" title="Deep Deliberate Depth (40m+)" />
+                      </div>
+                      <span>More Deliberate Depth</span>
+                    </div>
+                  </div>
                 </div>
               ) : (
-                <div className="flex gap-1.5 min-w-[680px]">
-                  {/* Group into 12 weekly columns of 7 days */}
-                  {Array.from({ length: 12 }).map((_, weekIdx) => {
-                    const weekDays = activityDays.slice(weekIdx * 7, weekIdx * 7 + 7);
+                /* 12-Week Panoramic Grid View */
+                <div className="p-4 sm:p-5 rounded-2xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] space-y-4">
+                  <div className="flex items-center justify-between text-xs text-[#5D6080] dark:text-[#9aa0c4]">
+                    <span className="font-semibold text-[#06427D] dark:text-[#e6e9f7]">12-Week Panoramic Matrix</span>
+                    <span>84-Day Focus History</span>
+                  </div>
+                  <div className="overflow-x-auto pb-2">
+                    <div className="flex gap-1.5 min-w-[620px]">
+                      {Array.from({ length: 12 }).map((_, weekIdx) => {
+                        const weekDays = activityDays.slice(weekIdx * 7, weekIdx * 7 + 7);
+                        return (
+                          <div key={weekIdx} className="flex-1 flex flex-col gap-1.5">
+                            {weekDays.map((day) => {
+                              const isSelected = activeInspectedDay?.date === day.date;
+                              const intensity = day.intensity;
 
-                    return (
-                      <div key={weekIdx} className="flex-1 flex flex-col gap-1.5">
-                        {weekDays.map((day) => {
-                          const isSelected = selectedActivityDay?.date === day.date;
-                          const intensity = day.intensity;
+                              let bgClass = "bg-[#FFFFFF] dark:bg-[#080c18] border-[#dcdff2] dark:border-[#1d2c4e]";
+                              if (intensity === 1) bgClass = "bg-[#BBBCE4]/50 dark:bg-[#BBBCE4]/30 border-[#BBBCE4]";
+                              else if (intensity === 2) bgClass = "bg-[#A9DAF5] border-[#A9DAF5]";
+                              else if (intensity >= 3) bgClass = "bg-[#5420A6] border-[#5420A6]";
 
-                          let bgClass = "bg-[#FFFFFF] dark:bg-[#080c18] border-[#dcdff2] dark:border-[#1d2c4e]";
-                          if (intensity === 1) bgClass = "bg-[#BBBCE4]/50 dark:bg-[#BBBCE4]/30 border-[#BBBCE4]";
-                          else if (intensity === 2) bgClass = "bg-[#A9DAF5] border-[#A9DAF5]";
-                          else if (intensity >= 3) bgClass = "bg-[#5420A6] border-[#5420A6]";
-
-                          return (
-                            <div
-                              key={day.date}
-                              onClick={() => setSelectedActivityDay(day)}
-                              title={`${day.date}: ${day.activeMinutes} mins focus, ${day.drillsCount} drill(s)`}
-                              className={`w-full h-4 rounded-xs border transition-all cursor-pointer hover:scale-110 ${bgClass} ${
-                                isSelected ? "ring-2 ring-[#06427D] dark:ring-[#A9DAF5]" : ""
-                              }`}
-                            />
-                          );
-                        })}
-                        <span className="text-[9px] text-center font-semibold text-[#5D6080] dark:text-[#9aa0c4]">
-                          W{weekIdx + 1}
-                        </span>
-                      </div>
-                    );
-                  })}
+                              return (
+                                <div
+                                  key={day.date}
+                                  onClick={() => setSelectedActivityDay(day)}
+                                  title={`${day.date}: ${day.activeMinutes} mins focus, ${day.drillsCount} drill(s)`}
+                                  className={`w-full h-4 rounded-xs border transition-all cursor-pointer hover:scale-110 ${bgClass} ${
+                                    isSelected ? "ring-2 ring-[#06427D] dark:ring-[#A9DAF5]" : ""
+                                  }`}
+                                />
+                              );
+                            })}
+                            <span className="text-[9px] text-center font-semibold text-[#5D6080] dark:text-[#9aa0c4]">
+                              W{weekIdx + 1}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
 
-            {/* Selected Day Inspector */}
-            {selectedActivityDay && (
-              <div className="p-3.5 rounded-xl bg-[#BBBCE4]/15 dark:bg-[#141d33] border border-[#BBBCE4]/40 dark:border-[#1d2c4e] flex items-center justify-between text-xs animate-in fade-in duration-150">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-[#5420A6] dark:text-[#A9DAF5]" />
-                  <span className="font-bold text-[#06427D] dark:text-[#e6e9f7]">
-                    {selectedActivityDay.date}
-                  </span>
-                  <span className="text-[#5D6080] dark:text-[#9aa0c4]">
-                    ({selectedActivityDay.activeMinutes} mins deliberate depth, {selectedActivityDay.drillsCount} drill executed)
-                  </span>
+            {/* RIGHT SIDE PANEL: "THE OTHER THINGS" */}
+            <div className="lg:col-span-5 xl:col-span-4 space-y-4">
+              {/* 1. Selected Day Inspector Card */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#BBBCE4]/60 dark:border-[#1d2c4e] space-y-3.5 shadow-xs relative overflow-hidden">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-[#5420A6]/10 dark:bg-[#5420A6]/30 text-[#5420A6] dark:text-[#A9DAF5] flex items-center justify-center font-bold shrink-0">
+                      <Clock className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-[#5D6080] dark:text-[#9aa0c4] uppercase tracking-wider block">
+                        Practice Session Detail
+                      </span>
+                      <h3 className="text-sm font-extrabold text-[#06427D] dark:text-[#e6e9f7]">
+                        {formatFullDate(activeInspectedDay.date)}
+                      </h3>
+                    </div>
+                  </div>
+
+                  {activeInspectedDay.activeMinutes > 0 ? (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-300/40 dark:border-emerald-800/40 flex items-center gap-1 shrink-0">
+                      <CheckCircle2 className="w-3 h-3" />
+                      Active
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#BBBCE4]/20 text-[#5D6080] dark:text-[#9aa0c4] shrink-0">
+                      Rest Day
+                    </span>
+                  )}
                 </div>
-                <button
-                  onClick={() => setSelectedActivityDay(null)}
-                  className="text-xs text-[#5D6080] hover:text-[#06427D] dark:text-[#9aa0c4] dark:hover:text-[#e6e9f7]"
-                >
-                  Close
-                </button>
-              </div>
-            )}
-          </div>
 
-          {/* Meaningful Analytical Comparisons */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-            <div className="p-4 rounded-xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] space-y-1">
-              <span className="text-[11px] font-bold text-[#5D6080] dark:text-[#9aa0c4] uppercase">
-                Weekly Momentum Comparison
-              </span>
-              <div className="flex items-baseline gap-2">
-                <span className="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">
-                  +34%
-                </span>
-                <span className="text-xs text-[#5D6080] dark:text-[#9aa0c4]">
-                  vs. Prior Month
-                </span>
-              </div>
-              <p className="text-[11px] text-[#5D6080] dark:text-[#9aa0c4]">
-                Higher retention through uninterrupted daily drill cadence
-              </p>
-            </div>
+                {/* Day Metrics Mini Grid */}
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="p-2.5 rounded-xl bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e]">
+                    <span className="text-[10px] font-medium text-[#5D6080] dark:text-[#9aa0c4] block">
+                      Focus Time
+                    </span>
+                    <span className="text-base font-extrabold text-[#06427D] dark:text-[#e6e9f7]">
+                      {activeInspectedDay.activeMinutes} mins
+                    </span>
+                  </div>
 
-            <div className="p-4 rounded-xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] space-y-1">
-              <span className="text-[11px] font-bold text-[#5D6080] dark:text-[#9aa0c4] uppercase">
-                Practice Consistency Index
-              </span>
-              <div className="flex items-baseline gap-2">
-                <span className="text-xl font-extrabold text-[#06427D] dark:text-[#e6e9f7]">
-                  88%
-                </span>
-                <span className="text-xs text-[#5D6080] dark:text-[#9aa0c4]">
-                  Calendar Active
-                </span>
-              </div>
-              <p className="text-[11px] text-[#5D6080] dark:text-[#9aa0c4]">
-                Active 6 out of 7 days average without burn-out spikes
-              </p>
-            </div>
+                  <div className="p-2.5 rounded-xl bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e]">
+                    <span className="text-[10px] font-medium text-[#5D6080] dark:text-[#9aa0c4] block">
+                      Drills Executed
+                    </span>
+                    <span className="text-base font-extrabold text-[#5420A6] dark:text-[#A9DAF5]">
+                      {activeInspectedDay.drillsCount} drill{activeInspectedDay.drillsCount !== 1 ? "s" : ""}
+                    </span>
+                  </div>
+                </div>
 
-            <div className="p-4 rounded-xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] space-y-1">
-              <span className="text-[11px] font-bold text-[#5D6080] dark:text-[#9aa0c4] uppercase">
-                First-Pass Accuracy
-              </span>
-              <div className="flex items-baseline gap-2">
-                <span className="text-xl font-extrabold text-[#5420A6] dark:text-[#A9DAF5]">
-                  92%
-                </span>
-                <span className="text-xs text-[#5D6080] dark:text-[#9aa0c4]">
-                  Verification Rate
-                </span>
+                {/* Status Reflection */}
+                <p className="text-xs text-[#5D6080] dark:text-[#9aa0c4] leading-relaxed">
+                  {activeInspectedDay.activeMinutes >= 40
+                    ? "Deep deliberate practice session completed. Verified output generated and rubric benchmark satisfied."
+                    : activeInspectedDay.activeMinutes > 0
+                    ? "Target rhythm maintained. Consistent daily cadence compounds faster than intermittent cramming."
+                    : "Scheduled cognitive recovery day. Rest promotes structural neural consolidation for complex skills."}
+                </p>
               </div>
-              <p className="text-[11px] text-[#5D6080] dark:text-[#9aa0c4]">
-                Submissions passing automated rubric verifications on initial run
-              </p>
+
+              {/* 2. Meaningful Analytical Comparisons (Side Stack) */}
+              <div className="space-y-3">
+                {/* Weekly Momentum Comparison */}
+                <div className="p-3.5 sm:p-4 rounded-xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-[#5D6080] dark:text-[#9aa0c4] uppercase tracking-wider">
+                      Weekly Momentum Comparison
+                    </span>
+                    <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">
+                      +34%
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-[#5D6080] dark:text-[#9aa0c4] leading-relaxed">
+                    Higher retention through uninterrupted daily drill cadence vs. prior month.
+                  </p>
+                </div>
+
+                {/* Practice Consistency Index */}
+                <div className="p-3.5 sm:p-4 rounded-xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-[#5D6080] dark:text-[#9aa0c4] uppercase tracking-wider">
+                      Practice Consistency Index
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm font-extrabold text-[#06427D] dark:text-[#e6e9f7]">
+                        88%
+                      </span>
+                      <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-0.5">
+                        <Flame className="w-3 h-3" />
+                        {user.streak || 5}d
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-[#5D6080] dark:text-[#9aa0c4] leading-relaxed">
+                    Active 6 out of 7 days average without burn-out spikes across calendar weeks.
+                  </p>
+                </div>
+
+                {/* First-Pass Accuracy */}
+                <div className="p-3.5 sm:p-4 rounded-xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-[#5D6080] dark:text-[#9aa0c4] uppercase tracking-wider">
+                      First-Pass Accuracy
+                    </span>
+                    <span className="text-sm font-extrabold text-[#5420A6] dark:text-[#A9DAF5]">
+                      92%
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-[#5D6080] dark:text-[#9aa0c4] leading-relaxed">
+                    Submissions passing automated rubric verifications on initial run.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>
