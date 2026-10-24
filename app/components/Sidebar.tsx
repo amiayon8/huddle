@@ -125,13 +125,13 @@ export const Sidebar: React.FC = () => {
           <button
             key={item.id}
             onClick={() => handleNavClick(item.id)}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm transition-all cursor-pointer ${
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-[13px] font-medium transition-all duration-150 cursor-pointer ${
               isMatch
-                ? "bg-[#BBBCE4]/20 dark:bg-[#5420A6]/25 text-[#5420A6] dark:text-[#BBBCE4] font-bold border-2 border-[#BBBCE4] dark:border-[#5420A6]/70 shadow-xs"
-                : "text-[#5D6080] dark:text-[#9aa0c4] hover:text-[#06427D] dark:hover:text-[#BBBCE4] hover:bg-[#BBBCE4]/10 dark:hover:bg-[#141f36] border-2 border-transparent font-medium"
+                ? "bg-[#5420A6]/10 dark:bg-[#5420A6]/20 text-[#5420A6] dark:text-[#c4b5fd] font-semibold"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/70 dark:hover:bg-slate-800/40"
             }`}
           >
-            <Icon className="w-4 h-4 shrink-0" />
+            <Icon className={`w-4 h-4 shrink-0 transition-colors ${isMatch ? "text-[#5420A6] dark:text-[#c4b5fd]" : "text-slate-400 dark:text-slate-500"}`} />
             <span>{item.label}</span>
           </button>
         );
@@ -156,8 +156,8 @@ export const Sidebar: React.FC = () => {
 
   return (
     <>
-      <aside className="hidden md:flex flex-col w-60 lg:w-64 fixed inset-y-0 left-0 z-30 bg-[#f8f9fd]/90 dark:bg-[#0b101e] border-r border-[#dcdff2]/80 dark:border-[#1d2c4e]/80 select-none">
-        <div className="h-16 px-6 flex items-center">
+      <aside className="hidden md:flex flex-col w-56 lg:w-60 fixed inset-y-0 left-0 z-30 bg-white/80 dark:bg-[#090d16]/90 backdrop-blur-md border-r border-slate-200/70 dark:border-slate-800/80 select-none">
+        <div className="h-14 px-5 flex items-center">
           <div
             onClick={() => handleNavClick("dashboard")}
             className="flex items-center gap-2.5 cursor-pointer group"
@@ -165,44 +165,44 @@ export const Sidebar: React.FC = () => {
             <img
               src="/logo.svg"
               alt="Huddle"
-              className="w-7 h-7 rounded-lg object-contain shrink-0 group-hover:scale-105 transition-transform"
+              className="w-6 h-6 rounded-md object-contain shrink-0 group-hover:scale-105 transition-transform"
             />
-            <span className="font-semibold text-base text-[#06427D] dark:text-[#BBBCE4] tracking-tight">
+            <span className="font-semibold text-sm tracking-tight text-slate-900 dark:text-slate-100">
               Huddle
             </span>
           </div>
         </div>
 
-        <div className="flex-1 py-3 overflow-y-auto">{renderNavItems()}</div>
+        <div className="flex-1 py-2 overflow-y-auto">{renderNavItems()}</div>
 
-        <div className="p-3 border-t border-[#dcdff2]/80 dark:border-[#1d2c4e]/80 space-y-1">
+        <div className="p-3 border-t border-slate-200/70 dark:border-slate-800/80 space-y-1">
           <button
             onClick={() => setMascotOpen(true)}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#5420A6] dark:text-[#A9DAF5] hover:bg-[#5420A6]/10 dark:hover:bg-[#5420A6]/20 transition-colors cursor-pointer"
+            className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-[#5420A6] dark:hover:text-[#c4b5fd] hover:bg-slate-100/70 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
           >
-            <Zap className="w-4 h-4" />
-            <span>Spark - Your AI Companion</span>
+            <Zap className="w-3.5 h-3.5 text-[#5420A6] dark:text-[#c4b5fd]" />
+            <span>AI Companion</span>
           </button>
 
-          <div className="flex items-center justify-between px-2 pt-2 text-[#5D6080] dark:text-[#9aa0c4] text-xs">
+          <div className="flex items-center justify-between px-1.5 pt-1.5 text-slate-500 dark:text-slate-400 text-xs">
             <button
               onClick={toggleTheme}
-              className="p-1.5 rounded-lg hover:text-[#06427D] dark:hover:text-[#BBBCE4] hover:bg-[#BBBCE4]/20 dark:hover:bg-[#141f36] transition-colors cursor-pointer"
+              className="p-1.5 rounded-md hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors cursor-pointer"
               title="Toggle theme"
             >
               {theme === "dark" ? (
-                <Sun className="w-4 h-4 text-[#A9DAF5]" />
+                <Sun className="w-3.5 h-3.5 text-amber-400" />
               ) : (
-                <Moon className="w-4 h-4 text-[#5420A6]" />
+                <Moon className="w-3.5 h-3.5 text-slate-600" />
               )}
             </button>
 
             <button
               onClick={() => setSettingsOpen(true)}
-              className="p-1.5 rounded-lg hover:text-[#06427D] dark:hover:text-[#BBBCE4] hover:bg-[#BBBCE4]/20 dark:hover:bg-[#141f36] transition-colors cursor-pointer"
+              className="p-1.5 rounded-md hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors cursor-pointer"
               title="Settings"
             >
-              <Settings className="w-4 h-4" />
+              <Settings className="w-3.5 h-3.5" />
             </button>
 
             {isAuthenticated && (
@@ -211,10 +211,10 @@ export const Sidebar: React.FC = () => {
                   await logout();
                   router.push("/auth/login");
                 }}
-                className="p-1.5 rounded-lg hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors cursor-pointer"
+                className="p-1.5 rounded-md hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors cursor-pointer"
                 title="Sign out"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
@@ -233,44 +233,44 @@ export const Sidebar: React.FC = () => {
 
       <aside
         ref={mobileSidebarRef}
-        className={`fixed inset-y-0 left-0 z-50 w-64 max-w-[85vw] bg-white dark:bg-[#0e1526] border-r border-[#dcdff2]/80 dark:border-[#1d2c4e]/80 shadow-xl flex flex-col transition-transform duration-200 ease-out md:hidden ${
+        className={`fixed inset-y-0 left-0 z-50 w-60 max-w-[85vw] bg-white dark:bg-[#090d16] border-r border-slate-200/80 dark:border-slate-800/80 shadow-2xl flex flex-col transition-transform duration-200 ease-out md:hidden ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         aria-label="Navigation drawer"
       >
-        <div className="h-14 px-5 border-b border-[#dcdff2]/60 dark:border-[#1d2c4e] flex items-center justify-between">
+        <div className="h-14 px-5 border-b border-slate-200/70 dark:border-slate-800/80 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <img
               src="/logo.svg"
               alt="Huddle"
-              className="w-7 h-7 rounded-lg object-contain shrink-0"
+              className="w-6 h-6 rounded-md object-contain shrink-0"
             />
-            <span className="font-semibold text-base text-[#06427D] dark:text-[#BBBCE4] tracking-tight">
+            <span className="font-semibold text-sm tracking-tight text-slate-900 dark:text-slate-100">
               Huddle
             </span>
           </div>
 
           <button
             onClick={() => setSidebarOpen(false)}
-            className="p-1.5 rounded-lg text-[#5D6080] hover:text-[#06427D] dark:text-[#9aa0c4] dark:hover:text-[#BBBCE4] transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors cursor-pointer"
             aria-label="Close menu"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="flex-1 py-4 overflow-y-auto">{renderNavItems()}</div>
+        <div className="flex-1 py-3 overflow-y-auto">{renderNavItems()}</div>
 
-        <div className="p-4 border-t border-[#dcdff2]/60 dark:border-[#1d2c4e]">
+        <div className="p-3 border-t border-slate-200/70 dark:border-slate-800/80">
           <button
             onClick={() => {
               setMascotOpen(true);
               setSidebarOpen(false);
             }}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[#5420A6] dark:text-[#A9DAF5] hover:bg-[#5420A6]/10 dark:hover:bg-[#5420A6]/20 transition-colors cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-[#5420A6] dark:hover:text-[#c4b5fd] hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors cursor-pointer"
           >
-            <Zap className="w-4 h-4" />
-            <span>Spark - Your AI Companion</span>
+            <Zap className="w-3.5 h-3.5 text-[#5420A6] dark:text-[#c4b5fd]" />
+            <span>AI Companion</span>
           </button>
         </div>
       </aside>
