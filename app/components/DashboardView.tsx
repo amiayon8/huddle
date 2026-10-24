@@ -158,7 +158,7 @@ export const DashboardView: React.FC = () => {
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 Active Sprint Run
               </span>
-              <span className="text-[11px] uppercase tracking-wider text-[#5D6080] dark:text-[#BBBCE4]/70">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-[#5D6080] dark:text-[#BBBCE4]/70">
                 Unit 01 // Curriculum Spec // {userSkill}
               </span>
             </div>
@@ -177,10 +177,10 @@ export const DashboardView: React.FC = () => {
             {/* Linear Progress Telemetry */}
             <div className="space-y-1.5 pt-1">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-[11px] uppercase tracking-wider font-bold text-[#06427D] dark:text-[#e6e9f7]">
+                <span className="font-mono text-[11px] uppercase tracking-wider font-bold text-[#06427D] dark:text-[#e6e9f7]">
                   Unit Mastery Telemetry
                 </span>
-                <span className="text-[11px] font-black text-[#5420A6] dark:text-[#A9DAF5]">
+                <span className="font-mono text-[11px] font-black text-[#5420A6] dark:text-[#A9DAF5]">
                   [{progressPercentage}% COMPLETE]
                 </span>
               </div>
@@ -193,7 +193,7 @@ export const DashboardView: React.FC = () => {
                 />
               </div>
 
-              <div className="flex justify-between items-center text-[10px] text-[#5D6080] dark:text-[#BBBCE4]/60 pt-0.5">
+              <div className="flex justify-between items-center text-[10px] font-mono text-[#5D6080] dark:text-[#BBBCE4]/60 pt-0.5">
                 <span>Start Unit</span>
                 <span>Milestone {completedCount} / {totalTasks}</span>
                 <span>Unit Capstone</span>
@@ -229,7 +229,7 @@ export const DashboardView: React.FC = () => {
             {/* 2x2 High-Precision Telemetry Matrix */}
             <div className="grid grid-cols-2 gap-2.5">
               <div className="p-3 rounded-2xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e]">
-                <div className="text-[10px] uppercase tracking-wider text-[#5D6080] dark:text-[#BBBCE4]/70 flex items-center gap-1">
+                <div className="text-[10px] font-mono uppercase tracking-wider text-[#5D6080] dark:text-[#BBBCE4]/70 flex items-center gap-1">
                   <Target className="w-3 h-3 text-[#5420A6] dark:text-[#A9DAF5]" />
                   <span>Tier</span>
                 </div>
@@ -239,7 +239,7 @@ export const DashboardView: React.FC = () => {
               </div>
 
               <div className="p-3 rounded-2xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e]">
-                <div className="text-[10px] uppercase tracking-wider text-[#5D6080] dark:text-[#BBBCE4]/70 flex items-center gap-1">
+                <div className="text-[10px] font-mono uppercase tracking-wider text-[#5D6080] dark:text-[#BBBCE4]/70 flex items-center gap-1">
                   <Clock className="w-3 h-3 text-[#5420A6] dark:text-[#A9DAF5]" />
                   <span>Cadence</span>
                 </div>
@@ -249,7 +249,7 @@ export const DashboardView: React.FC = () => {
               </div>
 
               <div className="p-3 rounded-2xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e]">
-                <div className="text-[10px] uppercase tracking-wider text-[#5D6080] dark:text-[#BBBCE4]/70 flex items-center gap-1">
+                <div className="text-[10px] font-mono uppercase tracking-wider text-[#5D6080] dark:text-[#BBBCE4]/70 flex items-center gap-1">
                   <Layers className="w-3 h-3 text-[#5420A6] dark:text-[#A9DAF5]" />
                   <span>Proofs</span>
                 </div>
@@ -259,7 +259,7 @@ export const DashboardView: React.FC = () => {
               </div>
 
               <div className="p-3 rounded-2xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e]">
-                <div className="text-[10px] uppercase tracking-wider text-[#5D6080] dark:text-[#BBBCE4]/70 flex items-center gap-1">
+                <div className="text-[10px] font-mono uppercase tracking-wider text-[#5D6080] dark:text-[#BBBCE4]/70 flex items-center gap-1">
                   <Activity className="w-3 h-3 text-[#5420A6] dark:text-[#A9DAF5]" />
                   <span>Status</span>
                 </div>
@@ -293,7 +293,7 @@ export const DashboardView: React.FC = () => {
         <div className="lg:col-span-7 xl:col-span-7 space-y-4">
           {/* Editorial Section Anchor for Roadmap */}
           <div className="flex items-center justify-between px-2 pt-2 pb-1 border-b border-[#dcdff2] dark:border-[#1d2c4e]">
-            <div className="flex items-center gap-2 text-[11px] uppercase tracking-widest text-[#5D6080] dark:text-[#BBBCE4]/80">
+            <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-[#5D6080] dark:text-[#BBBCE4]/80">
               <Layers className="w-3.5 h-3.5 text-[#5420A6] dark:text-[#A9DAF5]" />
               <span>Pathway // Stepping-Stone Progression</span>
             </div>
@@ -530,7 +530,7 @@ export const DashboardView: React.FC = () => {
 
                 <div className="flex items-baseline justify-between">
                   <div>
-                    <div className="text-3xl sm:text-4xl font-black tracking-tight text-[#06427D] dark:text-[#e6e9f7]">
+                    <div className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-[#06427D] dark:text-[#e6e9f7]">
                       {String(user.streak || 1).padStart(2, "0")}
                     </div>
                     <div className="text-xs font-bold uppercase tracking-wider text-[#5D6080] dark:text-[#BBBCE4] mt-0.5">
@@ -549,7 +549,7 @@ export const DashboardView: React.FC = () => {
 
                 {/* 7-Day Consistency Cadence */}
                 <div className="pt-1">
-                  <div className="text-[10px] text-[#5D6080] dark:text-[#BBBCE4]/60 mb-1.5">
+                  <div className="text-[10px] font-mono text-[#5D6080] dark:text-[#BBBCE4]/60 mb-1.5">
                     Last 7 Days Execution:
                   </div>
                   <div className="grid grid-cols-7 gap-1">
@@ -565,7 +565,7 @@ export const DashboardView: React.FC = () => {
                         >
                           {day.active ? "✓" : ""}
                         </div>
-                        <span className="text-[9px] text-[#5D6080] dark:text-[#BBBCE4]/50">
+                        <span className="text-[9px] font-mono text-[#5D6080] dark:text-[#BBBCE4]/50">
                           {day.label}
                         </span>
                       </div>
@@ -620,7 +620,7 @@ export const DashboardView: React.FC = () => {
                     <div className="text-xs font-bold text-[#06427D] dark:text-[#e6e9f7]">
                       Cohort Sync
                     </div>
-                    <div className="text-[10px] text-[#5D6080] dark:text-[#BBBCE4]/70">
+                    <div className="text-[10px] font-mono text-[#5D6080] dark:text-[#BBBCE4]/70">
                       {Math.round((squadCheckedIn / squadMembersCount) * 100)}% attendance
                     </div>
                   </div>
@@ -704,10 +704,10 @@ export const DashboardView: React.FC = () => {
               <div className="flex items-start justify-between pb-4 border-b border-[#dcdff2] dark:border-[#1d2c4e] shrink-0">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-md bg-[#5420A6]/10 text-[#5420A6] dark:text-[#A9DAF5] text-[10px] font-bold uppercase tracking-widest border border-[#5420A6]/20">
+                    <span className="px-2 py-0.5 rounded-md bg-[#5420A6]/10 text-[#5420A6] dark:text-[#A9DAF5] text-[10px] font-mono font-bold uppercase tracking-widest border border-[#5420A6]/20">
                       Huddle Spec // Dossier 1.0
                     </span>
-                    <span className="text-[11px] text-[#5D6080] dark:text-[#BBBCE4]/60">
+                    <span className="text-[11px] font-mono text-[#5D6080] dark:text-[#BBBCE4]/60">
                       Unit 01
                     </span>
                   </div>
@@ -731,7 +731,7 @@ export const DashboardView: React.FC = () => {
               <div className="space-y-5 overflow-y-auto pr-1 text-xs text-[#5D6080] dark:text-[#BBBCE4] leading-relaxed flex-1">
                 {/* Methodological Foundation */}
                 <div className="p-4 rounded-2xl bg-[#BBBCE4]/15 dark:bg-[#141d33] border border-[#BBBCE4]/40 dark:border-[#1d2c4e] space-y-1.5">
-                  <h4 className="font-bold text-[#06427D] dark:text-[#A9DAF5] flex items-center gap-1.5 text-xs uppercase tracking-wider">
+                  <h4 className="font-bold text-[#06427D] dark:text-[#A9DAF5] flex items-center gap-1.5 text-xs uppercase tracking-wider font-mono">
                     <BookOpen className="w-3.5 h-3.5" />
                     <span>Primary Learning Objective</span>
                   </h4>
@@ -744,7 +744,7 @@ export const DashboardView: React.FC = () => {
 
                 {/* Curriculum Milestones List */}
                 <div className="space-y-2.5">
-                  <h4 className="font-bold text-[#06427D] dark:text-[#e6e9f7] text-xs uppercase tracking-wider flex items-center gap-1.5">
+                  <h4 className="font-bold text-[#06427D] dark:text-[#e6e9f7] text-xs uppercase tracking-wider font-mono flex items-center gap-1.5">
                     <Layers className="w-3.5 h-3.5 text-[#5420A6] dark:text-[#A9DAF5]" />
                     <span>Curriculum Milestones Manifest ({tasks.length})</span>
                   </h4>
@@ -756,7 +756,7 @@ export const DashboardView: React.FC = () => {
                         className="p-3.5 rounded-2xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc]/60 dark:bg-[#141d33]/60 flex items-center justify-between gap-3"
                       >
                         <div className="flex items-center gap-3">
-                          <span className="w-7 h-7 rounded-xl bg-[#5420A6]/10 dark:bg-[#5420A6]/20 border border-[#5420A6]/20 text-[#5420A6] dark:text-[#A9DAF5] flex items-center justify-center font-bold text-xs shrink-0">
+                          <span className="w-7 h-7 rounded-xl bg-[#5420A6]/10 dark:bg-[#5420A6]/20 border border-[#5420A6]/20 text-[#5420A6] dark:text-[#A9DAF5] flex items-center justify-center font-mono font-bold text-xs shrink-0">
                             {task.dayNumber}
                           </span>
                           <div>
@@ -778,7 +778,7 @@ export const DashboardView: React.FC = () => {
                             Active
                           </span>
                         ) : (
-                          <span className="text-[10px] text-[#5D6080]/60 dark:text-[#BBBCE4]/50 shrink-0">
+                          <span className="text-[10px] font-mono text-[#5D6080]/60 dark:text-[#BBBCE4]/50 shrink-0">
                             Queued
                           </span>
                         )}
@@ -789,7 +789,7 @@ export const DashboardView: React.FC = () => {
 
                 {/* Verification Criteria */}
                 <div className="p-3.5 rounded-2xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] text-[11px] space-y-1">
-                  <span className="font-bold text-[#06427D] dark:text-[#e6e9f7] uppercase tracking-wider">
+                  <span className="font-bold text-[#06427D] dark:text-[#e6e9f7] uppercase tracking-wider font-mono">
                     Unit Capstone Benchmark:
                   </span>
                   <p className="text-[#5D6080] dark:text-[#BBBCE4]/80">
