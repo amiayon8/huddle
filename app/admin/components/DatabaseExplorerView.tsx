@@ -296,7 +296,7 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
   const renderCellValue = (colName: string, val: any, rowId?: string) => {
     if (val === null || val === undefined) {
       return (
-        <span className="text-zinc-400 dark:text-zinc-600 italic font-mono text-[11px]">
+        <span className="text-[#5D6080]/60 dark:text-[#BBBCE4]/40 italic font-mono text-[11px]">
           null
         </span>
       );
@@ -311,7 +311,7 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
           className={`px-2 py-0.5 rounded text-[10px] font-bold ${
             val
               ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"
-              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500"
+              : "bg-[#f6f7fc] dark:bg-[#141d33] text-[#5D6080] dark:text-[#BBBCE4]/70"
           }`}
         >
           {strVal}
@@ -332,7 +332,7 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
               data: val,
             })
           }
-          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 font-mono text-[10px] font-medium transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#5420A6]/10 dark:bg-[#5420A6]/20 text-[#5420A6] dark:text-[#BBBCE4] hover:bg-[#5420A6]/20 dark:hover:bg-[#5420A6]/30 font-mono text-[10px] font-medium transition-colors cursor-pointer"
         >
           <Code2 className="w-3 h-3" />
           <span>{label}</span>
@@ -342,7 +342,7 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
 
     if (lowerCol.includes("email")) {
       return (
-        <span className="font-mono text-zinc-700 dark:text-zinc-300">
+        <span className="font-mono text-[#06427D] dark:text-[#e6e9f7]">
           {maskEmail(strVal, rowId)}
         </span>
       );
@@ -355,7 +355,7 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
     ) {
       return (
         <span
-          className="font-mono text-zinc-600 dark:text-zinc-400"
+          className="font-mono text-[#5D6080] dark:text-[#BBBCE4]/80"
           title={strVal}
         >
           {maskId(strVal, rowId)}
@@ -371,7 +371,7 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
       const parsedDate = new Date(strVal);
       if (!isNaN(parsedDate.getTime())) {
         return (
-          <span className="font-mono text-zinc-500 text-[11px]" title={strVal}>
+          <span className="font-mono text-[#5D6080] dark:text-[#BBBCE4]/70 text-[11px]" title={strVal}>
             {parsedDate.toLocaleDateString()} {parsedDate.toLocaleTimeString()}
           </span>
         );
@@ -379,7 +379,7 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
     }
 
     return (
-      <span className="truncate max-w-xs block text-zinc-800 dark:text-zinc-200">
+      <span className="truncate max-w-xs block text-[#06427D] dark:text-[#e6e9f7]">
         {strVal}
       </span>
     );
@@ -387,20 +387,20 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
-      <div className="p-5 rounded-2xl bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-indigo-500/5 border border-indigo-200/70 dark:border-indigo-800/60 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+      <div className="p-5 rounded-2xl bg-gradient-to-r from-[#5420A6]/10 via-[#BBBCE4]/15 to-[#A9DAF5]/10 border border-[#5420A6]/20 dark:border-[#5420A6]/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-xs">
+            <div className="w-8 h-8 rounded-xl bg-[#5420A6] text-white flex items-center justify-center shadow-xs">
               <Database className="w-4 h-4" />
             </div>
-            <h2 className="text-base font-bold text-zinc-950 dark:text-white">
+            <h2 className="text-base font-bold text-[#06427D] dark:text-[#BBBCE4]">
               Supabase Database Explorer
             </h2>
             <span className="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold">
               26 Tables Live
             </span>
           </div>
-          <p className="text-xs text-zinc-600 dark:text-zinc-400">
+          <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4]/80">
             Real-time table viewer for all production PostgreSQL entities,
             survey payloads, and curriculum models.
           </p>
@@ -410,17 +410,17 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
           <button
             onClick={() => fetchTableData(selectedTable, rowLimit)}
             disabled={loading}
-            className="px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#181a26] text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+            className="px-3 py-1.5 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] text-xs font-semibold text-[#5D6080] dark:text-[#BBBCE4] hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
           >
             <RefreshCw
-              className={`w-3.5 h-3.5 ${loading ? "animate-spin text-indigo-500" : ""}`}
+              className={`w-3.5 h-3.5 ${loading ? "animate-spin text-[#5420A6]" : ""}`}
             />
             <span>Refresh</span>
           </button>
           <button
             onClick={handleExportJson}
             disabled={tableData.rows.length === 0}
-            className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+            className="px-3 py-1.5 rounded-xl bg-[#5420A6] hover:bg-[#5420A6]/90 text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export Table JSON</span>
@@ -430,7 +430,7 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
 
       <div className="space-y-2.5">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+          <span className="text-[10px] font-bold text-[#5D6080] dark:text-[#BBBCE4]/60 uppercase tracking-wider">
             Database Catalog ({catalog.length} Tables)
           </span>
           <div className="flex items-center gap-1 text-xs">
@@ -438,8 +438,8 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
               onClick={() => setCategoryFilter("all")}
               className={`px-2 py-0.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-colors ${
                 categoryFilter === "all"
-                  ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900"
-                  : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
+                  ? "bg-[#5420A6] text-white"
+                  : "text-[#5D6080] dark:text-[#BBBCE4]/70 hover:text-[#06427D] dark:hover:text-[#BBBCE4]"
               }`}
             >
               All Categories
@@ -450,8 +450,8 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
                 onClick={() => setCategoryFilter(cat)}
                 className={`px-2 py-0.5 rounded-lg text-[11px] font-semibold cursor-pointer transition-colors ${
                   categoryFilter === cat
-                    ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900"
-                    : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
+                    ? "bg-[#5420A6] text-white"
+                    : "text-[#5D6080] dark:text-[#BBBCE4]/70 hover:text-[#06427D] dark:hover:text-[#BBBCE4]"
                 }`}
               >
                 {cat}
@@ -469,20 +469,20 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
                 onClick={() => handleTableSelect(t.id)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2 border transition-all cursor-pointer ${
                   isSelected
-                    ? "bg-white dark:bg-[#181a26] text-zinc-950 dark:text-white border-indigo-500 ring-2 ring-indigo-500/20 shadow-sm"
-                    : "bg-white/60 dark:bg-[#0e1019]/60 border-zinc-200/80 dark:border-white/[0.06] text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white hover:border-zinc-300 dark:hover:border-zinc-700"
+                    ? "bg-[#FFFFFF] dark:bg-[#141d33] text-[#06427D] dark:text-[#BBBCE4] border-[#5420A6] ring-2 ring-[#5420A6]/20 shadow-sm"
+                    : "bg-[#FFFFFF]/70 dark:bg-[#0e1526]/80 border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#BBBCE4]/70 hover:text-[#06427D] dark:hover:text-[#BBBCE4] hover:border-[#BBBCE4] dark:hover:border-[#5420A6]/50"
                 }`}
               >
                 <Table
-                  className={`w-3.5 h-3.5 ${isSelected ? "text-indigo-500" : "text-zinc-400"}`}
+                  className={`w-3.5 h-3.5 ${isSelected ? "text-[#5420A6]" : "text-[#5D6080]/60"}`}
                 />
                 <span>{t.id}</span>
                 {t.rowCount !== undefined && (
                   <span
                     className={`text-[9.5px] font-bold px-1.5 py-0.2 rounded-full tabular-nums ${
                       isSelected
-                        ? "bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300"
-                        : "bg-zinc-100 dark:bg-zinc-800 text-zinc-400"
+                        ? "bg-[#5420A6]/10 dark:bg-[#5420A6]/30 text-[#5420A6] dark:text-[#BBBCE4]"
+                        : "bg-[#f6f7fc] dark:bg-[#141d33] text-[#5D6080] dark:text-[#BBBCE4]/60"
                     }`}
                   >
                     {t.rowCount}
@@ -494,13 +494,13 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
         </div>
       </div>
 
-      <div className="p-4 rounded-2xl bg-white/70 dark:bg-[#0e1019]/80 backdrop-blur-xl border border-zinc-200/70 dark:border-white/[0.07] shadow-sm space-y-4">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800/60">
+      <div className="p-4 rounded-2xl bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pb-3 border-b border-[#dcdff2] dark:border-[#1d2c4e]">
           <div className="flex items-center gap-3">
-            <span className="font-mono text-sm font-bold text-zinc-950 dark:text-white">
+            <span className="font-mono text-sm font-bold text-[#06427D] dark:text-[#BBBCE4]">
               public.{tableData.table}
             </span>
-            <span className="text-[11px] text-zinc-500 font-medium">
+            <span className="text-[11px] text-[#5D6080] dark:text-[#BBBCE4]/70 font-medium">
               Showing {filteredRows.length} of {tableData.totalRows} rows •{" "}
               {tableData.columns.length} columns
             </span>
@@ -508,13 +508,13 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
 
           <div className="flex items-center gap-2">
             <div className="relative flex-1 sm:w-64">
-              <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-[#5D6080]/60 absolute left-2.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Search within table..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-8 pr-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#0a0b10] text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                className="w-full pl-8 pr-2.5 py-1.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#080c18] text-xs text-[#06427D] dark:text-[#e6e9f7] placeholder-[#5D6080]/60 focus:outline-none focus:ring-2 focus:ring-[#5420A6]/30"
               />
             </div>
 
@@ -525,7 +525,7 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
                 setRowLimit(limit);
                 fetchTableData(selectedTable, limit);
               }}
-              className="px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#0a0b10] text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 cursor-pointer"
+              className="px-2.5 py-1.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#080c18] text-xs text-[#06427D] dark:text-[#e6e9f7] focus:outline-none focus:ring-2 focus:ring-[#5420A6]/30 cursor-pointer"
             >
               <option value={25}>25 rows</option>
               <option value={50}>50 rows</option>
@@ -537,8 +537,8 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
 
         {loading ? (
           <div className="py-16 text-center space-y-2">
-            <RefreshCw className="w-6 h-6 text-indigo-500 animate-spin mx-auto" />
-            <p className="text-xs text-zinc-500">
+            <RefreshCw className="w-6 h-6 text-[#5420A6] animate-spin mx-auto" />
+            <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4]/70">
               Querying Supabase table data...
             </p>
           </div>
@@ -548,15 +548,15 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
             <span>{tableData.error}</span>
           </div>
         ) : tableData.columns.length === 0 ? (
-          <div className="py-12 text-center text-zinc-400 text-xs">
+          <div className="py-12 text-center text-[#5D6080] dark:text-[#BBBCE4]/60 text-xs">
             Table public.{tableData.table} contains 0 records.
           </div>
         ) : (
-          <div className="rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 overflow-x-auto max-h-[600px] overflow-y-auto">
-            <table className="w-full text-left text-xs divide-y divide-zinc-200/60 dark:divide-zinc-800/60">
-              <thead className="bg-zinc-100/80 dark:bg-white/[0.04] sticky top-0 z-10 text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+          <div className="rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] overflow-x-auto max-h-[600px] overflow-y-auto">
+            <table className="w-full text-left text-xs divide-y divide-[#dcdff2] dark:divide-[#1d2c4e]">
+              <thead className="bg-[#f6f7fc] dark:bg-[#141d33] sticky top-0 z-10 text-[10px] font-bold text-[#5D6080] dark:text-[#BBBCE4]/80 uppercase tracking-wider">
                 <tr>
-                  <th className="py-2.5 px-3 w-10 text-center text-zinc-400">
+                  <th className="py-2.5 px-3 w-10 text-center text-[#5D6080]/60">
                     #
                   </th>
                   {tableData.columns.map((col) => (
@@ -566,15 +566,15 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-200/40 dark:divide-zinc-800/40 font-sans">
+              <tbody className="divide-y divide-[#dcdff2]/60 dark:divide-[#1d2c4e]/60 font-sans">
                 {filteredRows.map((row, idx) => {
                   const rowId = row.id || `row-${idx}`;
                   return (
                     <tr
                       key={rowId}
-                      className="hover:bg-zinc-50/70 dark:hover:bg-white/[0.02] transition-colors"
+                      className="hover:bg-[#f6f7fc]/80 dark:hover:bg-[#141d33]/50 transition-colors"
                     >
-                      <td className="py-2.5 px-3 text-center text-zinc-400 font-mono text-[10px]">
+                      <td className="py-2.5 px-3 text-center text-[#5D6080]/60 font-mono text-[10px]">
                         {idx + 1}
                       </td>
                       {tableData.columns.map((col) => (
@@ -593,32 +593,32 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
 
       {inspectingJson && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-150">
-          <div className="w-full max-w-xl max-h-[85vh] bg-white dark:bg-[#11131e] border border-zinc-200 dark:border-white/[0.1] rounded-2xl shadow-2xl p-6 overflow-hidden flex flex-col space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+          <div className="w-full max-w-xl max-h-[85vh] bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] rounded-2xl shadow-2xl p-6 overflow-hidden flex flex-col space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-[#dcdff2] dark:border-[#1d2c4e]">
               <div className="flex items-center gap-2">
-                <Code2 className="w-4 h-4 text-indigo-500" />
-                <h3 className="text-sm font-bold text-zinc-950 dark:text-white font-mono">
+                <Code2 className="w-4 h-4 text-[#5420A6] dark:text-[#A9DAF5]" />
+                <h3 className="text-sm font-bold text-[#06427D] dark:text-[#BBBCE4] font-mono">
                   {inspectingJson.title}
                 </h3>
               </div>
               <button
                 onClick={() => setInspectingJson(null)}
-                className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                className="p-1 rounded-lg text-[#5D6080] hover:text-[#06427D] dark:text-[#BBBCE4]/70 dark:hover:text-[#BBBCE4] hover:bg-[#BBBCE4]/20 dark:hover:bg-[#141d33] transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto rounded-xl bg-zinc-950 p-3.5 border border-zinc-800">
-              <pre className="font-mono text-xs text-indigo-300 overflow-x-auto leading-relaxed">
+            <div className="flex-1 overflow-y-auto rounded-xl bg-[#080c18] p-3.5 border border-[#1d2c4e]">
+              <pre className="font-mono text-xs text-[#A9DAF5] overflow-x-auto leading-relaxed">
                 {JSON.stringify(inspectingJson.data, null, 2)}
               </pre>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#dcdff2] dark:border-[#1d2c4e]">
               <button
                 onClick={() => handleCopyJson(inspectingJson.data)}
-                className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="px-3 py-1.5 rounded-xl bg-[#5420A6] hover:bg-[#5420A6]/90 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 {copiedJson ? (
                   <>
@@ -634,7 +634,7 @@ export const DatabaseExplorerView: React.FC<DatabaseExplorerViewProps> = ({
               </button>
               <button
                 onClick={() => setInspectingJson(null)}
-                className="px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                className="px-3 py-1.5 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#BBBCE4] text-xs font-semibold hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] transition-colors cursor-pointer"
               >
                 Close
               </button>

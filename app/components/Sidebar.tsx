@@ -127,8 +127,8 @@ export const Sidebar: React.FC = () => {
             onClick={() => handleNavClick(item.id)}
             className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-sm transition-all cursor-pointer ${
               isMatch
-                ? "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold border-2 border-indigo-200 dark:border-indigo-800/80 shadow-xs"
-                : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-900 border-2 border-transparent font-medium"
+                ? "bg-[#BBBCE4]/20 dark:bg-[#5420A6]/25 text-[#5420A6] dark:text-[#BBBCE4] font-bold border-2 border-[#BBBCE4] dark:border-[#5420A6]/70 shadow-xs"
+                : "text-[#5D6080] dark:text-[#9aa0c4] hover:text-[#06427D] dark:hover:text-[#BBBCE4] hover:bg-[#BBBCE4]/10 dark:hover:bg-[#141f36] border-2 border-transparent font-medium"
             }`}
           >
             <Icon className="w-4 h-4 shrink-0" />
@@ -138,7 +138,7 @@ export const Sidebar: React.FC = () => {
       })}
 
       {isAdmin && (
-        <div className="pt-2 mt-2 border-t border-zinc-200/60 dark:border-zinc-800/60">
+        <div className="pt-2 mt-2 border-t border-[#dcdff2]/60 dark:border-[#1d2c4e]/60">
           <button
             onClick={() => {
               setSidebarOpen(false);
@@ -156,7 +156,7 @@ export const Sidebar: React.FC = () => {
 
   return (
     <>
-      <aside className="hidden md:flex flex-col w-60 lg:w-64 fixed inset-y-0 left-0 z-30 bg-zinc-50/70 dark:bg-[#0c0d12] border-r border-zinc-200/80 dark:border-zinc-800/80 select-none">
+      <aside className="hidden md:flex flex-col w-60 lg:w-64 fixed inset-y-0 left-0 z-30 bg-[#f8f9fd]/90 dark:bg-[#0b101e] border-r border-[#dcdff2]/80 dark:border-[#1d2c4e]/80 select-none">
         <div className="h-16 px-6 flex items-center">
           <div
             onClick={() => handleNavClick("dashboard")}
@@ -167,7 +167,7 @@ export const Sidebar: React.FC = () => {
               alt="Huddle"
               className="w-7 h-7 rounded-lg object-contain shrink-0 group-hover:scale-105 transition-transform"
             />
-            <span className="font-semibold text-base text-zinc-900 dark:text-white tracking-tight">
+            <span className="font-semibold text-base text-[#06427D] dark:text-[#BBBCE4] tracking-tight">
               Huddle
             </span>
           </div>
@@ -175,31 +175,31 @@ export const Sidebar: React.FC = () => {
 
         <div className="flex-1 py-3 overflow-y-auto">{renderNavItems()}</div>
 
-        <div className="p-3 border-t border-zinc-200/80 dark:border-zinc-800/80 space-y-1">
+        <div className="p-3 border-t border-[#dcdff2]/80 dark:border-[#1d2c4e]/80 space-y-1">
           <button
             onClick={() => setMascotOpen(true)}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 transition-colors cursor-pointer"
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-[#5420A6] dark:text-[#A9DAF5] hover:bg-[#5420A6]/10 dark:hover:bg-[#5420A6]/20 transition-colors cursor-pointer"
           >
             <Zap className="w-4 h-4" />
             <span>Spark - Your AI Companion</span>
           </button>
 
-          <div className="flex items-center justify-between px-2 pt-2 text-zinc-500 text-xs">
+          <div className="flex items-center justify-between px-2 pt-2 text-[#5D6080] dark:text-[#9aa0c4] text-xs">
             <button
               onClick={toggleTheme}
-              className="p-1.5 rounded-lg hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg hover:text-[#06427D] dark:hover:text-[#BBBCE4] hover:bg-[#BBBCE4]/20 dark:hover:bg-[#141f36] transition-colors cursor-pointer"
               title="Toggle theme"
             >
               {theme === "dark" ? (
-                <Sun className="w-4 h-4" />
+                <Sun className="w-4 h-4 text-[#A9DAF5]" />
               ) : (
-                <Moon className="w-4 h-4" />
+                <Moon className="w-4 h-4 text-[#5420A6]" />
               )}
             </button>
 
             <button
               onClick={() => setSettingsOpen(true)}
-              className="p-1.5 rounded-lg hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg hover:text-[#06427D] dark:hover:text-[#BBBCE4] hover:bg-[#BBBCE4]/20 dark:hover:bg-[#141f36] transition-colors cursor-pointer"
               title="Settings"
             >
               <Settings className="w-4 h-4" />
@@ -233,26 +233,26 @@ export const Sidebar: React.FC = () => {
 
       <aside
         ref={mobileSidebarRef}
-        className={`fixed inset-y-0 left-0 z-50 w-64 max-w-[85vw] bg-white dark:bg-[#0c0d12] border-r border-zinc-200/80 dark:border-zinc-800/80 shadow-xl flex flex-col transition-transform duration-200 ease-out md:hidden ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 max-w-[85vw] bg-white dark:bg-[#0e1526] border-r border-[#dcdff2]/80 dark:border-[#1d2c4e]/80 shadow-xl flex flex-col transition-transform duration-200 ease-out md:hidden ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         aria-label="Navigation drawer"
       >
-        <div className="h-14 px-5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+        <div className="h-14 px-5 border-b border-[#dcdff2]/60 dark:border-[#1d2c4e] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <img
               src="/logo.svg"
               alt="Huddle"
               className="w-7 h-7 rounded-lg object-contain shrink-0"
             />
-            <span className="font-semibold text-base text-zinc-900 dark:text-white tracking-tight">
+            <span className="font-semibold text-base text-[#06427D] dark:text-[#BBBCE4] tracking-tight">
               Huddle
             </span>
           </div>
 
           <button
             onClick={() => setSidebarOpen(false)}
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-[#5D6080] hover:text-[#06427D] dark:text-[#9aa0c4] dark:hover:text-[#BBBCE4] transition-colors cursor-pointer"
             aria-label="Close menu"
           >
             <X className="w-4 h-4" />
@@ -261,13 +261,13 @@ export const Sidebar: React.FC = () => {
 
         <div className="flex-1 py-4 overflow-y-auto">{renderNavItems()}</div>
 
-        <div className="p-4 border-t border-zinc-100 dark:border-zinc-800">
+        <div className="p-4 border-t border-[#dcdff2]/60 dark:border-[#1d2c4e]">
           <button
             onClick={() => {
               setMascotOpen(true);
               setSidebarOpen(false);
             }}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-colors cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[#5420A6] dark:text-[#A9DAF5] hover:bg-[#5420A6]/10 dark:hover:bg-[#5420A6]/20 transition-colors cursor-pointer"
           >
             <Zap className="w-4 h-4" />
             <span>Spark - Your AI Companion</span>

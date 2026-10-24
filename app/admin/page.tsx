@@ -898,9 +898,9 @@ export default function AdminDashboardPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center p-4">
-        <div className="flex items-center gap-2 text-xs text-zinc-500 font-medium">
-          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+      <div className="min-h-screen bg-[#f6f7fc] dark:bg-[#080c18] flex items-center justify-center p-4">
+        <div className="flex items-center gap-2 text-xs text-[#5D6080] dark:text-[#BBBCE4] font-medium">
+          <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#5420A6] dark:text-[#A9DAF5]" />
           <span>Verifying access...</span>
         </div>
       </div>
@@ -909,16 +909,16 @@ export default function AdminDashboardPage() {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center p-4">
-        <div className="w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 space-y-4">
-          <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300">
+      <div className="min-h-screen bg-[#f6f7fc] dark:bg-[#080c18] flex items-center justify-center p-4">
+        <div className="w-full max-w-sm bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] rounded-2xl p-6 space-y-4 shadow-xl">
+          <div className="w-10 h-10 rounded-xl bg-[#BBBCE4]/20 dark:bg-[#141d33] border border-[#BBBCE4]/40 dark:border-[#1d2c4e] flex items-center justify-center text-[#5420A6] dark:text-[#A9DAF5]">
             <Lock className="w-5 h-5" />
           </div>
           <div className="space-y-1">
-            <h1 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            <h1 className="text-sm font-bold text-[#06427D] dark:text-[#e6e9f7]">
               Access Restricted
             </h1>
-            <p className="text-xs text-zinc-500 leading-relaxed">
+            <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4] leading-relaxed">
               This area requires administrator permissions. Signed in as{" "}
               <span className="font-mono">{maskEmail(user?.email || "")}</span>.
             </p>
@@ -926,13 +926,13 @@ export default function AdminDashboardPage() {
           <div className="pt-2 flex gap-2">
             <Link
               href="/app"
-              className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+              className="px-3 py-1.5 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] text-[#06427D] dark:text-[#e6e9f7] text-xs font-semibold hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] transition-colors"
             >
               Return to App
             </Link>
             <Link
               href="/auth/login"
-              className="px-3 py-1.5 rounded bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-medium hover:opacity-90 transition-opacity"
+              className="px-3 py-1.5 rounded-xl bg-[#5420A6] text-[#FFFFFF] text-xs font-bold hover:bg-[#45188d] transition-colors shadow-sm shadow-[#5420A6]/20"
             >
               Change Account
             </Link>
@@ -981,18 +981,18 @@ export default function AdminDashboardPage() {
   const pendingReportsList = reportsList.filter((r) => r.status === "pending");
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans antialiased">
-      <header className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 sm:px-6 py-2.5 sticky top-0 z-40">
+    <div className="min-h-screen bg-[#f6f7fc] dark:bg-[#080c18] text-[#06427D] dark:text-[#e6e9f7] font-sans antialiased">
+      <header className="border-b border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] px-4 sm:px-6 py-2.5 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link
               href="/app"
-              className="p-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="p-1.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] hover:text-[#06427D] dark:hover:text-[#BBBCE4] hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] transition-colors"
               title="Return to App"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
             </Link>
-            <span className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+            <span className="text-sm font-bold tracking-tight text-[#06427D] dark:text-[#e6e9f7]">
               Huddle Admin
             </span>
           </div>
@@ -1003,9 +1003,9 @@ export default function AdminDashboardPage() {
                 setPrivacySafeMode(!privacySafeMode);
                 setRevealedItemIds(new Set());
               }}
-              className={`px-2.5 py-1 rounded border text-xs font-mono transition-colors cursor-pointer ${
+              className={`px-2.5 py-1 rounded-lg border text-xs font-mono transition-colors cursor-pointer ${
                 privacySafeMode
-                  ? "border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300"
+                  ? "border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-[#06427D] dark:text-[#BBBCE4]"
                   : "border-amber-400 bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
               }`}
               title="Toggle masking for sensitive emails and IDs"
@@ -1016,7 +1016,7 @@ export default function AdminDashboardPage() {
             <button
               onClick={loadAllAdminData}
               disabled={loading}
-              className="p-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] hover:text-[#06427D] dark:hover:text-[#BBBCE4] hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] transition-colors cursor-pointer"
               title="Refresh dataset"
             >
               <RefreshCw
@@ -1024,7 +1024,7 @@ export default function AdminDashboardPage() {
               />
             </button>
 
-            <div className="text-zinc-500 font-mono text-[11px] pl-2 border-l border-zinc-200 dark:border-zinc-800 hidden sm:block">
+            <div className="text-[#5D6080] dark:text-[#BBBCE4] font-mono text-[11px] pl-2 border-l border-[#dcdff2] dark:border-[#1d2c4e] hidden sm:block">
               {user?.email || "admin"}
             </div>
           </div>
@@ -1050,7 +1050,7 @@ export default function AdminDashboardPage() {
             </div>
             <button
               onClick={() => setStatusMessage(null)}
-              className="hover:opacity-70 text-zinc-500 p-0.5 cursor-pointer"
+              className="hover:opacity-70 text-[#5D6080] p-0.5 cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -1059,7 +1059,7 @@ export default function AdminDashboardPage() {
       )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4">
-        <nav className="flex items-center gap-1 border-b border-zinc-200 dark:border-zinc-800 overflow-x-auto text-xs">
+        <nav className="flex items-center gap-1 border-b border-[#dcdff2] dark:border-[#1d2c4e] overflow-x-auto text-xs">
           {[
             { id: "overview", label: "Overview" },
             { id: "users", label: "Users", count: stats.totalUsers },
@@ -1095,10 +1095,10 @@ export default function AdminDashboardPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as AdminTab)}
-                className={`px-3 py-2 font-medium border-b-2 transition-colors whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
+                className={`px-3 py-2 font-semibold border-b-2 transition-colors whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
                   isActive
-                    ? "border-zinc-900 text-zinc-900 dark:border-zinc-100 dark:text-zinc-100 font-semibold"
-                    : "border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300"
+                    ? "border-[#5420A6] text-[#5420A6] dark:border-[#A9DAF5] dark:text-[#A9DAF5]"
+                    : "border-transparent text-[#5D6080] dark:text-[#BBBCE4] hover:text-[#06427D] dark:hover:text-[#e6e9f7]"
                 }`}
               >
                 <span>{tab.label}</span>
@@ -1107,7 +1107,7 @@ export default function AdminDashboardPage() {
                     className={`font-mono text-[10px] px-1.5 py-0.2 rounded tabular-nums ${
                       tab.urgent
                         ? "bg-rose-600 text-white font-bold"
-                        : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+                        : "bg-[#BBBCE4]/20 dark:bg-[#141d33] text-[#5420A6] dark:text-[#A9DAF5]"
                     }`}
                   >
                     {tab.count}
@@ -1146,16 +1146,16 @@ export default function AdminDashboardPage() {
                     return (
                       <div
                         key={reportId || Math.random()}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white dark:bg-zinc-900 border border-amber-200 dark:border-amber-900/40 rounded-md text-xs"
+                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-[#FFFFFF] dark:bg-[#0e1526] border border-amber-200 dark:border-amber-900/40 rounded-md text-xs"
                       >
                         <div className="space-y-0.5">
-                          <span className="font-semibold text-zinc-900 dark:text-zinc-100 capitalize">
+                          <span className="font-semibold text-[#06427D] dark:text-[#e6e9f7] capitalize">
                             {report.reasonCategory || "Safety Issue"}:{" "}
                           </span>
-                          <span className="text-zinc-600 dark:text-zinc-400">
+                          <span className="text-[#5D6080] dark:text-[#5D6080]/70">
                             "{report.details || "No details provided"}"
                           </span>
-                          <div className="text-[11px] text-zinc-400 font-mono">
+                          <div className="text-[11px] text-[#5D6080]/70 font-mono">
                             Report ID: {maskId(reportId)} • Squad:{" "}
                             {report.squadId || "Unassigned"}
                           </div>
@@ -1165,7 +1165,7 @@ export default function AdminDashboardPage() {
                             onClick={() =>
                               handleResolveReport(reportId, "reviewed")
                             }
-                            className="px-2.5 py-1 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 font-medium text-xs transition-colors cursor-pointer"
+                            className="px-2.5 py-1 rounded bg-[#5420A6] hover:bg-[#5420A6]/90 dark:bg-[#f6f7fc] dark:hover:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#06427D] font-medium text-xs transition-colors cursor-pointer"
                           >
                             Mark Reviewed
                           </button>
@@ -1173,7 +1173,7 @@ export default function AdminDashboardPage() {
                             onClick={() =>
                               handleResolveReport(reportId, "dismissed")
                             }
-                            className="px-2.5 py-1 rounded border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium text-xs transition-colors cursor-pointer"
+                            className="px-2.5 py-1 rounded border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#BBBCE4] hover:bg-[#BBBCE4]/20 dark:hover:bg-[#141d33] font-medium text-xs transition-colors cursor-pointer"
                           >
                             Dismiss
                           </button>
@@ -1184,59 +1184,59 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
             ) : (
-              <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg px-4 py-3 bg-white dark:bg-zinc-900 flex items-center justify-between text-xs text-zinc-500">
+              <div className="border border-[#dcdff2] dark:border-[#1d2c4e] rounded-lg px-4 py-3 bg-[#FFFFFF] dark:bg-[#0e1526] flex items-center justify-between text-xs text-[#5D6080]">
                 <span>
                   All systems normal. No pending safety reports or actions
                   required.
                 </span>
-                <span className="font-mono text-[11px] text-zinc-400">
+                <span className="font-mono text-[11px] text-[#5D6080]/70">
                   Queue clear
                 </span>
               </div>
             )}
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              <div className="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-                <div className="text-xs text-zinc-500 font-medium">
+              <div className="p-3.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526]">
+                <div className="text-xs text-[#5D6080] font-medium">
                   Engineers
                 </div>
-                <div className="text-xl font-semibold font-mono tabular-nums text-zinc-900 dark:text-zinc-100 mt-1">
+                <div className="text-xl font-semibold font-mono tabular-nums text-[#06427D] dark:text-[#e6e9f7] mt-1">
                   {stats.totalUsers}
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-                <div className="text-xs text-zinc-500 font-medium">
+              <div className="p-3.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526]">
+                <div className="text-xs text-[#5D6080] font-medium">
                   Micro-Squads
                 </div>
-                <div className="text-xl font-semibold font-mono tabular-nums text-zinc-900 dark:text-zinc-100 mt-1">
+                <div className="text-xl font-semibold font-mono tabular-nums text-[#06427D] dark:text-[#e6e9f7] mt-1">
                   {stats.totalSquads}
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-                <div className="text-xs text-zinc-500 font-medium">
+              <div className="p-3.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526]">
+                <div className="text-xs text-[#5D6080] font-medium">
                   Active Sprints
                 </div>
-                <div className="text-xl font-semibold font-mono tabular-nums text-zinc-900 dark:text-zinc-100 mt-1">
+                <div className="text-xl font-semibold font-mono tabular-nums text-[#06427D] dark:text-[#e6e9f7] mt-1">
                   {stats.totalSprints}
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-                <div className="text-xs text-zinc-500 font-medium">
+              <div className="p-3.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526]">
+                <div className="text-xs text-[#5D6080] font-medium">
                   Curriculum Tasks
                 </div>
-                <div className="text-xl font-semibold font-mono tabular-nums text-zinc-900 dark:text-zinc-100 mt-1">
+                <div className="text-xl font-semibold font-mono tabular-nums text-[#06427D] dark:text-[#e6e9f7] mt-1">
                   {stats.totalCurriculumTasks}
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-                <div className="text-xs text-zinc-500 font-medium">
+              <div className="p-3.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526]">
+                <div className="text-xs text-[#5D6080] font-medium">
                   Discussions
                 </div>
-                <div className="text-xl font-semibold font-mono tabular-nums text-zinc-900 dark:text-zinc-100 mt-1">
+                <div className="text-xl font-semibold font-mono tabular-nums text-[#06427D] dark:text-[#e6e9f7] mt-1">
                   {stats.totalDiscussions}
                 </div>
               </div>
@@ -1245,14 +1245,14 @@ export default function AdminDashboardPage() {
                 className={`p-3.5 rounded-lg border ${
                   stats.pendingReports > 0
                     ? "border-rose-300 dark:border-rose-900/80 bg-rose-50/50 dark:bg-rose-950/20"
-                    : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"
+                    : "border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526]"
                 }`}
               >
                 <div
                   className={`text-xs font-medium ${
                     stats.pendingReports > 0
                       ? "text-rose-700 dark:text-rose-400 font-semibold"
-                      : "text-zinc-500"
+                      : "text-[#5D6080]"
                   }`}
                 >
                   Pending Reports
@@ -1261,7 +1261,7 @@ export default function AdminDashboardPage() {
                   className={`text-xl font-semibold font-mono tabular-nums mt-1 ${
                     stats.pendingReports > 0
                       ? "text-rose-700 dark:text-rose-400"
-                      : "text-zinc-900 dark:text-zinc-100"
+                      : "text-[#06427D] dark:text-[#e6e9f7]"
                   }`}
                 >
                   {stats.pendingReports}
@@ -1269,35 +1269,35 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 bg-white dark:bg-zinc-900 space-y-2.5">
-              <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+            <div className="border border-[#dcdff2] dark:border-[#1d2c4e] rounded-lg p-4 bg-[#FFFFFF] dark:bg-[#0e1526] space-y-2.5">
+              <div className="text-xs font-semibold text-[#06427D] dark:text-[#e6e9f7]">
                 Quick Operations
               </div>
               <div className="flex items-center gap-2 flex-wrap">
                 <button
                   onClick={() => setShowCreateUserModal(true)}
-                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs font-medium text-[#06427D] dark:text-[#e6e9f7] hover:bg-[#BBBCE4]/20 dark:hover:bg-[#141d33] transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
                   <span>Register User</span>
                 </button>
                 <button
                   onClick={() => setShowCreateSquadModal(true)}
-                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs font-medium text-[#06427D] dark:text-[#e6e9f7] hover:bg-[#BBBCE4]/20 dark:hover:bg-[#141d33] transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <FolderPlus className="w-3.5 h-3.5" />
                   <span>Create Squad</span>
                 </button>
                 <button
                   onClick={() => setShowCreateTaskModal(true)}
-                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs font-medium text-[#06427D] dark:text-[#e6e9f7] hover:bg-[#BBBCE4]/20 dark:hover:bg-[#141d33] transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <BookOpen className="w-3.5 h-3.5" />
                   <span>Add Task Template</span>
                 </button>
                 <button
                   onClick={() => setShowCreateDiscussionModal(true)}
-                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs font-medium text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs font-medium text-[#06427D] dark:text-[#e6e9f7] hover:bg-[#BBBCE4]/20 dark:hover:bg-[#141d33] transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <MessageSquare className="w-3.5 h-3.5" />
                   <span>Post Announcement</span>
@@ -1305,20 +1305,20 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 overflow-hidden">
-              <div className="px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
-                <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+            <div className="border border-[#dcdff2] dark:border-[#1d2c4e] rounded-lg bg-[#FFFFFF] dark:bg-[#0e1526] overflow-hidden">
+              <div className="px-4 py-3 border-b border-[#dcdff2] dark:border-[#1d2c4e] flex items-center justify-between">
+                <span className="text-xs font-semibold text-[#06427D] dark:text-[#e6e9f7]">
                   Recent Administrative Events
                 </span>
                 <button
                   onClick={() => setActiveTab("audit")}
-                  className="text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors cursor-pointer"
+                  className="text-xs text-[#5D6080] hover:text-[#06427D] dark:hover:text-[#BBBCE4] transition-colors cursor-pointer"
                 >
                   View full audit log →
                 </button>
               </div>
               <table className="w-full text-left text-xs font-mono">
-                <thead className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 text-zinc-500 text-[11px]">
+                <thead className="border-b border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-[#5D6080] text-[11px]">
                   <tr>
                     <th className="py-2.5 px-4 font-medium">Timestamp</th>
                     <th className="py-2.5 px-4 font-medium">Admin</th>
@@ -1327,27 +1327,27 @@ export default function AdminDashboardPage() {
                     <th className="py-2.5 px-4 font-medium">Target ID</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800 text-[11px]">
+                <tbody className="divide-y divide-[#dcdff2] dark:divide-[#1d2c4e] text-[11px]">
                   {auditLogs.slice(0, 5).map((log) => (
                     <tr
                       key={log.id}
-                      className="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/30 transition-colors"
+                      className="hover:bg-[#f6f7fc]/80 dark:hover:bg-[#141d33]/50 transition-colors"
                     >
-                      <td className="py-2 px-4 text-zinc-400">
+                      <td className="py-2 px-4 text-[#5D6080]/70">
                         {new Date(log.createdAt).toLocaleTimeString()}
                       </td>
-                      <td className="py-2 px-4 font-sans font-medium text-zinc-900 dark:text-zinc-100">
+                      <td className="py-2 px-4 font-sans font-medium text-[#06427D] dark:text-[#e6e9f7]">
                         {log.adminName}
                       </td>
                       <td className="py-2 px-4">
-                        <span className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-mono text-[10px]">
+                        <span className="px-1.5 py-0.5 rounded bg-[#f6f7fc] dark:bg-[#141d33] text-[#5D6080] dark:text-[#BBBCE4] font-mono text-[10px]">
                           {log.action}
                         </span>
                       </td>
-                      <td className="py-2 px-4 font-sans capitalize text-zinc-500">
+                      <td className="py-2 px-4 font-sans capitalize text-[#5D6080]">
                         {log.targetType}
                       </td>
-                      <td className="py-2 px-4 text-zinc-400">
+                      <td className="py-2 px-4 text-[#5D6080]/70">
                         {log.targetId ? maskId(log.targetId) : "-"}
                       </td>
                     </tr>
@@ -1356,7 +1356,7 @@ export default function AdminDashboardPage() {
                     <tr>
                       <td
                         colSpan={5}
-                        className="py-6 text-center text-zinc-400 font-sans text-xs"
+                        className="py-6 text-center text-[#5D6080]/70 font-sans text-xs"
                       >
                         No administrative transactions logged yet.
                       </td>
@@ -1373,19 +1373,19 @@ export default function AdminDashboardPage() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2 flex-1 max-w-md">
                 <div className="relative flex-1">
-                  <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Search className="w-3.5 h-3.5 text-[#5D6080]/70 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     placeholder="Search by name, handle, or email..."
                     value={userSearchQuery}
                     onChange={(e) => setUserSearchQuery(e.target.value)}
-                    className="w-full pl-8 pr-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-400"
+                    className="w-full pl-8 pr-3 py-1.5 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] text-xs text-[#06427D] dark:text-[#e6e9f7] placeholder-[#5D6080]/60 focus:outline-none focus:border-[#5420A6]"
                   />
                 </div>
                 <select
                   value={userRoleFilter}
                   onChange={(e) => setUserRoleFilter(e.target.value)}
-                  className="p-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-700 dark:text-zinc-300 focus:outline-none"
+                  className="p-1.5 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] text-xs text-[#5D6080] dark:text-[#BBBCE4] focus:outline-none"
                 >
                   <option value="all">All Roles</option>
                   <option value="user">User</option>
@@ -1396,17 +1396,17 @@ export default function AdminDashboardPage() {
 
               <button
                 onClick={() => setShowCreateUserModal(true)}
-                className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 rounded bg-[#5420A6] hover:bg-[#5420A6]/90 dark:bg-[#f6f7fc] dark:hover:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#06427D] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 <span>Register User</span>
               </button>
             </div>
 
-            <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 overflow-hidden">
+            <div className="border border-[#dcdff2] dark:border-[#1d2c4e] rounded-lg bg-[#FFFFFF] dark:bg-[#0e1526] overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 text-zinc-500 font-medium text-[11px]">
+                  <thead className="border-b border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-[#5D6080] font-medium text-[11px]">
                     <tr>
                       <th className="py-2.5 px-4">User</th>
                       <th className="py-2.5 px-4">Email</th>
@@ -1417,38 +1417,38 @@ export default function AdminDashboardPage() {
                       <th className="py-2.5 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                  <tbody className="divide-y divide-[#dcdff2] dark:divide-[#1d2c4e]">
                     {filteredUsers.map((u) => {
                       const revealed = isRevealed(u.id);
                       return (
                         <tr
                           key={u.id}
-                          className="hover:bg-zinc-50/60 dark:hover:bg-zinc-800/30 transition-colors"
+                          className="hover:bg-[#f6f7fc]/60 dark:hover:bg-[#5420A6]/90/30 transition-colors"
                         >
                           <td className="py-2.5 px-4">
                             <div className="flex items-center gap-2.5">
                               <img
                                 src={getUserAvatarUrl(u, 64)}
                                 alt={u.name}
-                                className="w-7 h-7 rounded-md object-cover bg-zinc-100 dark:bg-zinc-800 shrink-0 border border-zinc-200 dark:border-zinc-800"
+                                className="w-7 h-7 rounded-md object-cover bg-[#f6f7fc] dark:bg-[#141d33] shrink-0 border border-[#dcdff2] dark:border-[#1d2c4e]"
                               />
                               <div>
-                                <div className="font-medium text-zinc-900 dark:text-zinc-100">
+                                <div className="font-medium text-[#06427D] dark:text-[#e6e9f7]">
                                   {u.name}
                                 </div>
-                                <div className="text-[11px] text-zinc-400 font-mono">
+                                <div className="text-[11px] text-[#5D6080]/70 font-mono">
                                   {u.handle}
                                 </div>
                               </div>
                             </div>
                           </td>
 
-                          <td className="py-2.5 px-4 font-mono text-zinc-600 dark:text-zinc-400">
+                          <td className="py-2.5 px-4 font-mono text-[#5D6080] dark:text-[#5D6080]/70">
                             <div className="flex items-center gap-1.5">
                               <span>{maskEmail(u.email, u.id)}</span>
                               <button
                                 onClick={() => toggleRevealItem(u.id)}
-                                className="p-0.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer"
+                                className="p-0.5 text-[#5D6080]/70 hover:text-[#5D6080] dark:hover:text-[#BBBCE4] cursor-pointer"
                                 title={revealed ? "Hide Email" : "Reveal Email"}
                               >
                                 {revealed ? (
@@ -1460,14 +1460,14 @@ export default function AdminDashboardPage() {
                             </div>
                           </td>
 
-                          <td className="py-2.5 px-4 font-mono text-zinc-500 text-[11px]">
+                          <td className="py-2.5 px-4 font-mono text-[#5D6080] text-[11px]">
                             <div className="flex items-center gap-1.5">
                               <span className="tabular-nums">
                                 {maskId(u.id, u.id)}
                               </span>
                               <button
                                 onClick={() => toggleRevealItem(u.id)}
-                                className="p-0.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer"
+                                className="p-0.5 text-[#5D6080]/70 hover:text-[#5D6080] dark:hover:text-[#BBBCE4] cursor-pointer"
                                 title={revealed ? "Hide ID" : "Reveal ID"}
                               >
                                 {revealed ? (
@@ -1486,7 +1486,7 @@ export default function AdminDashboardPage() {
                                     });
                                   }
                                 }}
-                                className="p-0.5 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer"
+                                className="p-0.5 text-[#5D6080]/70 hover:text-[#5D6080] dark:hover:text-[#BBBCE4] cursor-pointer"
                                 title="Copy full ID"
                               >
                                 <Copy className="w-3 h-3" />
@@ -1495,7 +1495,7 @@ export default function AdminDashboardPage() {
                           </td>
 
                           <td className="py-2.5 px-4">
-                            <span className="capitalize text-zinc-700 dark:text-zinc-300">
+                            <span className="capitalize text-[#5D6080] dark:text-[#BBBCE4]">
                               {u.role || "user"}
                             </span>
                           </td>
@@ -1510,13 +1510,13 @@ export default function AdminDashboardPage() {
                                 flagged
                               </span>
                             ) : (
-                              <span className="text-zinc-400 font-mono text-[11px]">
+                              <span className="text-[#5D6080]/70 font-mono text-[11px]">
                                 active
                               </span>
                             )}
                           </td>
 
-                          <td className="py-2.5 px-4 text-zinc-600 dark:text-zinc-400 max-w-xs truncate">
+                          <td className="py-2.5 px-4 text-[#5D6080] dark:text-[#5D6080]/70 max-w-xs truncate">
                             {u.primaryGoal || "Master System Architecture"}
                           </td>
 
@@ -1538,7 +1538,7 @@ export default function AdminDashboardPage() {
                                       u.careerMilestone || "Software Engineer",
                                   });
                                 }}
-                                className="px-2 py-1 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs transition-colors cursor-pointer"
+                                className="px-2 py-1 rounded border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#BBBCE4] hover:bg-[#BBBCE4]/20 dark:hover:bg-[#141d33] text-xs transition-colors cursor-pointer"
                               >
                                 Edit
                               </button>
@@ -1582,19 +1582,19 @@ export default function AdminDashboardPage() {
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <div className="relative flex-1 max-w-md">
-                <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-3.5 h-3.5 text-[#5D6080]/70 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Search squads by name or skill focus..."
                   value={squadSearchQuery}
                   onChange={(e) => setSquadSearchQuery(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-zinc-400"
+                  className="w-full pl-8 pr-3 py-1.5 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] text-xs text-[#06427D] dark:text-[#e6e9f7] placeholder-[#5D6080]/60 focus:outline-none focus:border-[#5420A6]"
                 />
               </div>
 
               <button
                 onClick={() => setShowCreateSquadModal(true)}
-                className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 rounded bg-[#5420A6] hover:bg-[#5420A6]/90 dark:bg-[#f6f7fc] dark:hover:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#06427D] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Create Squad</span>
@@ -1607,15 +1607,15 @@ export default function AdminDashboardPage() {
                 return (
                   <div
                     key={sq.id}
-                    className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col justify-between space-y-3"
+                    className="p-4 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] flex flex-col justify-between space-y-3"
                   >
                     <div className="space-y-2">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <div className="text-[11px] font-mono text-zinc-500">
+                          <div className="text-[11px] font-mono text-[#5D6080]">
                             {sq.skillFocus}
                           </div>
-                          <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-0.5">
+                          <h4 className="text-sm font-semibold text-[#06427D] dark:text-[#e6e9f7] mt-0.5">
                             {sq.name}
                           </h4>
                         </div>
@@ -1631,7 +1631,7 @@ export default function AdminDashboardPage() {
                                 inviteCode: sq.inviteCode,
                               });
                             }}
-                            className="p-1 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white cursor-pointer"
+                            className="p-1 rounded border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] hover:text-[#06427D] dark:hover:text-[#e6e9f7] cursor-pointer"
                             title="Edit squad"
                           >
                             <Edit2 className="w-3 h-3" />
@@ -1652,27 +1652,27 @@ export default function AdminDashboardPage() {
                         </div>
                       </div>
 
-                      <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                      <p className="text-xs text-[#5D6080] dark:text-[#5D6080]/70 leading-relaxed">
                         {sq.sharedGoal}
                       </p>
                     </div>
 
-                    <div className="pt-2.5 border-t border-zinc-100 dark:border-zinc-800 space-y-1.5 text-[11px]">
-                      <div className="flex items-center justify-between text-zinc-500">
+                    <div className="pt-2.5 border-t border-[#dcdff2] dark:border-[#1d2c4e] space-y-1.5 text-[11px]">
+                      <div className="flex items-center justify-between text-[#5D6080]">
                         <span>Target</span>
-                        <span className="font-mono text-zinc-900 dark:text-zinc-100">
+                        <span className="font-mono text-[#06427D] dark:text-[#e6e9f7]">
                           {sq.currentProgress || 0} / {sq.targetProgress}{" "}
                           Milestones
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between text-zinc-500">
+                      <div className="flex items-center justify-between text-[#5D6080]">
                         <span>Invite Code</span>
-                        <div className="flex items-center gap-1 font-mono text-zinc-800 dark:text-zinc-200">
+                        <div className="flex items-center gap-1 font-mono text-[#06427D] dark:text-[#e6e9f7]">
                           <span>{maskCode(sq.inviteCode, sq.id)}</span>
                           <button
                             onClick={() => toggleRevealItem(sq.id)}
-                            className="p-0.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+                            className="p-0.5 text-[#5D6080]/70 hover:text-[#5D6080] dark:hover:text-[#BBBCE4] cursor-pointer"
                             title={revealed ? "Hide code" : "Reveal code"}
                           >
                             {revealed ? (
@@ -1698,7 +1698,7 @@ export default function AdminDashboardPage() {
                 <select
                   value={taskCategoryFilter}
                   onChange={(e) => setTaskCategoryFilter(e.target.value)}
-                  className="p-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-xs text-zinc-700 dark:text-zinc-300 focus:outline-none"
+                  className="p-1.5 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] text-xs text-[#5D6080] dark:text-[#BBBCE4] focus:outline-none"
                 >
                   <option value="all">All Tracks</option>
                   <option value="System Architecture">
@@ -1714,14 +1714,14 @@ export default function AdminDashboardPage() {
                     API Design & Performance
                   </option>
                 </select>
-                <span className="text-xs text-zinc-500 font-mono">
+                <span className="text-xs text-[#5D6080] font-mono">
                   {filteredTasks.length} templates
                 </span>
               </div>
 
               <button
                 onClick={() => setShowCreateTaskModal(true)}
-                className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 rounded bg-[#5420A6] hover:bg-[#5420A6]/90 dark:bg-[#f6f7fc] dark:hover:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#06427D] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Task Template</span>
@@ -1732,16 +1732,16 @@ export default function AdminDashboardPage() {
               {filteredTasks.map((t) => (
                 <div
                   key={t.id}
-                  className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col justify-between space-y-3"
+                  className="p-4 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] flex flex-col justify-between space-y-3"
                 >
                   <div className="space-y-2">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <div className="text-[11px] font-mono text-zinc-500">
+                        <div className="text-[11px] font-mono text-[#5D6080]">
                           Lesson {t.dayNumber} • {t.taskType} •{" "}
                           {t.skillCategory}
                         </div>
-                        <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-0.5">
+                        <h4 className="text-sm font-semibold text-[#06427D] dark:text-[#e6e9f7] mt-0.5">
                           {t.title}
                         </h4>
                       </div>
@@ -1762,7 +1762,7 @@ export default function AdminDashboardPage() {
                               artifactTitle: t.artifactTitle || "",
                             });
                           }}
-                          className="p-1 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white cursor-pointer"
+                          className="p-1 rounded border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] hover:text-[#06427D] dark:hover:text-[#e6e9f7] cursor-pointer"
                           title="Edit template"
                         >
                           <Edit2 className="w-3 h-3" />
@@ -1783,12 +1783,12 @@ export default function AdminDashboardPage() {
                       </div>
                     </div>
 
-                    <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed line-clamp-2">
+                    <p className="text-xs text-[#5D6080] dark:text-[#5D6080]/70 leading-relaxed line-clamp-2">
                       {t.description}
                     </p>
                   </div>
 
-                  <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-[11px] text-zinc-400 font-mono">
+                  <div className="pt-2 border-t border-[#dcdff2] dark:border-[#1d2c4e] flex items-center justify-between text-[11px] text-[#5D6080]/70 font-mono">
                     <span>{t.estimatedMinutes} mins</span>
                     <span>{t.creatorName}</span>
                   </div>
@@ -1801,13 +1801,13 @@ export default function AdminDashboardPage() {
         {activeTab === "discussions" && (
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-              <span className="text-xs text-zinc-500">
+              <span className="text-xs text-[#5D6080]">
                 Community announcements and technical discussions
               </span>
 
               <button
                 onClick={() => setShowCreateDiscussionModal(true)}
-                className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1.5 rounded bg-[#5420A6] hover:bg-[#5420A6]/90 dark:bg-[#f6f7fc] dark:hover:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#06427D] text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Post Announcement</span>
@@ -1818,23 +1818,23 @@ export default function AdminDashboardPage() {
               {filteredDiscussions.map((post) => (
                 <div
                   key={post.id}
-                  className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+                  className="p-4 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
                 >
                   <div className="space-y-1 flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 font-mono text-[10px] uppercase">
+                      <span className="px-1.5 py-0.5 rounded bg-[#f6f7fc] dark:bg-[#141d33] text-[#5D6080] dark:text-[#5D6080]/70 font-mono text-[10px] uppercase">
                         {post.category || "discussion"}
                       </span>
-                      <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">
+                      <h4 className="text-sm font-semibold text-[#06427D] dark:text-[#e6e9f7] truncate">
                         {post.title}
                       </h4>
                     </div>
 
-                    <p className="text-xs text-zinc-600 dark:text-zinc-400 line-clamp-1">
+                    <p className="text-xs text-[#5D6080] dark:text-[#5D6080]/70 line-clamp-1">
                       {post.content}
                     </p>
 
-                    <div className="flex items-center gap-3 text-[11px] text-zinc-400">
+                    <div className="flex items-center gap-3 text-[11px] text-[#5D6080]/70">
                       <span>By {post.authorName}</span>
                       <span>•</span>
                       <span className="flex items-center gap-1 font-mono">
@@ -1858,7 +1858,7 @@ export default function AdminDashboardPage() {
                           skillTitle: post.skillTitle || "System Architecture",
                         });
                       }}
-                      className="px-2 py-1 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs transition-colors cursor-pointer"
+                      className="px-2 py-1 rounded border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#BBBCE4] hover:bg-[#BBBCE4]/20 dark:hover:bg-[#141d33] text-xs transition-colors cursor-pointer"
                     >
                       Edit
                     </button>
@@ -1879,7 +1879,7 @@ export default function AdminDashboardPage() {
               ))}
 
               {filteredDiscussions.length === 0 && (
-                <div className="p-8 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-800 text-center text-xs text-zinc-500">
+                <div className="p-8 rounded-lg border border-dashed border-[#dcdff2] dark:border-[#1d2c4e] text-center text-xs text-[#5D6080]">
                   No community posts recorded yet.
                 </div>
               )}
@@ -1890,7 +1890,7 @@ export default function AdminDashboardPage() {
         {activeTab === "reports" && (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-zinc-500 font-medium">Filter:</span>
+              <span className="text-xs text-[#5D6080] font-medium">Filter:</span>
               <div className="flex items-center gap-1">
                 {(["pending", "resolved", "all"] as const).map((st) => (
                   <button
@@ -1898,8 +1898,8 @@ export default function AdminDashboardPage() {
                     onClick={() => setReportFilter(st)}
                     className={`px-2.5 py-1 rounded text-xs font-mono capitalize transition-colors cursor-pointer ${
                       reportFilter === st
-                        ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 font-semibold"
-                        : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900"
+                        ? "bg-[#5420A6] text-white dark:bg-[#f6f7fc] dark:text-[#06427D] font-semibold"
+                        : "bg-[#f6f7fc] dark:bg-[#141d33] text-[#5D6080] dark:text-[#5D6080]/70 hover:text-[#06427D]"
                     }`}
                   >
                     {st}
@@ -1914,10 +1914,10 @@ export default function AdminDashboardPage() {
                 return (
                   <div
                     key={repId || Math.random()}
-                    className={`p-4 rounded-lg border bg-white dark:bg-zinc-900 space-y-2.5 ${
+                    className={`p-4 rounded-lg border bg-[#FFFFFF] dark:bg-[#0e1526] space-y-2.5 ${
                       rep.status === "pending"
                         ? "border-amber-300 dark:border-amber-800/70"
-                        : "border-zinc-200 dark:border-zinc-800"
+                        : "border-[#dcdff2] dark:border-[#1d2c4e]"
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -1927,16 +1927,16 @@ export default function AdminDashboardPage() {
                             className={`px-1.5 py-0.5 rounded font-mono text-[10px] uppercase font-semibold ${
                               rep.status === "pending"
                                 ? "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-200"
-                                : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+                                : "bg-[#f6f7fc] dark:bg-[#141d33] text-[#5D6080] dark:text-[#5D6080]/70"
                             }`}
                           >
                             {rep.status}
                           </span>
-                          <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 capitalize">
+                          <span className="text-xs font-semibold text-[#06427D] dark:text-[#e6e9f7] capitalize">
                             Reason: {rep.reasonCategory || "Unspecified"}
                           </span>
                         </div>
-                        <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                        <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4] leading-relaxed">
                           "{rep.details || "No details provided"}"
                         </p>
                       </div>
@@ -1948,7 +1948,7 @@ export default function AdminDashboardPage() {
                               onClick={() =>
                                 handleResolveReport(repId, "reviewed")
                               }
-                              className="px-2.5 py-1 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
+                              className="px-2.5 py-1 rounded bg-[#5420A6] hover:bg-[#5420A6]/90 dark:bg-[#f6f7fc] dark:hover:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#06427D] text-xs font-medium transition-colors cursor-pointer"
                             >
                               Mark Reviewed
                             </button>
@@ -1956,7 +1956,7 @@ export default function AdminDashboardPage() {
                               onClick={() =>
                                 handleResolveReport(repId, "dismissed")
                               }
-                              className="px-2.5 py-1 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-medium transition-colors cursor-pointer"
+                              className="px-2.5 py-1 rounded border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#5D6080]/70 hover:bg-[#BBBCE4]/20 dark:hover:bg-[#141d33] text-xs font-medium transition-colors cursor-pointer"
                             >
                               Dismiss
                             </button>
@@ -1980,7 +1980,7 @@ export default function AdminDashboardPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between text-[11px] text-zinc-400 font-mono pt-1 border-t border-zinc-100 dark:border-zinc-800">
+                    <div className="flex items-center justify-between text-[11px] text-[#5D6080]/70 font-mono pt-1 border-t border-[#dcdff2] dark:border-[#1d2c4e]">
                       <span>Squad: {rep.squadId || "Unassigned"}</span>
                       <span>Report ID: {maskId(repId)}</span>
                     </div>
@@ -1989,7 +1989,7 @@ export default function AdminDashboardPage() {
               })}
 
               {filteredReports.length === 0 && (
-                <div className="p-8 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-800 text-center text-xs text-zinc-500">
+                <div className="p-8 rounded-lg border border-dashed border-[#dcdff2] dark:border-[#1d2c4e] text-center text-xs text-[#5D6080]">
                   No moderation reports matching filter.
                 </div>
               )}
@@ -2010,15 +2010,15 @@ export default function AdminDashboardPage() {
 
         {activeTab === "audit" && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between text-xs text-zinc-500">
+            <div className="flex items-center justify-between text-xs text-[#5D6080]">
               <span>Audit record of administrative modifications</span>
               <span className="font-mono">{auditLogs.length} events</span>
             </div>
 
-            <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 overflow-hidden">
+            <div className="border border-[#dcdff2] dark:border-[#1d2c4e] rounded-lg bg-[#FFFFFF] dark:bg-[#0e1526] overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs font-mono">
-                  <thead className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/40 text-zinc-500 text-[11px]">
+                  <thead className="border-b border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-[#5D6080] text-[11px]">
                     <tr>
                       <th className="py-2.5 px-4 font-medium">Timestamp</th>
                       <th className="py-2.5 px-4 font-medium">Admin</th>
@@ -2028,30 +2028,30 @@ export default function AdminDashboardPage() {
                       <th className="py-2.5 px-4 font-medium">Parameters</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800 text-[11px]">
+                  <tbody className="divide-y divide-[#dcdff2] dark:divide-[#1d2c4e] text-[11px]">
                     {auditLogs.map((log) => (
                       <tr
                         key={log.id}
-                        className="hover:bg-zinc-50/70 dark:hover:bg-zinc-800/30 transition-colors"
+                        className="hover:bg-[#f6f7fc]/80 dark:hover:bg-[#141d33]/50 transition-colors"
                       >
-                        <td className="py-2 px-4 text-zinc-400">
+                        <td className="py-2 px-4 text-[#5D6080]/70">
                           {new Date(log.createdAt).toLocaleString()}
                         </td>
-                        <td className="py-2 px-4 font-sans font-medium text-zinc-900 dark:text-zinc-100">
+                        <td className="py-2 px-4 font-sans font-medium text-[#06427D] dark:text-[#e6e9f7]">
                           {log.adminName}
                         </td>
                         <td className="py-2 px-4">
-                          <span className="px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold text-[10px]">
+                          <span className="px-1.5 py-0.5 rounded bg-[#f6f7fc] dark:bg-[#141d33] text-[#5D6080] dark:text-[#BBBCE4] font-semibold text-[10px]">
                             {log.action}
                           </span>
                         </td>
-                        <td className="py-2 px-4 font-sans capitalize text-zinc-500">
+                        <td className="py-2 px-4 font-sans capitalize text-[#5D6080]">
                           {log.targetType}
                         </td>
-                        <td className="py-2 px-4 text-zinc-400">
+                        <td className="py-2 px-4 text-[#5D6080]/70">
                           {maskId(log.targetId || "", log.targetId)}
                         </td>
-                        <td className="py-2 px-4 text-zinc-500 max-w-xs truncate">
+                        <td className="py-2 px-4 text-[#5D6080] max-w-xs truncate">
                           {maskDetails(log.details)}
                         </td>
                       </tr>
@@ -2066,14 +2066,14 @@ export default function AdminDashboardPage() {
 
       {showCreateUserModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
+          <div className="w-full max-w-md bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] rounded-lg p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              <h3 className="text-sm font-semibold text-[#06427D] dark:text-[#e6e9f7]">
                 Register User
               </h3>
               <button
                 onClick={() => setShowCreateUserModal(false)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+                className="text-[#5D6080]/70 hover:text-[#5D6080] dark:hover:text-[#BBBCE4] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2081,7 +2081,7 @@ export default function AdminDashboardPage() {
 
             <form onSubmit={handleCreateUser} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Full Name
                 </label>
                 <input
@@ -2092,12 +2092,12 @@ export default function AdminDashboardPage() {
                     setUserForm({ ...userForm, name: e.target.value })
                   }
                   placeholder="e.g. Sarah Jenkins"
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-400"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7] focus:outline-none focus:border-[#5420A6]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Email
                 </label>
                 <input
@@ -2108,13 +2108,13 @@ export default function AdminDashboardPage() {
                     setUserForm({ ...userForm, email: e.target.value })
                   }
                   placeholder="e.g. sarah@example.com"
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:border-zinc-400"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7] focus:outline-none focus:border-[#5420A6]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                     Role
                   </label>
                   <select
@@ -2125,7 +2125,7 @@ export default function AdminDashboardPage() {
                         role: e.target.value as any,
                       })
                     }
-                    className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                    className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                   >
                     <option value="user">User</option>
                     <option value="moderator">Moderator</option>
@@ -2134,7 +2134,7 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                     Status
                   </label>
                   <select
@@ -2145,7 +2145,7 @@ export default function AdminDashboardPage() {
                         status: e.target.value as any,
                       })
                     }
-                    className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                    className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                   >
                     <option value="active">Active</option>
                     <option value="flagged">Flagged</option>
@@ -2155,7 +2155,7 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Primary Goal
                 </label>
                 <input
@@ -2164,22 +2164,22 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setUserForm({ ...userForm, primaryGoal: e.target.value })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#dcdff2] dark:border-[#1d2c4e]">
                 <button
                   type="button"
                   onClick={() => setShowCreateUserModal(false)}
-                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#5D6080]/70 text-xs font-medium hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded bg-[#5420A6] hover:bg-[#5420A6]/90 dark:bg-[#f6f7fc] dark:hover:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#06427D] text-xs font-medium transition-colors cursor-pointer"
                 >
                   {actionLoading ? "Registering..." : "Register User"}
                 </button>
@@ -2191,14 +2191,14 @@ export default function AdminDashboardPage() {
 
       {selectedUserForEdit && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
+          <div className="w-full max-w-md bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] rounded-lg p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              <h3 className="text-sm font-semibold text-[#06427D] dark:text-[#e6e9f7]">
                 Update User Profile
               </h3>
               <button
                 onClick={() => setSelectedUserForEdit(null)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+                className="text-[#5D6080]/70 hover:text-[#5D6080] dark:hover:text-[#BBBCE4] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2206,7 +2206,7 @@ export default function AdminDashboardPage() {
 
             <form onSubmit={handleSaveUser} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Full Name
                 </label>
                 <input
@@ -2216,13 +2216,13 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setUserForm({ ...userForm, name: e.target.value })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                     Role
                   </label>
                   <select
@@ -2233,7 +2233,7 @@ export default function AdminDashboardPage() {
                         role: e.target.value as any,
                       })
                     }
-                    className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                    className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                   >
                     <option value="user">User</option>
                     <option value="moderator">Moderator</option>
@@ -2242,7 +2242,7 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                     Status
                   </label>
                   <select
@@ -2253,7 +2253,7 @@ export default function AdminDashboardPage() {
                         status: e.target.value as any,
                       })
                     }
-                    className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                    className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                   >
                     <option value="active">Active</option>
                     <option value="flagged">Flagged</option>
@@ -2263,7 +2263,7 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Primary Goal
                 </label>
                 <input
@@ -2272,22 +2272,22 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setUserForm({ ...userForm, primaryGoal: e.target.value })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#dcdff2] dark:border-[#1d2c4e]">
                 <button
                   type="button"
                   onClick={() => setSelectedUserForEdit(null)}
-                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#5D6080]/70 text-xs font-medium hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded bg-[#5420A6] hover:bg-[#5420A6]/90 dark:bg-[#f6f7fc] dark:hover:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#06427D] text-xs font-medium transition-colors cursor-pointer"
                 >
                   {actionLoading ? "Saving..." : "Save Changes"}
                 </button>
@@ -2299,14 +2299,14 @@ export default function AdminDashboardPage() {
 
       {showCreateSquadModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
+          <div className="w-full max-w-md bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] rounded-lg p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              <h3 className="text-sm font-semibold text-[#06427D] dark:text-[#e6e9f7]">
                 Create Squad
               </h3>
               <button
                 onClick={() => setShowCreateSquadModal(false)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+                className="text-[#5D6080]/70 hover:text-[#5D6080] dark:hover:text-[#BBBCE4] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2314,7 +2314,7 @@ export default function AdminDashboardPage() {
 
             <form onSubmit={handleCreateSquad} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Squad Name
                 </label>
                 <input
@@ -2325,12 +2325,12 @@ export default function AdminDashboardPage() {
                     setSquadForm({ ...squadForm, name: e.target.value })
                   }
                   placeholder="e.g. Distributed Systems Cohort A"
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Skill Focus
                 </label>
                 <input
@@ -2340,12 +2340,12 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setSquadForm({ ...squadForm, skillFocus: e.target.value })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Shared Weekly Goal
                 </label>
                 <input
@@ -2354,12 +2354,12 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setSquadForm({ ...squadForm, sharedGoal: e.target.value })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Target Milestones
                 </label>
                 <input
@@ -2373,22 +2373,22 @@ export default function AdminDashboardPage() {
                       targetProgress: parseInt(e.target.value, 10) || 12,
                     })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#dcdff2] dark:border-[#1d2c4e]">
                 <button
                   type="button"
                   onClick={() => setShowCreateSquadModal(false)}
-                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#5D6080]/70 text-xs font-medium hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded bg-[#5420A6] hover:bg-[#5420A6]/90 dark:bg-[#f6f7fc] dark:hover:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#06427D] text-xs font-medium transition-colors cursor-pointer"
                 >
                   {actionLoading ? "Creating..." : "Create Squad"}
                 </button>
@@ -2400,14 +2400,14 @@ export default function AdminDashboardPage() {
 
       {editingSquad && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
+          <div className="w-full max-w-md bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] rounded-lg p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              <h3 className="text-sm font-semibold text-[#06427D] dark:text-[#e6e9f7]">
                 Edit Squad Settings
               </h3>
               <button
                 onClick={() => setEditingSquad(null)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+                className="text-[#5D6080]/70 hover:text-[#5D6080] dark:hover:text-[#BBBCE4] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2415,7 +2415,7 @@ export default function AdminDashboardPage() {
 
             <form onSubmit={handleSaveSquad} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Squad Name
                 </label>
                 <input
@@ -2425,12 +2425,12 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setSquadForm({ ...squadForm, name: e.target.value })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Skill Focus
                 </label>
                 <input
@@ -2440,12 +2440,12 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setSquadForm({ ...squadForm, skillFocus: e.target.value })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Shared Weekly Goal
                 </label>
                 <input
@@ -2454,12 +2454,12 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setSquadForm({ ...squadForm, sharedGoal: e.target.value })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Target Milestones
                 </label>
                 <input
@@ -2473,22 +2473,22 @@ export default function AdminDashboardPage() {
                       targetProgress: parseInt(e.target.value, 10) || 12,
                     })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#dcdff2] dark:border-[#1d2c4e]">
                 <button
                   type="button"
                   onClick={() => setEditingSquad(null)}
-                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#5D6080]/70 text-xs font-medium hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded bg-[#5420A6] hover:bg-[#5420A6]/90 dark:bg-[#f6f7fc] dark:hover:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#06427D] text-xs font-medium transition-colors cursor-pointer"
                 >
                   {actionLoading ? "Saving..." : "Save Changes"}
                 </button>
@@ -2500,14 +2500,14 @@ export default function AdminDashboardPage() {
 
       {showCreateTaskModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
+          <div className="w-full max-w-md bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] rounded-lg p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              <h3 className="text-sm font-semibold text-[#06427D] dark:text-[#e6e9f7]">
                 Add Task Template
               </h3>
               <button
                 onClick={() => setShowCreateTaskModal(false)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+                className="text-[#5D6080]/70 hover:text-[#5D6080] dark:hover:text-[#BBBCE4] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2515,7 +2515,7 @@ export default function AdminDashboardPage() {
 
             <form onSubmit={handleCreateTask} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Task Title
                 </label>
                 <input
@@ -2526,13 +2526,13 @@ export default function AdminDashboardPage() {
                     setTaskForm({ ...taskForm, title: e.target.value })
                   }
                   placeholder="e.g. Design Event-Driven Architecture"
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                     Day Number
                   </label>
                   <input
@@ -2546,12 +2546,12 @@ export default function AdminDashboardPage() {
                         dayNumber: parseInt(e.target.value, 10) || 1,
                       })
                     }
-                    className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                    className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                     Duration (mins)
                   </label>
                   <input
@@ -2565,13 +2565,13 @@ export default function AdminDashboardPage() {
                         estimatedMinutes: parseInt(e.target.value, 10) || 20,
                       })
                     }
-                    className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                    className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Skill Category
                 </label>
                 <select
@@ -2579,7 +2579,7 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setTaskForm({ ...taskForm, skillCategory: e.target.value })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 >
                   <option value="System Architecture">
                     System Architecture
@@ -2597,7 +2597,7 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Description
                 </label>
                 <textarea
@@ -2607,22 +2607,22 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setTaskForm({ ...taskForm, description: e.target.value })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#dcdff2] dark:border-[#1d2c4e]">
                 <button
                   type="button"
                   onClick={() => setShowCreateTaskModal(false)}
-                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#5D6080]/70 text-xs font-medium hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded bg-[#5420A6] hover:bg-[#5420A6]/90 dark:bg-[#f6f7fc] dark:hover:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#06427D] text-xs font-medium transition-colors cursor-pointer"
                 >
                   {actionLoading ? "Adding..." : "Add Task Template"}
                 </button>
@@ -2634,14 +2634,14 @@ export default function AdminDashboardPage() {
 
       {editingTask && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
+          <div className="w-full max-w-md bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] rounded-lg p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              <h3 className="text-sm font-semibold text-[#06427D] dark:text-[#e6e9f7]">
                 Edit Task Template
               </h3>
               <button
                 onClick={() => setEditingTask(null)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+                className="text-[#5D6080]/70 hover:text-[#5D6080] dark:hover:text-[#BBBCE4] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2649,7 +2649,7 @@ export default function AdminDashboardPage() {
 
             <form onSubmit={handleSaveTask} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Task Title
                 </label>
                 <input
@@ -2659,13 +2659,13 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setTaskForm({ ...taskForm, title: e.target.value })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                     Day Number
                   </label>
                   <input
@@ -2679,12 +2679,12 @@ export default function AdminDashboardPage() {
                         dayNumber: parseInt(e.target.value, 10) || 1,
                       })
                     }
-                    className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                    className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                  <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                     Duration (mins)
                   </label>
                   <input
@@ -2698,13 +2698,13 @@ export default function AdminDashboardPage() {
                         estimatedMinutes: parseInt(e.target.value, 10) || 20,
                       })
                     }
-                    className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                    className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Skill Category
                 </label>
                 <select
@@ -2712,7 +2712,7 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setTaskForm({ ...taskForm, skillCategory: e.target.value })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 >
                   <option value="System Architecture">
                     System Architecture
@@ -2730,7 +2730,7 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Description
                 </label>
                 <textarea
@@ -2740,22 +2740,22 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setTaskForm({ ...taskForm, description: e.target.value })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#dcdff2] dark:border-[#1d2c4e]">
                 <button
                   type="button"
                   onClick={() => setEditingTask(null)}
-                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#5D6080]/70 text-xs font-medium hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded bg-[#5420A6] hover:bg-[#5420A6]/90 dark:bg-[#f6f7fc] dark:hover:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#06427D] text-xs font-medium transition-colors cursor-pointer"
                 >
                   {actionLoading ? "Saving..." : "Save Changes"}
                 </button>
@@ -2767,14 +2767,14 @@ export default function AdminDashboardPage() {
 
       {showCreateDiscussionModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
+          <div className="w-full max-w-md bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] rounded-lg p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              <h3 className="text-sm font-semibold text-[#06427D] dark:text-[#e6e9f7]">
                 Post Community Announcement
               </h3>
               <button
                 onClick={() => setShowCreateDiscussionModal(false)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+                className="text-[#5D6080]/70 hover:text-[#5D6080] dark:hover:text-[#BBBCE4] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2785,7 +2785,7 @@ export default function AdminDashboardPage() {
               className="space-y-3 text-xs"
             >
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Headline
                 </label>
                 <input
@@ -2799,12 +2799,12 @@ export default function AdminDashboardPage() {
                     })
                   }
                   placeholder="e.g. Sprint 14 Retrospective & Technical Updates"
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Category
                 </label>
                 <select
@@ -2815,7 +2815,7 @@ export default function AdminDashboardPage() {
                       category: e.target.value as any,
                     })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 >
                   <option value="discussion">General Discussion</option>
                   <option value="question">Technical Question</option>
@@ -2825,7 +2825,7 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Content
                 </label>
                 <textarea
@@ -2839,22 +2839,22 @@ export default function AdminDashboardPage() {
                     })
                   }
                   placeholder="Write clear announcement content..."
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#dcdff2] dark:border-[#1d2c4e]">
                 <button
                   type="button"
                   onClick={() => setShowCreateDiscussionModal(false)}
-                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#5D6080]/70 text-xs font-medium hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded bg-[#5420A6] hover:bg-[#5420A6]/90 dark:bg-[#f6f7fc] dark:hover:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#06427D] text-xs font-medium transition-colors cursor-pointer"
                 >
                   {actionLoading ? "Publishing..." : "Publish Post"}
                 </button>
@@ -2866,14 +2866,14 @@ export default function AdminDashboardPage() {
 
       {editingDiscussion && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
+          <div className="w-full max-w-md bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] rounded-lg p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              <h3 className="text-sm font-semibold text-[#06427D] dark:text-[#e6e9f7]">
                 Edit Discussion Post
               </h3>
               <button
                 onClick={() => setEditingDiscussion(null)}
-                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+                className="text-[#5D6080]/70 hover:text-[#5D6080] dark:hover:text-[#BBBCE4] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2881,7 +2881,7 @@ export default function AdminDashboardPage() {
 
             <form onSubmit={handleSaveDiscussion} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Headline
                 </label>
                 <input
@@ -2894,12 +2894,12 @@ export default function AdminDashboardPage() {
                       title: e.target.value,
                     })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Category
                 </label>
                 <select
@@ -2910,7 +2910,7 @@ export default function AdminDashboardPage() {
                       category: e.target.value as any,
                     })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 >
                   <option value="discussion">General Discussion</option>
                   <option value="question">Technical Question</option>
@@ -2920,7 +2920,7 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-medium text-[#5D6080] dark:text-[#BBBCE4]">
                   Content
                 </label>
                 <textarea
@@ -2933,22 +2933,22 @@ export default function AdminDashboardPage() {
                       content: e.target.value,
                     })
                   }
-                  className="w-full p-2 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100"
+                  className="w-full p-2 rounded border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7]"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#dcdff2] dark:border-[#1d2c4e]">
                 <button
                   type="button"
                   onClick={() => setEditingDiscussion(null)}
-                  className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
+                  className="px-3 py-1.5 rounded border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#5D6080]/70 text-xs font-medium hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-3 py-1.5 rounded bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-zinc-900 text-xs font-medium transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded bg-[#5420A6] hover:bg-[#5420A6]/90 dark:bg-[#f6f7fc] dark:hover:bg-[#FFFFFF] text-[#FFFFFF] dark:text-[#06427D] text-xs font-medium transition-colors cursor-pointer"
                 >
                   {actionLoading ? "Saving..." : "Save Changes"}
                 </button>
@@ -2960,21 +2960,21 @@ export default function AdminDashboardPage() {
 
       {deleteConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-3">
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          <div className="w-full max-w-sm bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] rounded-lg p-5 space-y-3">
+            <h3 className="text-sm font-semibold text-[#06427D] dark:text-[#e6e9f7]">
               Confirm Deletion
             </h3>
-            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            <p className="text-xs text-[#5D6080] dark:text-[#5D6080]/70 leading-relaxed">
               Are you sure you want to delete{" "}
-              <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+              <span className="font-semibold text-[#06427D] dark:text-[#e6e9f7]">
                 "{deleteConfirmModal.name}"
               </span>
               ? This action cannot be reversed.
             </p>
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#dcdff2] dark:border-[#1d2c4e]">
               <button
                 onClick={() => setDeleteConfirmModal(null)}
-                className="px-3 py-1.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs font-medium hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
+                className="px-3 py-1.5 rounded border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#5D6080]/70 text-xs font-medium hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] cursor-pointer"
               >
                 Cancel
               </button>

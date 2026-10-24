@@ -32,7 +32,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${inter.className} min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-100 antialiased selection:bg-indigo-600 selection:text-white transition-colors duration-150`}
+        className={`${inter.className} min-h-screen bg-[#f6f7fc] dark:bg-[#080c18] text-[#06427D] dark:text-[#BBBCE4] antialiased selection:bg-[#5420A6] selection:text-[#FFFFFF] dark:selection:text-[#BBBCE4] transition-colors duration-150`}
       >
         <HuddleProvider>{children}</HuddleProvider>
       </body>

@@ -43,8 +43,8 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] flex items-center justify-center p-4 selection:bg-indigo-600 selection:text-white">
-      <div className="w-full max-w-md bg-white dark:bg-[#111218] border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl shadow-sm p-7 sm:p-9 space-y-6 animate-in fade-in duration-150">
+    <div className="min-h-screen bg-[#f6f7fc] dark:bg-[#080c18] flex items-center justify-center p-4 selection:bg-[#5420A6] selection:text-white dark:selection:text-[#BBBCE4]">
+      <div className="w-full max-w-md bg-white dark:bg-[#0e1526] border border-[#dcdff2]/80 dark:border-[#1d2c4e]/80 rounded-2xl shadow-sm p-7 sm:p-9 space-y-6 animate-in fade-in duration-150">
         <div className="flex items-center gap-3">
           <img
             src="/logo.svg"
@@ -52,24 +52,24 @@ export default function ForgotPasswordPage() {
             className="w-8 h-8 rounded-lg object-contain shrink-0"
           />
           <div>
-            <h1 className="text-lg font-bold tracking-tight text-zinc-950 dark:text-white">
+            <h1 className="text-lg font-bold tracking-tight text-[#06427D] dark:text-[#BBBCE4]">
               Reset your password
             </h1>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-[#5D6080] dark:text-[#9aa0c4]">
               Enter your account email to receive a recovery link.
             </p>
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 flex items-center gap-3">
-          <div className="shrink-0 w-8 h-8 rounded-lg bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-700 p-1 flex items-center justify-center">
+        <div className="p-4 rounded-xl bg-[#A9DAF5]/15 dark:bg-[#06427D]/20 border border-[#A9DAF5]/40 dark:border-[#1d2c4e] flex items-center gap-3">
+          <div className="shrink-0 w-8 h-8 rounded-lg bg-white dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] p-1 flex items-center justify-center">
             <img
               src="/mascot_thinking.svg"
               alt="Spark"
               className="w-full h-full object-contain"
             />
           </div>
-          <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          <p className="text-xs text-[#06427D] dark:text-[#BBBCE4] leading-relaxed">
             Enter the email address registered with your account and we will send you instructions to reset your password.
           </p>
         </div>
@@ -86,7 +86,7 @@ export default function ForgotPasswordPage() {
             <div className="pt-2">
               <Link
                 href="/auth/login"
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-[#5420A6] dark:text-[#A9DAF5] hover:underline"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Return to sign in</span>
@@ -103,18 +103,18 @@ export default function ForgotPasswordPage() {
             )}
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+              <label className="text-xs font-medium text-[#06427D] dark:text-[#BBBCE4]">
                 Email address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-2.5 w-4 h-4 text-zinc-400" />
+                <Mail className="absolute left-3.5 top-2.5 w-4 h-4 text-[#5D6080]/60 dark:text-[#9aa0c4]/60" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="alex@example.com"
-                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-white dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7] placeholder-[#8488ab] focus:outline-none focus:ring-1 focus:ring-[#5420A6]"
                 />
               </div>
             </div>
@@ -122,7 +122,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-medium transition-colors cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#5420A6] hover:bg-[#45188d] disabled:opacity-50 text-white dark:text-[#e6e9f7] text-xs font-medium transition-colors cursor-pointer shadow-sm"
             >
               {loading ? (
                 <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
@@ -134,7 +134,7 @@ export default function ForgotPasswordPage() {
             <div className="pt-2 text-center">
               <Link
                 href="/auth/login"
-                className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                className="inline-flex items-center gap-1.5 text-xs text-[#5D6080] dark:text-[#9aa0c4] hover:text-[#06427D] dark:hover:text-[#BBBCE4]"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Return to sign in</span>

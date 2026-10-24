@@ -58,15 +58,15 @@ export default function LoginPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] flex items-center justify-center">
-        <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#f6f7fc] dark:bg-[#080c18] flex items-center justify-center">
+        <div className="w-5 h-5 border-2 border-[#5420A6] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] flex items-center justify-center p-4 selection:bg-indigo-600 selection:text-white">
-      <div className="w-full max-w-md bg-white dark:bg-[#111218] border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl shadow-sm p-7 sm:p-9 space-y-6 animate-in fade-in duration-150">
+    <div className="min-h-screen bg-[#f6f7fc] dark:bg-[#080c18] flex items-center justify-center p-4 selection:bg-[#5420A6] selection:text-white dark:selection:text-[#BBBCE4]">
+      <div className="w-full max-w-md bg-white dark:bg-[#0e1526] border border-[#dcdff2]/80 dark:border-[#1d2c4e]/80 rounded-2xl shadow-sm p-7 sm:p-9 space-y-6 animate-in fade-in duration-150">
         <div className="flex items-center gap-3">
           <img
             src="/logo.svg"
@@ -74,24 +74,24 @@ export default function LoginPage() {
             className="w-8 h-8 rounded-lg object-contain shrink-0"
           />
           <div>
-            <h1 className="text-lg font-bold tracking-tight text-zinc-950 dark:text-white">
+            <h1 className="text-lg font-bold tracking-tight text-[#06427D] dark:text-[#BBBCE4]">
               Welcome back
             </h1>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-[#5D6080] dark:text-[#9aa0c4]">
               Sign in to continue where you left off.
             </p>
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 flex items-center gap-3">
-          <div className="shrink-0 w-8 h-8 rounded-lg bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-700 p-1 flex items-center justify-center">
+        <div className="p-4 rounded-xl bg-[#A9DAF5]/15 dark:bg-[#06427D]/20 border border-[#A9DAF5]/40 dark:border-[#1d2c4e] flex items-center gap-3">
+          <div className="shrink-0 w-8 h-8 rounded-lg bg-white dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] p-1 flex items-center justify-center">
             <img
               src="/mascot_idle.svg"
               alt="Spark"
               className="w-full h-full object-contain"
             />
           </div>
-          <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          <p className="text-xs text-[#06427D] dark:text-[#BBBCE4] leading-relaxed">
             A focused 20 minutes today keeps your momentum going and deepens what you learned yesterday.
           </p>
         </div>
@@ -105,43 +105,43 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+            <label className="text-xs font-medium text-[#06427D] dark:text-[#BBBCE4]">
               Email address
             </label>
             <div className="relative">
-              <Mail className="absolute left-3.5 top-2.5 w-4 h-4 text-zinc-400" />
+              <Mail className="absolute left-3.5 top-2.5 w-4 h-4 text-[#5D6080]/60 dark:text-[#9aa0c4]/60" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="alex@example.com"
-                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-white dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7] placeholder-[#8488ab] focus:outline-none focus:ring-1 focus:ring-[#5420A6]"
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+              <label className="text-xs font-medium text-[#06427D] dark:text-[#BBBCE4]">
                 Password
               </label>
               <Link
                 href="/auth/forgot-password"
-                className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
+                className="text-xs text-[#5420A6] dark:text-[#A9DAF5] hover:underline"
               >
                 Forgot password?
               </Link>
             </div>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-2.5 w-4 h-4 text-zinc-400" />
+              <Lock className="absolute left-3.5 top-2.5 w-4 h-4 text-[#5D6080]/60 dark:text-[#9aa0c4]/60" />
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
-                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-white dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7] placeholder-[#8488ab] focus:outline-none focus:ring-1 focus:ring-[#5420A6]"
               />
             </div>
           </div>
@@ -149,7 +149,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full py-2.5 rounded-xl bg-[#5420A6] hover:bg-[#45188d] disabled:opacity-50 text-white dark:text-[#e6e9f7] font-medium text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
           >
             {loading ? (
               <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
@@ -163,8 +163,8 @@ export default function LoginPage() {
         </form>
 
         <div className="relative flex items-center justify-center py-1">
-          <div className="border-t border-zinc-200 dark:border-zinc-800 w-full" />
-          <span className="bg-white dark:bg-[#111218] px-3 text-xs text-zinc-400 absolute">
+          <div className="border-t border-[#dcdff2] dark:border-[#1d2c4e] w-full" />
+          <span className="bg-white dark:bg-[#0e1526] px-3 text-xs text-[#5D6080] dark:text-[#9aa0c4] absolute">
             or
           </span>
         </div>
@@ -173,16 +173,16 @@ export default function LoginPage() {
           type="button"
           onClick={handleDemoSignIn}
           disabled={loading}
-          className="w-full py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full py-2.5 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] hover:bg-[#f1f3fa] dark:hover:bg-[#151e36] text-[#06427D] dark:text-[#BBBCE4] font-medium text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
         >
           <span>Continue with demo account</span>
         </button>
 
-        <div className="text-center text-xs text-zinc-500 pt-1">
+        <div className="text-center text-xs text-[#5D6080] dark:text-[#9aa0c4] pt-1">
           Do not have an account?{" "}
           <Link
             href="/auth/signup"
-            className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
+            className="text-[#5420A6] dark:text-[#A9DAF5] font-medium hover:underline"
           >
             Create an account
           </Link>

@@ -19,17 +19,17 @@ export default function RootIndexPage() {
   }, [isAuthenticated, authLoading, router]);
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] flex items-center justify-center">
+    <div className="min-h-screen bg-[#f6f7fc] dark:bg-[#080c18] flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-12 h-12 p-1.5 rounded-2xl bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 shadow-xs flex items-center justify-center">
+        <div className="w-12 h-12 p-1.5 rounded-2xl bg-white dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] shadow-xs flex items-center justify-center">
           <img
             src="/mascot_idle.svg"
             alt="Spark"
             className="w-full h-full object-contain opacity-90"
           />
         </div>
-        <div className="flex items-center gap-2 text-xs text-zinc-500">
-          <div className="w-3 h-3 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+        <div className="flex items-center gap-2 text-xs text-[#5D6080] dark:text-[#9aa0c4]">
+          <div className="w-3 h-3 border-2 border-[#5420A6] border-t-transparent rounded-full animate-spin" />
           <span>Loading...</span>
         </div>
       </div>

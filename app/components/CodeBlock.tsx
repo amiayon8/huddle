@@ -63,10 +63,10 @@ const highlightSyntax = (rawCode: string): React.ReactNode[] => {
     if (trimmed.startsWith('--') || trimmed.startsWith('//') || trimmed.startsWith('#')) {
       return (
         <div key={lineIndex} className="table-row">
-          <span className="table-cell pr-4 text-zinc-500 select-none text-right w-8 text-[11px]">
+          <span className="table-cell pr-4 text-[#5D6080]/60 select-none text-right w-8 text-[11px]">
             {lineIndex + 1}
           </span>
-          <span className="table-cell text-zinc-400 italic">
+          <span className="table-cell text-[#5D6080]/70 italic">
             {line}
           </span>
         </div>
@@ -77,7 +77,7 @@ const highlightSyntax = (rawCode: string): React.ReactNode[] => {
 
     return (
       <div key={lineIndex} className="table-row">
-        <span className="table-cell pr-4 text-zinc-500 select-none text-right w-8 text-[11px]">
+        <span className="table-cell pr-4 text-[#5D6080]/60 select-none text-right w-8 text-[11px]">
           {lineIndex + 1}
         </span>
         <span className="table-cell">
@@ -94,7 +94,7 @@ const highlightSyntax = (rawCode: string): React.ReactNode[] => {
 
             if (token.startsWith('//') || token.startsWith('--') || token.startsWith('#')) {
               return (
-                <span key={tokenIndex} className="text-zinc-500 italic">
+                <span key={tokenIndex} className="text-[#5D6080]/70 italic">
                   {token}
                 </span>
               );
@@ -102,7 +102,7 @@ const highlightSyntax = (rawCode: string): React.ReactNode[] => {
 
             if (/^(local|if|then|else|elseif|end|return|function|const|let|var|import|export|from|async|await|select|where|not|and|or|class|interface|type|extends|implements|new|try|catch|finally|throw|typeof|instanceof|def|elif|in|is|yield|lambda|for|while|do|break|continue|switch|case|default|public|private|protected|static|readonly|as)$/i.test(token)) {
               return (
-                <span key={tokenIndex} className="text-indigo-400 font-semibold">
+                <span key={tokenIndex} className="text-[#A9DAF5] font-semibold">
                   {token}
                 </span>
               );
@@ -150,7 +150,7 @@ const highlightSyntax = (rawCode: string): React.ReactNode[] => {
                         {subToken}
                       </span>
                     ) : (
-                      <span key={subIndex} className="text-zinc-200">
+                      <span key={subIndex} className="text-[#e6e9f7]">
                         {subToken}
                       </span>
                     )
@@ -159,7 +159,7 @@ const highlightSyntax = (rawCode: string): React.ReactNode[] => {
               );
             }
 
-            return <span key={tokenIndex} className="text-zinc-200">{token}</span>;
+            return <span key={tokenIndex} className="text-[#e6e9f7]">{token}</span>;
           })}
         </span>
       </div>
@@ -203,16 +203,16 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ code, language, filename }
   };
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-950 text-zinc-100 overflow-hidden shadow-md my-2 text-xs">
-      <div className="flex items-center justify-between px-4 py-2.5 bg-zinc-900/90 border-b border-zinc-800 text-[11px]">
-        <div className="flex items-center gap-2 text-zinc-400 font-medium">
-          <Terminal className="w-3.5 h-3.5 text-indigo-400" />
-          <span className="font-semibold text-zinc-300">{filename || detected}</span>
+    <div className="rounded-2xl border border-[#1d2c4e] bg-[#080c18] text-[#e6e9f7] overflow-hidden shadow-md my-2 text-xs">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-[#0e1526] border-b border-[#1d2c4e] text-[11px]">
+        <div className="flex items-center gap-2 text-[#5D6080] font-medium">
+          <Terminal className="w-3.5 h-3.5 text-[#A9DAF5]" />
+          <span className="font-semibold text-[#BBBCE4]">{filename || detected}</span>
         </div>
 
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#141d33] hover:bg-[#1d2c4e] text-[#BBBCE4] hover:text-[#e6e9f7] transition-colors cursor-pointer"
           title="Copy code to clipboard"
         >
           {copied ? (
@@ -222,7 +222,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ code, language, filename }
             </>
           ) : (
             <>
-              <Copy className="w-3 h-3 text-zinc-400" />
+              <Copy className="w-3 h-3 text-[#5D6080]" />
               <span>Copy</span>
             </>
           )}

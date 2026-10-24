@@ -305,10 +305,10 @@ export const MascotDrawer: React.FC = () => {
     <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
       <div className="flex-1" onClick={() => setMascotOpen(false)} />
 
-      <div className="w-full sm:w-[480px] bg-white dark:bg-[#111218] border-l border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-150">
-        <div className="p-4 sm:p-5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+      <div className="w-full sm:w-[480px] bg-[#FFFFFF] dark:bg-[#0e1526] border-l border-[#dcdff2] dark:border-[#1d2c4e] shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-150">
+        <div className="p-4 sm:p-5 border-b border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc]/80 dark:bg-[#141d33]/50 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[#BBBCE4]/20 dark:bg-[#141d33] border border-[#BBBCE4]/40 dark:border-[#1d2c4e] p-1 flex items-center justify-center shrink-0">
               <img
                 src={mascotMap[currentMascotEmotion] || "/mascot_idle.svg"}
                 alt="Spark"
@@ -316,11 +316,11 @@ export const MascotDrawer: React.FC = () => {
               />
             </div>
             <div>
-              <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
+              <h3 className="font-bold text-sm text-[#06427D] dark:text-[#e6e9f7]">
                 Spark - Your AI Companion
               </h3>
               <p
-                className="text-xs text-zinc-500 truncate max-w-[180px] sm:max-w-[220px]"
+                className="text-xs text-[#5D6080] dark:text-[#BBBCE4] truncate max-w-[180px] sm:max-w-[220px]"
                 title={activeSession?.title}
               >
                 {showHistory
@@ -333,7 +333,7 @@ export const MascotDrawer: React.FC = () => {
           <div className="flex items-center gap-1.5">
             <button
               onClick={handleStartNewChat}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-xs font-medium transition-colors cursor-pointer"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#141d33] text-[#06427D] dark:text-[#e6e9f7] hover:bg-[#f6f7fc] dark:hover:bg-[#1d2c4e] text-xs font-semibold transition-colors cursor-pointer"
               title="Start a new conversation"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -344,8 +344,8 @@ export const MascotDrawer: React.FC = () => {
               onClick={() => setShowHistory(!showHistory)}
               className={`p-2 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
                 showHistory
-                  ? "border-indigo-600 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40"
-                  : "border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                  ? "border-[#5420A6] text-[#5420A6] dark:text-[#A9DAF5] bg-[#BBBCE4]/20 dark:bg-[#141d33]"
+                  : "border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#BBBCE4] hover:bg-[#f6f7fc] dark:hover:bg-[#141d33]"
               }`}
               title="View conversation history"
             >
@@ -354,7 +354,7 @@ export const MascotDrawer: React.FC = () => {
 
             <button
               onClick={() => setMascotOpen(false)}
-              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg text-[#5D6080] hover:text-[#06427D] dark:hover:text-[#BBBCE4] transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -367,17 +367,17 @@ export const MascotDrawer: React.FC = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setShowHistory(false)}
-                  className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                  className="p-1.5 rounded-lg text-[#5D6080] hover:text-[#06427D] dark:hover:text-[#BBBCE4] hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] transition-colors cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
                 </button>
-                <h4 className="font-semibold text-xs text-zinc-900 dark:text-zinc-100">
+                <h4 className="font-bold text-xs text-[#06427D] dark:text-[#e6e9f7]">
                   Previous conversations ({sessions.length})
                 </h4>
               </div>
             </div>
 
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4]">
               Choose any past conversation to pick up right where you left off.
             </p>
 
@@ -397,18 +397,18 @@ export const MascotDrawer: React.FC = () => {
                     onClick={() => handleSelectSession(sess.id)}
                     className={`p-3 rounded-xl border text-left transition-colors cursor-pointer flex items-center justify-between ${
                       isActive
-                        ? "border-indigo-500/80 bg-indigo-50/30 dark:bg-indigo-950/20"
-                        : "border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-[#111218] hover:border-zinc-300 dark:hover:border-zinc-700"
+                        ? "border-[#5420A6] bg-[#BBBCE4]/15 dark:bg-[#141d33]"
+                        : "border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#141d33]/50 hover:border-[#5420A6]"
                     }`}
                   >
                     <div className="space-y-1 min-w-0 pr-3">
                       <div className="flex items-center gap-2">
-                        <MessageSquare className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
-                        <h5 className="font-medium text-xs text-zinc-900 dark:text-zinc-100 truncate">
+                        <MessageSquare className="w-3.5 h-3.5 text-[#5420A6] dark:text-[#A9DAF5] shrink-0" />
+                        <h5 className="font-semibold text-xs text-[#06427D] dark:text-[#e6e9f7] truncate">
                           {sess.title}
                         </h5>
                       </div>
-                      <div className="flex items-center gap-2 text-[11px] text-zinc-400">
+                      <div className="flex items-center gap-2 text-[11px] text-[#5D6080] dark:text-[#BBBCE4]">
                         <span>{dateFormatted}</span>
                         <span>•</span>
                         <span>{sess.messages.length} messages</span>
@@ -418,12 +418,12 @@ export const MascotDrawer: React.FC = () => {
                     <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={(e) => handleDeleteSession(sess.id, e)}
-                        className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                        className="p-1.5 rounded-lg text-[#5D6080] hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
                         title="Delete conversation"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
-                      <ChevronRight className="w-4 h-4 text-zinc-400" />
+                      <ChevronRight className="w-4 h-4 text-[#5D6080]" />
                     </div>
                   </div>
                 );
@@ -440,7 +440,7 @@ export const MascotDrawer: React.FC = () => {
                 }`}
               >
                 {m.sender === "spark" && (
-                  <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 p-1 flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-[#BBBCE4]/20 dark:bg-[#141d33] border border-[#BBBCE4]/40 dark:border-[#1d2c4e] p-1 flex items-center justify-center shrink-0">
                     <img
                       src={m.mascotSvg || "/mascot_idle.svg"}
                       alt="Spark"
@@ -453,8 +453,8 @@ export const MascotDrawer: React.FC = () => {
                   <div
                     className={`p-3.5 rounded-2xl leading-relaxed ${
                       m.sender === "user"
-                        ? "bg-indigo-600 text-white"
-                        : "bg-zinc-100 dark:bg-zinc-800/80 text-zinc-900 dark:text-zinc-100 border border-zinc-200/50 dark:border-zinc-700/50"
+                        ? "bg-[#5420A6] text-[#FFFFFF]"
+                        : "bg-[#f6f7fc] dark:bg-[#141d33] text-[#06427D] dark:text-[#e6e9f7] border border-[#dcdff2] dark:border-[#1d2c4e]"
                     }`}
                   >
                     {m.sender === "user" ? (
@@ -465,7 +465,7 @@ export const MascotDrawer: React.FC = () => {
                   </div>
                   {m.timestamp && (
                     <div
-                      className={`text-[10px] text-zinc-400 px-1 ${
+                      className={`text-[10px] text-[#5D6080] dark:text-[#BBBCE4]/70 px-1 ${
                         m.sender === "user" ? "text-right" : "text-left"
                       }`}
                     >
@@ -477,16 +477,16 @@ export const MascotDrawer: React.FC = () => {
             ))}
 
             {isThinking && (
-              <div className="flex items-center gap-2.5 text-zinc-500 text-xs py-2">
-                <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 p-1 flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-2.5 text-[#5D6080] dark:text-[#BBBCE4] text-xs py-2">
+                <div className="w-8 h-8 rounded-lg bg-[#BBBCE4]/20 dark:bg-[#141d33] border border-[#BBBCE4]/40 dark:border-[#1d2c4e] p-1 flex items-center justify-center shrink-0">
                   <img
                     src="/mascot_thinking.svg"
                     alt="Thinking"
                     className="w-full h-full object-contain opacity-70"
                   />
                 </div>
-                <div className="p-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-xs flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                <div className="p-2.5 rounded-xl bg-[#f6f7fc] dark:bg-[#141d33] text-[#06427D] dark:text-[#e6e9f7] border border-[#dcdff2] dark:border-[#1d2c4e] text-xs flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 border-2 border-[#5420A6] border-t-transparent rounded-full animate-spin" />
                   <span>Thinking...</span>
                 </div>
               </div>
@@ -497,7 +497,7 @@ export const MascotDrawer: React.FC = () => {
         )}
 
         {!showHistory && (
-          <div className="p-4 border-t border-zinc-100 dark:border-zinc-800 space-y-3">
+          <div className="p-4 border-t border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc]/80 dark:bg-[#141d33]/50 space-y-3">
             <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
               {[
                 sprint?.tasks?.find((t) => !t.completed)
@@ -511,7 +511,7 @@ export const MascotDrawer: React.FC = () => {
                   key={index}
                   type="button"
                   onClick={() => handleQuickQuestion(prompt)}
-                  className="px-2.5 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200/80 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-[11px] font-medium hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors shrink-0 cursor-pointer"
+                  className="px-2.5 py-1.5 rounded-lg bg-[#FFFFFF] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] text-[#06427D] dark:text-[#BBBCE4] text-[11px] font-medium hover:border-[#5420A6] dark:hover:border-[#A9DAF5] transition-colors shrink-0 cursor-pointer"
                 >
                   {prompt}
                 </button>
@@ -528,12 +528,12 @@ export const MascotDrawer: React.FC = () => {
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 disabled={isThinking}
-                className="flex-1 px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 placeholder:text-zinc-400"
+                className="flex-1 px-3.5 py-2.5 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#141d33] text-[#06427D] dark:text-[#e6e9f7] text-xs focus:outline-none focus:ring-2 focus:ring-[#5420A6]/30 focus:border-[#5420A6] placeholder:text-[#5D6080]/60"
               />
               <button
                 type="submit"
                 disabled={!chatInput.trim() || isThinking}
-                className="p-2.5 rounded-xl bg-indigo-600 disabled:opacity-40 hover:bg-indigo-700 text-white transition-colors cursor-pointer"
+                className="p-2.5 rounded-xl bg-[#5420A6] disabled:opacity-40 hover:bg-[#45188d] text-[#FFFFFF] shadow-sm shadow-[#5420A6]/20 transition-colors cursor-pointer"
                 aria-label="Send message"
               >
                 <Send className="w-3.5 h-3.5" />

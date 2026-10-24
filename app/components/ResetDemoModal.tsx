@@ -69,18 +69,18 @@ export const ResetDemoModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="relative w-full max-w-md bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl p-6 sm:p-7">
+      <div className="relative w-full max-w-md bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] rounded-2xl shadow-xl p-6 sm:p-7">
         <button
           onClick={handleClose}
           disabled={loadingAction !== null}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors disabled:opacity-40 cursor-pointer"
+          className="absolute top-4 right-4 p-1.5 rounded-lg text-[#5D6080] hover:text-[#06427D] dark:hover:text-[#BBBCE4] transition-colors disabled:opacity-40 cursor-pointer"
           aria-label="Close"
         >
           <X className="w-4 h-4" />
         </button>
 
         <div className="flex items-center gap-3.5 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-[#BBBCE4]/20 dark:bg-[#141d33] border border-[#BBBCE4]/40 dark:border-[#1d2c4e] p-1 flex items-center justify-center shrink-0">
             <img
               src="/mascot_planning.svg"
               alt="Spark"
@@ -88,10 +88,10 @@ export const ResetDemoModal: React.FC = () => {
             />
           </div>
           <div>
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+            <h2 className="text-base font-bold text-[#06427D] dark:text-[#e6e9f7]">
               Reset sample data
             </h2>
-            <p className="text-xs text-zinc-500 mt-0.5">
+            <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4] mt-0.5">
               Return your workspace and sample lessons to their starting state.
             </p>
           </div>
@@ -112,21 +112,21 @@ export const ResetDemoModal: React.FC = () => {
         )}
 
         <div className="space-y-3 mb-6">
-          <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4] leading-relaxed">
             This will restore the demo account to its initial state:
           </p>
 
-          <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 space-y-2 text-xs">
-            <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
-              <CheckCircle2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+          <div className="p-3.5 rounded-xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] space-y-2 text-xs">
+            <div className="flex items-center gap-2 text-[#06427D] dark:text-[#BBBCE4]">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#5420A6] dark:text-[#A9DAF5] shrink-0" />
               <span>Resets your weekly plan back to Day 1</span>
             </div>
-            <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
-              <CheckCircle2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+            <div className="flex items-center gap-2 text-[#06427D] dark:text-[#BBBCE4]">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#5420A6] dark:text-[#A9DAF5] shrink-0" />
               <span>Clears completed lesson marks so you can practice again</span>
             </div>
-            <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300">
-              <CheckCircle2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+            <div className="flex items-center gap-2 text-[#06427D] dark:text-[#BBBCE4]">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#5420A6] dark:text-[#A9DAF5] shrink-0" />
               <span>Restores focus time metrics and progress counters</span>
             </div>
           </div>
@@ -136,7 +136,7 @@ export const ResetDemoModal: React.FC = () => {
           <button
             onClick={() => handleReset(false)}
             disabled={loadingAction !== null}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors disabled:opacity-50 cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#5420A6] hover:bg-[#45188d] text-[#FFFFFF] text-xs font-bold transition-colors disabled:opacity-50 cursor-pointer shadow-sm shadow-[#5420A6]/20"
           >
             {loadingAction === "reset_stay" ? (
               <>
@@ -154,7 +154,7 @@ export const ResetDemoModal: React.FC = () => {
           <button
             onClick={() => handleReset(true)}
             disabled={loadingAction !== null}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-medium transition-colors disabled:opacity-50 cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] text-[#06427D] dark:text-[#e6e9f7] text-xs font-semibold transition-colors disabled:opacity-50 cursor-pointer"
           >
             {loadingAction === "reset_logout" ? (
               <>
@@ -172,7 +172,7 @@ export const ResetDemoModal: React.FC = () => {
           <button
             onClick={handleClose}
             disabled={loadingAction !== null}
-            className="w-full py-2 text-center text-xs text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors disabled:opacity-40 cursor-pointer"
+            className="w-full py-2 text-center text-xs text-[#5D6080] hover:text-[#06427D] dark:hover:text-[#BBBCE4] transition-colors disabled:opacity-40 cursor-pointer"
           >
             Cancel
           </button>

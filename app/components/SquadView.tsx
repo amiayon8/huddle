@@ -9,7 +9,6 @@ import {
   Clock,
   CheckCircle2,
   Users,
-  Flame,
   Send,
   Bell,
   MessageSquare,
@@ -168,14 +167,14 @@ export const SquadView: React.FC = () => {
     <div className="space-y-8 pb-12 animate-in fade-in duration-150">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#5420A6] dark:text-[#A9DAF5]">
             <Users className="w-4 h-4" />
             <span>4-Person Micro Squad • Accountability & Peer Momentum</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-950 dark:text-white mt-0.5">
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#06427D] dark:text-[#e6e9f7] mt-0.5">
             Micro Squad
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-500 mt-1 max-w-2xl leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#5D6080] dark:text-[#BBBCE4]/80 mt-1 max-w-2xl leading-relaxed">
             A small 4-person circle to check in on each other, monitor daily
             practice progress, exchange standup notes, and maintain constructive
             peer accountability.
@@ -187,13 +186,13 @@ export const SquadView: React.FC = () => {
             onClick={() => setActiveTab("community")}
             className="duo-button-secondary px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5"
           >
-            <Globe className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+            <Globe className="w-3.5 h-3.5 text-[#5420A6] dark:text-[#A9DAF5]" />
             <span>Browse Communities</span>
           </button>
 
           <button
             onClick={() => setIsJoinModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
+            className="px-3.5 py-2 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#141d33] text-xs font-medium text-[#06427D] dark:text-[#BBBCE4] hover:bg-[#BBBCE4]/20 transition-colors cursor-pointer"
           >
             Join with code
           </button>
@@ -209,24 +208,24 @@ export const SquadView: React.FC = () => {
       </div>
 
       {cheerNotice && (
-        <div className="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-medium animate-in fade-in flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+        <div className="p-3 rounded-2xl bg-[#BBBCE4]/15 dark:bg-[#141d33] border border-[#BBBCE4]/40 dark:border-[#1d2c4e] text-[#06427D] dark:text-[#BBBCE4] text-xs font-medium animate-in fade-in flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-[#5420A6] dark:text-[#A9DAF5] shrink-0" />
           <span>{cheerNotice}</span>
         </div>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-5 rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] space-y-1">
-          <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+        <div className="p-5 rounded-3xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] space-y-1">
+          <div className="text-[11px] font-bold text-[#5D6080] dark:text-[#BBBCE4]/70 uppercase tracking-wider">
             Today's Squad Rate
           </div>
-          <div className="text-2xl font-black text-zinc-950 dark:text-white">
+          <div className="text-2xl font-black text-[#06427D] dark:text-[#e6e9f7]">
             {completedTodayCount} of {members.length} Completed
           </div>
-          <div className="text-xs text-zinc-500">
+          <div className="text-xs text-[#5D6080] dark:text-[#BBBCE4]/80">
             {executionRate}% daily milestone completion rate
           </div>
-          <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2 rounded-full mt-2 overflow-hidden">
+          <div className="w-full bg-[#dcdff2] dark:bg-[#080c18] h-2 rounded-full mt-2 overflow-hidden">
             <div
               className="bg-emerald-500 h-full rounded-full transition-all"
               style={{ width: `${executionRate}%` }}
@@ -234,19 +233,19 @@ export const SquadView: React.FC = () => {
           </div>
         </div>
 
-        <div className="p-5 rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] space-y-1">
-          <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+        <div className="p-5 rounded-3xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] space-y-1">
+          <div className="text-[11px] font-bold text-[#5D6080] dark:text-[#BBBCE4]/70 uppercase tracking-wider">
             Shared Weekly Target
           </div>
-          <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
+          <div className="text-2xl font-black text-[#5420A6] dark:text-[#A9DAF5]">
             {squad.currentProgress || 8} / {squad.targetProgress || 12}
           </div>
-          <div className="text-xs text-zinc-500">
+          <div className="text-xs text-[#5D6080] dark:text-[#BBBCE4]/80">
             Milestones verified by members this sprint
           </div>
-          <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2 rounded-full mt-2 overflow-hidden">
+          <div className="w-full bg-[#dcdff2] dark:bg-[#080c18] h-2 rounded-full mt-2 overflow-hidden">
             <div
-              className="bg-indigo-600 h-full rounded-full transition-all"
+              className="bg-[#5420A6] h-full rounded-full transition-all"
               style={{
                 width: `${Math.round(((squad.currentProgress || 8) / (squad.targetProgress || 12)) * 100)}%`,
               }}
@@ -254,23 +253,23 @@ export const SquadView: React.FC = () => {
           </div>
         </div>
 
-        <div className="p-5 rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] space-y-1">
-          <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+        <div className="p-5 rounded-3xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] space-y-1">
+          <div className="text-[11px] font-bold text-[#5D6080] dark:text-[#BBBCE4]/70 uppercase tracking-wider">
             Squad Focus Track
           </div>
-          <div className="text-lg font-bold text-zinc-950 dark:text-white truncate">
+          <div className="text-lg font-bold text-[#06427D] dark:text-[#e6e9f7] truncate">
             {squad.name || "Engineering Crew"}
           </div>
-          <div className="text-xs text-zinc-500 truncate">
+          <div className="text-xs text-[#5D6080] dark:text-[#BBBCE4]/75 truncate">
             {squad.skillFocus || "System Architecture"}
           </div>
           <div className="pt-1 flex items-center justify-between text-[11px]">
-            <span className="font-mono text-zinc-400">
+            <span className="font-mono text-[#5D6080] dark:text-[#BBBCE4]/60">
               Code: {squad.inviteCode || "HUDDLE-SYS-01"}
             </span>
             <button
               onClick={copyInviteCode}
-              className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"
+              className="text-[#5420A6] dark:text-[#A9DAF5] font-semibold hover:underline cursor-pointer"
             >
               {inviteCopied ? "Copied" : "Copy"}
             </button>
@@ -280,13 +279,13 @@ export const SquadView: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <div className="lg:col-span-7 space-y-6">
-          <div className="rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] p-6 shadow-sm space-y-4">
-            <div className="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800">
+          <div className="rounded-3xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-4 border-b border-[#dcdff2] dark:border-[#1d2c4e]">
               <div>
-                <h2 className="text-base font-bold text-zinc-950 dark:text-white">
+                <h2 className="text-base font-bold text-[#06427D] dark:text-[#e6e9f7]">
                   Member Performance & Development
                 </h2>
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4]/75">
                   Individual consistency and progress check-ins
                 </p>
               </div>
@@ -300,7 +299,7 @@ export const SquadView: React.FC = () => {
               </button>
             </div>
 
-            <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            <div className="divide-y divide-[#dcdff2] dark:divide-[#1d2c4e]">
               {members.map((member) => {
                 const isCurrentUser = member.id === user.id;
 
@@ -313,28 +312,32 @@ export const SquadView: React.FC = () => {
                       <img
                         src={getUserAvatarUrl(member, 72)}
                         alt={member.name}
-                        className="w-10 h-10 rounded-2xl object-cover ring-1 ring-zinc-200 dark:ring-zinc-800"
+                        className="w-10 h-10 rounded-2xl object-cover ring-1 ring-[#dcdff2] dark:ring-[#1d2c4e]"
                       />
 
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-xs text-zinc-900 dark:text-zinc-100">
+                          <span className="font-bold text-xs text-[#06427D] dark:text-[#e6e9f7]">
                             {member.name}
                           </span>
                           {isCurrentUser && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 font-medium">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#BBBCE4]/20 dark:bg-[#141d33] text-[#5420A6] dark:text-[#A9DAF5] font-semibold">
                               You
                             </span>
                           )}
                           {member.role === "lead" && (
-                            <Shield className="w-3.5 h-3.5 text-indigo-500" />
+                            <Shield className="w-3.5 h-3.5 text-[#5420A6] dark:text-[#A9DAF5]" />
                           )}
                         </div>
-                        <div className="flex items-center gap-2 text-[11px] text-zinc-400 mt-0.5">
+                        <div className="flex items-center gap-2 text-[11px] text-[#5D6080] dark:text-[#BBBCE4]/70 mt-0.5">
                           <span>{member.handle}</span>
                           <span>•</span>
                           <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-semibold">
-                            <Flame className="w-3 h-3 fill-amber-500" />
+                            <img
+                              src="/icons/meteor-svgrepo-com.svg"
+                              alt="Streak"
+                              className="w-3.5 h-3.5 object-contain"
+                            />
                             <span>{member.currentStreak || 1}d</span>
                           </span>
                           <span>•</span>
@@ -364,7 +367,7 @@ export const SquadView: React.FC = () => {
                             onClick={() =>
                               handleCheerMember(member.id, member.name)
                             }
-                            className="px-2.5 py-1 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-colors cursor-pointer"
+                            className="px-2.5 py-1 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] hover:bg-[#BBBCE4]/20 text-[#06427D] dark:text-[#BBBCE4] text-xs font-semibold transition-colors cursor-pointer"
                           >
                             Cheer
                           </button>
@@ -391,32 +394,32 @@ export const SquadView: React.FC = () => {
         </div>
 
         <div className="lg:col-span-5 space-y-6">
-          <div className="rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] p-5 sm:p-6 shadow-sm space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
-              <h3 className="text-sm font-bold text-zinc-950 dark:text-white flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+          <div className="rounded-3xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] p-5 sm:p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#dcdff2] dark:border-[#1d2c4e]">
+              <h3 className="text-sm font-bold text-[#06427D] dark:text-[#e6e9f7] flex items-center gap-2">
+                <MessageSquare className="w-4 h-4 text-[#5420A6] dark:text-[#A9DAF5]" />
                 <span>Squad Discussions & Standups</span>
               </h3>
-              <span className="text-[11px] font-semibold text-zinc-400">
+              <span className="text-[11px] font-semibold text-[#5D6080] dark:text-[#BBBCE4]/60">
                 Small group only
               </span>
             </div>
 
-            <p className="text-xs text-zinc-500 leading-relaxed">
+            <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4]/75 leading-relaxed">
               Post daily standups, ask questions, or flag blockers for your 3
               peers.
             </p>
 
             <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
               {squadDiscussions.length === 0 ? (
-                <div className="py-8 text-center text-xs text-zinc-400">
+                <div className="py-8 text-center text-xs text-[#5D6080] dark:text-[#BBBCE4]/60">
                   No squad messages yet. Say hello to your squad!
                 </div>
               ) : (
                 squadDiscussions.map((msg) => (
                   <div
                     key={msg.id}
-                    className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800 space-y-1.5"
+                    className="p-3 rounded-2xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] space-y-1.5"
                   >
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
@@ -425,7 +428,7 @@ export const SquadView: React.FC = () => {
                           alt={msg.senderName}
                           className="w-5 h-5 rounded-md object-cover"
                         />
-                        <span className="font-bold text-zinc-900 dark:text-white">
+                        <span className="font-bold text-[#06427D] dark:text-[#e6e9f7]">
                           {msg.senderName}
                         </span>
                         {msg.type === "blocker" && (
@@ -434,16 +437,16 @@ export const SquadView: React.FC = () => {
                           </span>
                         )}
                         {msg.type === "standup" && (
-                          <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-600 border border-indigo-500/20">
+                          <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-[#BBBCE4]/30 text-[#5420A6] dark:text-[#A9DAF5] border border-[#BBBCE4]/40">
                             Standup
                           </span>
                         )}
                       </div>
-                      <span className="text-[10px] text-zinc-400">
+                      <span className="text-[10px] text-[#5D6080] dark:text-[#BBBCE4]/60">
                         {msg.timestamp}
                       </span>
                     </div>
-                    <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed pl-7">
+                    <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4] leading-relaxed pl-7">
                       {msg.message}
                     </p>
                   </div>
@@ -453,7 +456,7 @@ export const SquadView: React.FC = () => {
 
             <form
               onSubmit={handleSendDiscussion}
-              className="pt-2 border-t border-zinc-100 dark:border-zinc-800 space-y-2.5"
+              className="pt-2 border-t border-[#dcdff2] dark:border-[#1d2c4e] space-y-2.5"
             >
               <div className="flex items-center gap-1.5 text-xs">
                 {(["standup", "blocker", "message"] as const).map((type) => (
@@ -463,8 +466,8 @@ export const SquadView: React.FC = () => {
                     onClick={() => setDiscussionType(type)}
                     className={`px-2.5 py-1 rounded-lg text-[11px] font-bold capitalize transition-colors cursor-pointer ${
                       discussionType === type
-                        ? "bg-indigo-600 text-white shadow-xs"
-                        : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                        ? "bg-[#5420A6] text-[#FFFFFF] shadow-xs"
+                        : "bg-[#f6f7fc] dark:bg-[#141d33] text-[#5D6080] dark:text-[#BBBCE4]/80 hover:text-[#06427D] dark:hover:text-[#BBBCE4]"
                     }`}
                   >
                     {type}
@@ -478,7 +481,7 @@ export const SquadView: React.FC = () => {
                   value={discussionInput}
                   onChange={(e) => setDiscussionInput(e.target.value)}
                   placeholder="Share a standup note or ask your squad..."
-                  className="flex-1 px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="flex-1 px-3.5 py-2 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#080c18] text-xs text-[#06427D] dark:text-[#e6e9f7] placeholder:text-[#5D6080]/60 focus:outline-none focus:ring-1 focus:ring-[#5420A6]"
                 />
                 <button
                   type="submit"
@@ -496,14 +499,14 @@ export const SquadView: React.FC = () => {
       {isJoinModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs"
             onClick={() => setIsJoinModalOpen(false)}
           />
-          <div className="relative w-full max-w-md bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-xl z-10 space-y-4">
-            <h3 className="text-base font-bold text-zinc-950 dark:text-white">
+          <div className="relative w-full max-w-md bg-[#FFFFFF] dark:bg-[#0e1526] border-2 border-[#5420A6] rounded-3xl p-6 shadow-xl z-10 space-y-4">
+            <h3 className="text-base font-bold text-[#06427D] dark:text-[#e6e9f7]">
               Join a Micro Squad
             </h3>
-            <p className="text-xs text-zinc-500 leading-relaxed">
+            <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4]/80 leading-relaxed">
               Enter the invite code from your 3 accountability peers to join
               their squad.
             </p>
@@ -514,7 +517,7 @@ export const SquadView: React.FC = () => {
                 value={joinCodeInput}
                 onChange={(e) => setJoinCodeInput(e.target.value)}
                 placeholder="e.g. HUDDLE-SYS-01"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white font-mono focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#080c18] text-xs text-[#06427D] dark:text-[#e6e9f7] font-mono focus:outline-none focus:ring-1 focus:ring-[#5420A6]"
               />
 
               {joinError && (
@@ -552,21 +555,21 @@ export const SquadView: React.FC = () => {
       {isCreateModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs"
             onClick={() => setIsCreateModalOpen(false)}
           />
-          <div className="relative w-full max-w-md bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-xl z-10 space-y-4">
-            <h3 className="text-base font-bold text-zinc-950 dark:text-white">
+          <div className="relative w-full max-w-md bg-[#FFFFFF] dark:bg-[#0e1526] border-2 border-[#5420A6] rounded-3xl p-6 shadow-xl z-10 space-y-4">
+            <h3 className="text-base font-bold text-[#06427D] dark:text-[#e6e9f7]">
               Create a Micro Squad
             </h3>
-            <p className="text-xs text-zinc-500 leading-relaxed">
+            <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4]/80 leading-relaxed">
               Start a new 4-person accountability group and share code to
               practice together.
             </p>
 
             <form onSubmit={handleCreateSquad} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                <label className="text-xs font-bold text-[#06427D] dark:text-[#e6e9f7]">
                   Squad Name
                 </label>
                 <input
@@ -574,12 +577,12 @@ export const SquadView: React.FC = () => {
                   value={newSquadName}
                   onChange={(e) => setNewSquadName(e.target.value)}
                   placeholder="e.g. Distributed Core Squad"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#080c18] text-xs text-[#06427D] dark:text-[#e6e9f7] focus:outline-none focus:ring-1 focus:ring-[#5420A6]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                <label className="text-xs font-bold text-[#06427D] dark:text-[#e6e9f7]">
                   Shared Weekly Goal
                 </label>
                 <input
@@ -587,7 +590,7 @@ export const SquadView: React.FC = () => {
                   value={newSquadGoal}
                   onChange={(e) => setNewSquadGoal(e.target.value)}
                   placeholder="e.g. Complete our daily deliberate milestones without misses"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#080c18] text-xs text-[#06427D] dark:text-[#e6e9f7] focus:outline-none focus:ring-1 focus:ring-[#5420A6]"
                 />
               </div>
 

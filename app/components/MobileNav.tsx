@@ -28,7 +28,7 @@ export const MobileNav: React.FC = () => {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-zinc-200/80 dark:border-zinc-800/80 bg-white/95 dark:bg-[#090a0f]/95 backdrop-blur-md px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] transition-colors">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF]/95 dark:bg-[#0e1526]/95 backdrop-blur-md px-2 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] transition-colors">
       <div className="flex items-center justify-around max-w-md mx-auto">
         {navigationItems.map((item) => {
           const Icon = item.icon;
@@ -50,8 +50,8 @@ export const MobileNav: React.FC = () => {
               onClick={() => setActiveTab(item.id)}
               className={`flex flex-col items-center justify-center py-1 px-3 rounded-lg transition-colors cursor-pointer ${
                 isActive
-                  ? "text-indigo-600 dark:text-indigo-400 font-semibold"
-                  : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+                  ? "text-[#5420A6] dark:text-[#A9DAF5] font-bold"
+                  : "text-[#5D6080] dark:text-[#BBBCE4] hover:text-[#06427D] dark:hover:text-[#e6e9f7]"
               }`}
             >
               <Icon className="w-4 h-4" />

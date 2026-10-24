@@ -67,8 +67,8 @@ export default function AppPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] flex items-center justify-center">
-        <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#f6f7fc] dark:bg-[#080c18] flex items-center justify-center">
+        <div className="w-5 h-5 border-2 border-[#5420A6] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -79,7 +79,7 @@ export default function AppPage() {
 
   if ((!user.onboardingCompleted && !hasSkippedToPreview) || onboardingActive) {
     return (
-      <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-100 font-sans transition-colors">
+      <div className="min-h-screen bg-[#f6f7fc] dark:bg-[#080c18] text-[#06427D] dark:text-[#BBBCE4] font-sans transition-colors">
         <LandingQuestionnaire />
         <AuthModal />
         <SearchModal />
@@ -116,25 +116,27 @@ export default function AppPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] dark:bg-[#090a0f] text-zinc-900 dark:text-zinc-100 flex flex-col font-sans transition-colors md:pl-60 lg:pl-64 pb-16 md:pb-0">
+    <div className="min-h-screen bg-[#f6f7fc] dark:bg-[#080c18] text-[#06427D] dark:text-[#BBBCE4] flex flex-col font-sans transition-colors md:pl-60 lg:pl-64 pb-16 md:pb-0">
       <Navbar />
 
       {!user.onboardingCompleted && (
         <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 sm:px-6">
-          <div className="max-w-7xl w-full mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
-            <div className="flex items-center gap-2.5 text-amber-900 dark:text-amber-200">
-              <img
-                src="/mascot_planning.svg"
-                alt="Spark"
-                className="w-4 h-4 object-contain shrink-0"
-              />
-              <span>
+          <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-3 text-amber-900 dark:text-amber-200">
+              <div className="w-6 h-6 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0">
+                <img
+                  src="/mascot_planning.svg"
+                  alt="Spark"
+                  className="w-4 h-4 object-contain"
+                />
+              </div>
+              <span className="font-medium">
                 Your skill profile has not been customized yet. Personalize your topics and schedule whenever you are ready.
               </span>
             </div>
             <button
               onClick={() => setOnboardingActive(true)}
-              className="px-3 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs transition-colors shrink-0 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-[#FFFFFF] font-bold text-xs uppercase tracking-wider transition-colors shrink-0 cursor-pointer shadow-xs"
             >
               Personalize (1 min)
             </button>
@@ -142,7 +144,7 @@ export default function AppPage() {
         </div>
       )}
 
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-12 sm:pb-16">
+      <main className="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 pt-6 sm:pt-8 pb-12 sm:pb-16">
         {renderActiveView()}
       </main>
 

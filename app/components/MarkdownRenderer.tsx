@@ -40,7 +40,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
           parts.push(
             <div
               key={`math-block-${keyCounter++}`}
-              className="my-3 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-950/80 border border-zinc-200 dark:border-zinc-800 text-center overflow-x-auto text-sm sm:text-base font-serif"
+              className="my-3 p-3 rounded-2xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] text-center overflow-x-auto text-sm sm:text-base font-serif text-[#06427D] dark:text-[#e6e9f7]"
               dangerouslySetInnerHTML={{ __html: html }}
             />
           );
@@ -48,7 +48,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
           parts.push(
             <span
               key={`math-inline-${keyCounter++}`}
-              className="inline-block px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800/80 font-serif"
+              className="inline-block px-1 py-0.5 rounded bg-[#f6f7fc] dark:bg-[#141d33] text-[#06427D] dark:text-[#e6e9f7] font-serif"
               dangerouslySetInnerHTML={{ __html: html }}
             />
           );
@@ -85,19 +85,19 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
       const token = match[0];
       if (token.startsWith('**') && token.endsWith('**')) {
         pieces.push(
-          <strong key={`${baseKey}-b-${count++}`} className="font-bold text-zinc-900 dark:text-zinc-100">
+          <strong key={`${baseKey}-b-${count++}`} className="font-bold text-[#06427D] dark:text-[#e6e9f7]">
             {token.slice(2, -2)}
           </strong>
         );
       } else if (token.startsWith('*') && token.endsWith('*')) {
         pieces.push(
-          <em key={`${baseKey}-i-${count++}`} className="italic text-zinc-800 dark:text-zinc-200">
+          <em key={`${baseKey}-i-${count++}`} className="italic text-[#06427D] dark:text-[#BBBCE4]">
             {token.slice(1, -1)}
           </em>
         );
       } else if (token.startsWith('`') && token.endsWith('`')) {
         pieces.push(
-          <code key={`${baseKey}-c-${count++}`} className="px-1.5 py-0.5 rounded-lg bg-zinc-200/80 dark:bg-zinc-800 text-[11px] text-indigo-600 dark:text-indigo-300 border border-zinc-300/40 dark:border-zinc-700/50">
+          <code key={`${baseKey}-c-${count++}`} className="px-1.5 py-0.5 rounded-lg bg-[#BBBCE4]/20 dark:bg-[#141d33] text-[11px] font-semibold text-[#5420A6] dark:text-[#A9DAF5] border border-[#BBBCE4]/40 dark:border-[#1d2c4e]">
             {token.slice(1, -1)}
           </code>
         );
@@ -110,7 +110,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
             href={linkUrl}
             target="_blank"
             rel="noreferrer"
-            className="text-indigo-600 dark:text-indigo-400 hover:underline font-medium inline-flex items-center gap-0.5"
+            className="text-[#5420A6] dark:text-[#A9DAF5] hover:underline font-semibold inline-flex items-center gap-0.5"
           >
             {linkText}
           </a>
@@ -165,7 +165,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
 
       if (line.startsWith('### ')) {
         result.push(
-          <h3 key={`h3-${blockIndex++}`} className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100 mt-3 mb-1">
+          <h3 key={`h3-${blockIndex++}`} className="text-sm sm:text-base font-bold text-[#06427D] dark:text-[#e6e9f7] mt-3 mb-1">
             {renderMathAndText(line.slice(4))}
           </h3>
         );
@@ -173,7 +173,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
       }
       if (line.startsWith('## ')) {
         result.push(
-          <h2 key={`h2-${blockIndex++}`} className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100 mt-4 mb-1.5 border-b border-zinc-200/60 dark:border-zinc-800 pb-1">
+          <h2 key={`h2-${blockIndex++}`} className="text-base sm:text-lg font-bold text-[#06427D] dark:text-[#e6e9f7] mt-4 mb-1.5 border-b border-[#dcdff2] dark:border-[#1d2c4e] pb-1">
             {renderMathAndText(line.slice(3))}
           </h2>
         );
@@ -181,7 +181,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
       }
       if (line.startsWith('# ')) {
         result.push(
-          <h1 key={`h1-${blockIndex++}`} className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-zinc-100 mt-4 mb-2">
+          <h1 key={`h1-${blockIndex++}`} className="text-lg sm:text-xl font-bold text-[#06427D] dark:text-[#e6e9f7] mt-4 mb-2">
             {renderMathAndText(line.slice(2))}
           </h1>
         );
@@ -190,7 +190,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
 
       if (line.startsWith('> ')) {
         result.push(
-          <blockquote key={`quote-${blockIndex++}`} className="my-2 pl-3.5 py-1.5 border-l-2 border-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/20 text-xs italic text-zinc-700 dark:text-zinc-300 rounded-r-xl">
+          <blockquote key={`quote-${blockIndex++}`} className="my-2 pl-3.5 py-1.5 border-l-2 border-[#5420A6] bg-[#BBBCE4]/15 dark:bg-[#141d33] text-xs italic text-[#06427D] dark:text-[#BBBCE4] rounded-r-xl">
             {renderMathAndText(line.slice(2))}
           </blockquote>
         );
@@ -199,8 +199,8 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
 
       if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
         result.push(
-          <div key={`li-${blockIndex++}`} className="flex items-start gap-2.5 my-1 text-xs text-zinc-700 dark:text-zinc-300 pl-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0" />
+          <div key={`li-${blockIndex++}`} className="flex items-start gap-2.5 my-1 text-xs text-[#06427D] dark:text-[#BBBCE4] pl-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#5420A6] mt-1.5 shrink-0" />
             <div className="flex-1 leading-relaxed">
               {renderMathAndText(line.trim().slice(2))}
             </div>
@@ -212,8 +212,8 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
       const numMatch = line.trim().match(/^(\d+)\.\s+(.*)/);
       if (numMatch) {
         result.push(
-          <div key={`num-${blockIndex++}`} className="flex items-start gap-2 my-1 text-xs text-zinc-700 dark:text-zinc-300 pl-1">
-            <span className="font-bold text-indigo-600 dark:text-indigo-400 shrink-0 text-[11px]">{numMatch[1]}.</span>
+          <div key={`num-${blockIndex++}`} className="flex items-start gap-2 my-1 text-xs text-[#06427D] dark:text-[#BBBCE4] pl-1">
+            <span className="font-bold text-[#5420A6] dark:text-[#A9DAF5] shrink-0 text-[11px]">{numMatch[1]}.</span>
             <div className="flex-1 leading-relaxed">
               {renderMathAndText(numMatch[2])}
             </div>
@@ -227,7 +227,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content, cla
       }
 
       result.push(
-        <p key={`p-${blockIndex++}`} className="my-1.5 leading-relaxed text-xs sm:text-[13px] text-zinc-700 dark:text-zinc-300">
+        <p key={`p-${blockIndex++}`} className="my-1.5 leading-relaxed text-xs sm:text-[13px] text-[#06427D] dark:text-[#BBBCE4]">
           {renderMathAndText(line)}
         </p>
       );

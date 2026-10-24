@@ -56,20 +56,20 @@ export const SearchModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="w-full max-w-2xl bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
-        <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center gap-3">
-          <Search className="w-4 h-4 text-zinc-400 shrink-0" />
+      <div className="w-full max-w-2xl bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+        <div className="p-4 border-b border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc]/80 dark:bg-[#141d33]/50 flex items-center gap-3">
+          <Search className="w-4 h-4 text-[#5420A6] dark:text-[#A9DAF5] shrink-0" />
           <input
             type="text"
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search topics, guides, and creators..."
-            className="w-full bg-transparent text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none"
+            className="w-full bg-transparent text-xs sm:text-sm text-[#06427D] dark:text-[#e6e9f7] placeholder-[#5D6080]/60 focus:outline-none"
           />
           <button
             onClick={() => setSearchOpen(false)}
-            className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+            className="p-1 rounded-lg text-[#5D6080] hover:text-[#06427D] dark:hover:text-[#BBBCE4] cursor-pointer"
             aria-label="Close search"
           >
             <X className="w-4 h-4" />
@@ -80,7 +80,7 @@ export const SearchModal: React.FC = () => {
           {!query ? (
             <>
               <div className="space-y-2.5">
-                <span className="text-xs font-medium text-zinc-500 block">
+                <span className="text-xs font-semibold text-[#06427D] dark:text-[#BBBCE4] block">
                   Recent searches
                 </span>
                 <div className="flex flex-wrap gap-2">
@@ -88,7 +88,7 @@ export const SearchModal: React.FC = () => {
                     <button
                       key={rs}
                       onClick={() => setQuery(rs)}
-                      className="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-xs text-zinc-700 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-xs font-medium text-[#06427D] dark:text-[#e6e9f7] hover:border-[#5420A6] transition-colors cursor-pointer"
                     >
                       {rs}
                     </button>
@@ -97,7 +97,7 @@ export const SearchModal: React.FC = () => {
               </div>
 
               <div className="space-y-2.5">
-                <span className="text-xs font-medium text-zinc-500 block">
+                <span className="text-xs font-semibold text-[#06427D] dark:text-[#BBBCE4] block">
                   Suggested topics
                 </span>
                 <div className="flex flex-wrap gap-2">
@@ -108,7 +108,7 @@ export const SearchModal: React.FC = () => {
                         setSearchOpen(false);
                         setActiveTab("explore");
                       }}
-                      className="px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-medium hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg bg-[#BBBCE4]/20 dark:bg-[#141d33] border border-[#BBBCE4]/40 dark:border-[#1d2c4e] text-[#5420A6] dark:text-[#A9DAF5] text-xs font-semibold hover:bg-[#BBBCE4]/30 transition-colors cursor-pointer"
                     >
                       {st}
                     </button>
@@ -120,7 +120,7 @@ export const SearchModal: React.FC = () => {
             <div className="space-y-6">
               {filteredCreators.length > 0 && (
                 <div className="space-y-2">
-                  <span className="text-xs font-medium text-zinc-500 block">
+                  <span className="text-xs font-semibold text-[#06427D] dark:text-[#BBBCE4] block">
                     Creators
                   </span>
                   <div className="space-y-1.5">
@@ -131,24 +131,24 @@ export const SearchModal: React.FC = () => {
                           setSearchOpen(false);
                           setActiveTab("explore");
                         }}
-                        className="p-3 rounded-xl border border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 cursor-pointer flex items-center justify-between transition-colors"
+                        className="p-3 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] hover:bg-[#f6f7fc] dark:hover:bg-[#141d33]/60 cursor-pointer flex items-center justify-between transition-colors"
                       >
                         <div className="flex items-center gap-3">
                           <img
                             src={c.avatar?.includes("gravatar.com") ? c.avatar : getGravatarUrl(c.handle || c.name, 64)}
                             alt={c.name}
-                            className="w-8 h-8 rounded-lg object-cover"
+                            className="w-8 h-8 rounded-lg object-cover border border-[#dcdff2] dark:border-[#1d2c4e]"
                           />
                           <div>
-                            <div className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
+                            <div className="text-xs font-semibold text-[#06427D] dark:text-[#e6e9f7]">
                               {c.name}
                             </div>
-                            <div className="text-[11px] text-zinc-500">
+                            <div className="text-[11px] text-[#5D6080] dark:text-[#BBBCE4]">
                               {c.title}
                             </div>
                           </div>
                         </div>
-                        <ArrowRight className="w-4 h-4 text-zinc-400" />
+                        <ArrowRight className="w-4 h-4 text-[#5420A6] dark:text-[#A9DAF5]" />
                       </div>
                     ))}
                   </div>
@@ -157,7 +157,7 @@ export const SearchModal: React.FC = () => {
 
               {filteredPosts.length > 0 && (
                 <div className="space-y-2">
-                  <span className="text-xs font-medium text-zinc-500 block">
+                  <span className="text-xs font-semibold text-[#06427D] dark:text-[#BBBCE4] block">
                     Guides and topics
                   </span>
                   <div className="space-y-1.5">
@@ -168,12 +168,12 @@ export const SearchModal: React.FC = () => {
                           setSearchOpen(false);
                           setActiveTab("explore");
                         }}
-                        className="p-3 rounded-xl border border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 cursor-pointer transition-colors"
+                        className="p-3 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] hover:bg-[#f6f7fc] dark:hover:bg-[#141d33]/60 cursor-pointer transition-colors"
                       >
-                        <div className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
+                        <div className="text-xs font-semibold text-[#06427D] dark:text-[#e6e9f7]">
                           {p.title}
                         </div>
-                        <div className="text-[11px] text-zinc-500 mt-0.5">
+                        <div className="text-[11px] text-[#5D6080] dark:text-[#BBBCE4] mt-0.5">
                           {p.authorName} • {p.skillTitle}
                         </div>
                       </div>
@@ -183,7 +183,7 @@ export const SearchModal: React.FC = () => {
               )}
 
               {filteredCreators.length === 0 && filteredPosts.length === 0 && (
-                <div className="py-8 text-center text-xs text-zinc-500">
+                <div className="py-8 text-center text-xs text-[#5D6080] dark:text-[#BBBCE4]">
                   No matching creators or topics found.
                 </div>
               )}

@@ -88,15 +88,15 @@ export const SettingsModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="w-full max-w-xl bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row max-h-[85vh]">
-        <div className="w-full md:w-48 p-4 border-b md:border-b-0 md:border-r border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 space-y-1 shrink-0">
+      <div className="w-full max-w-xl bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row max-h-[85vh]">
+        <div className="w-full md:w-48 p-4 border-b md:border-b-0 md:border-r border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc]/80 dark:bg-[#141d33]/50 space-y-1 shrink-0">
           <div className="flex items-center justify-between pb-3">
-            <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+            <span className="text-xs font-bold text-[#06427D] dark:text-[#e6e9f7]">
               Settings
             </span>
             <button
               onClick={() => setSettingsOpen(false)}
-              className="md:hidden p-1 rounded-lg text-zinc-400"
+              className="md:hidden p-1 rounded-lg text-[#5D6080] hover:text-[#06427D] dark:hover:text-[#BBBCE4]"
             >
               <X className="w-4 h-4" />
             </button>
@@ -106,8 +106,8 @@ export const SettingsModal: React.FC = () => {
             onClick={() => setActiveTab("account")}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-left transition-colors cursor-pointer ${
               activeTab === "account"
-                ? "bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-xs"
-                : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
+                ? "bg-[#FFFFFF] dark:bg-[#1d2c4e] text-[#5420A6] dark:text-[#A9DAF5] shadow-xs font-bold"
+                : "text-[#5D6080] dark:text-[#BBBCE4] hover:bg-[#BBBCE4]/10 dark:hover:bg-[#1d2c4e]/50 hover:text-[#06427D]"
             }`}
           >
             <UserIcon className="w-3.5 h-3.5" />
@@ -118,8 +118,8 @@ export const SettingsModal: React.FC = () => {
             onClick={() => setActiveTab("appearance")}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-left transition-colors cursor-pointer ${
               activeTab === "appearance"
-                ? "bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-xs"
-                : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
+                ? "bg-[#FFFFFF] dark:bg-[#1d2c4e] text-[#5420A6] dark:text-[#A9DAF5] shadow-xs font-bold"
+                : "text-[#5D6080] dark:text-[#BBBCE4] hover:bg-[#BBBCE4]/10 dark:hover:bg-[#1d2c4e]/50 hover:text-[#06427D]"
             }`}
           >
             <Sun className="w-3.5 h-3.5" />
@@ -130,8 +130,8 @@ export const SettingsModal: React.FC = () => {
             onClick={() => setActiveTab("assistant")}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-left transition-colors cursor-pointer ${
               activeTab === "assistant"
-                ? "bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-xs"
-                : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
+                ? "bg-[#FFFFFF] dark:bg-[#1d2c4e] text-[#5420A6] dark:text-[#A9DAF5] shadow-xs font-bold"
+                : "text-[#5D6080] dark:text-[#BBBCE4] hover:bg-[#BBBCE4]/10 dark:hover:bg-[#1d2c4e]/50 hover:text-[#06427D]"
             }`}
           >
             <Bot className="w-3.5 h-3.5" />
@@ -143,8 +143,8 @@ export const SettingsModal: React.FC = () => {
               onClick={() => setActiveTab("demo")}
               className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-left transition-colors cursor-pointer ${
                 activeTab === "demo"
-                  ? "bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-xs"
-                  : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/60"
+                  ? "bg-[#FFFFFF] dark:bg-[#1d2c4e] text-[#5420A6] dark:text-[#A9DAF5] shadow-xs font-bold"
+                  : "text-[#5D6080] dark:text-[#BBBCE4] hover:bg-[#BBBCE4]/10 dark:hover:bg-[#1d2c4e]/50 hover:text-[#06427D]"
               }`}
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -152,7 +152,7 @@ export const SettingsModal: React.FC = () => {
             </button>
           )}
 
-          <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800">
+          <div className="pt-2 border-t border-[#dcdff2] dark:border-[#1d2c4e]">
             <button
               onClick={handleSignOut}
               className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-left transition-colors cursor-pointer"
@@ -164,8 +164,8 @@ export const SettingsModal: React.FC = () => {
         </div>
 
         <div className="flex-1 p-6 overflow-y-auto">
-          <div className="flex items-center justify-between pb-4 mb-4 border-b border-zinc-100 dark:border-zinc-800">
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#dcdff2] dark:border-[#1d2c4e]">
+            <h3 className="text-sm font-bold text-[#06427D] dark:text-[#e6e9f7]">
               {activeTab === "account" && "Profile and learning goals"}
               {activeTab === "appearance" && "Appearance and theme"}
               {activeTab === "assistant" && "Spark - AI Companion preferences"}
@@ -173,7 +173,7 @@ export const SettingsModal: React.FC = () => {
             </h3>
             <button
               onClick={() => setSettingsOpen(false)}
-              className="hidden md:block p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+              className="hidden md:block p-1 rounded-lg text-[#5D6080] hover:text-[#06427D] dark:hover:text-[#BBBCE4] cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -182,19 +182,19 @@ export const SettingsModal: React.FC = () => {
           {activeTab === "account" && (
             <form onSubmit={handleSave} className="space-y-4 text-xs">
               <div className="space-y-1.5">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-semibold text-[#06427D] dark:text-[#BBBCE4]">
                   Full name
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7] focus:outline-none focus:ring-2 focus:ring-[#5420A6]/30 focus:border-[#5420A6]"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-semibold text-[#06427D] dark:text-[#BBBCE4]">
                   Short bio
                 </label>
                 <textarea
@@ -202,12 +202,12 @@ export const SettingsModal: React.FC = () => {
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   placeholder="Share a brief overview of your background and what you are learning."
-                  className="w-full px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7] placeholder:text-[#5D6080]/60 focus:outline-none focus:ring-2 focus:ring-[#5420A6]/30 focus:border-[#5420A6]"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-semibold text-[#06427D] dark:text-[#BBBCE4]">
                   Target role or milestone
                 </label>
                 <input
@@ -215,12 +215,12 @@ export const SettingsModal: React.FC = () => {
                   value={careerMilestone}
                   onChange={(e) => setCareerMilestone(e.target.value)}
                   placeholder="e.g. Senior Frontend Engineer, Architect"
-                  className="w-full px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7] placeholder:text-[#5D6080]/60 focus:outline-none focus:ring-2 focus:ring-[#5420A6]/30 focus:border-[#5420A6]"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-medium text-zinc-700 dark:text-zinc-300">
+                <label className="font-semibold text-[#06427D] dark:text-[#BBBCE4]">
                   Primary focus
                 </label>
                 <input
@@ -228,7 +228,7 @@ export const SettingsModal: React.FC = () => {
                   value={primaryGoal}
                   onChange={(e) => setPrimaryGoal(e.target.value)}
                   placeholder="e.g. Build production architectures, master concurrency"
-                  className="w-full px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#141d33] text-xs text-[#06427D] dark:text-[#e6e9f7] placeholder:text-[#5D6080]/60 focus:outline-none focus:ring-2 focus:ring-[#5420A6]/30 focus:border-[#5420A6]"
                 />
               </div>
 
@@ -241,7 +241,7 @@ export const SettingsModal: React.FC = () => {
                 )}
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-[#5420A6] hover:bg-[#45188d] text-[#FFFFFF] text-xs font-bold transition-colors cursor-pointer shadow-sm shadow-[#5420A6]/20"
                 >
                   Save changes
                 </button>
@@ -251,7 +251,7 @@ export const SettingsModal: React.FC = () => {
 
           {activeTab === "appearance" && (
             <div className="space-y-4 text-xs">
-              <p className="text-zinc-500">
+              <p className="text-[#5D6080] dark:text-[#BBBCE4]">
                 Choose the interface theme that is easiest on your eyes.
               </p>
               <div className="grid grid-cols-2 gap-3">
@@ -259,16 +259,16 @@ export const SettingsModal: React.FC = () => {
                   onClick={() => setTheme("light")}
                   className={`p-4 rounded-xl border text-left flex flex-col gap-2 transition-colors cursor-pointer ${
                     theme === "light"
-                      ? "border-indigo-600 bg-indigo-50/40 dark:bg-indigo-950/20"
-                      : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-300"
+                      ? "border-[#5420A6] bg-[#BBBCE4]/15 dark:bg-[#141d33]"
+                      : "border-[#dcdff2] dark:border-[#1d2c4e] hover:border-[#5420A6]"
                   }`}
                 >
                   <Sun className="w-5 h-5 text-amber-500" />
                   <div>
-                    <span className="font-medium block text-zinc-900 dark:text-zinc-100">
+                    <span className="font-bold block text-[#06427D] dark:text-[#e6e9f7]">
                       Light
                     </span>
-                    <span className="text-[11px] text-zinc-500">
+                    <span className="text-[11px] text-[#5D6080] dark:text-[#BBBCE4]">
                       Clean white surfaces with high contrast
                     </span>
                   </div>
@@ -278,16 +278,16 @@ export const SettingsModal: React.FC = () => {
                   onClick={() => setTheme("dark")}
                   className={`p-4 rounded-xl border text-left flex flex-col gap-2 transition-colors cursor-pointer ${
                     theme === "dark"
-                      ? "border-indigo-600 bg-indigo-50/40 dark:bg-indigo-950/20"
-                      : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-300"
+                      ? "border-[#5420A6] bg-[#BBBCE4]/15 dark:bg-[#141d33]"
+                      : "border-[#dcdff2] dark:border-[#1d2c4e] hover:border-[#5420A6]"
                   }`}
                 >
-                  <Moon className="w-5 h-5 text-indigo-400" />
+                  <Moon className="w-5 h-5 text-[#A9DAF5]" />
                   <div>
-                    <span className="font-medium block text-zinc-900 dark:text-zinc-100">
+                    <span className="font-bold block text-[#06427D] dark:text-[#e6e9f7]">
                       Dark
                     </span>
-                    <span className="text-[11px] text-zinc-500">
+                    <span className="text-[11px] text-[#5D6080] dark:text-[#BBBCE4]">
                       Calm, reduced brightness for night sessions
                     </span>
                   </div>
@@ -298,12 +298,12 @@ export const SettingsModal: React.FC = () => {
 
           {activeTab === "assistant" && (
             <div className="space-y-4 text-xs">
-              <div className="flex items-center justify-between p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e]">
                 <div>
-                  <span className="font-medium block text-zinc-900 dark:text-zinc-100">
+                  <span className="font-bold block text-[#06427D] dark:text-[#e6e9f7]">
                     Floating Spark companion button
                   </span>
-                  <p className="text-zinc-500 text-[11px] mt-0.5">
+                  <p className="text-[#5D6080] dark:text-[#BBBCE4] text-[11px] mt-0.5">
                     Show the floating Spark companion button in the bottom right
                     corner for quick access.
                   </p>
@@ -313,12 +313,12 @@ export const SettingsModal: React.FC = () => {
                   onClick={toggleSparkDismissal}
                   className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
                     !isSparkDismissed
-                      ? "bg-indigo-600"
-                      : "bg-zinc-300 dark:bg-zinc-700"
+                      ? "bg-[#5420A6]"
+                      : "bg-[#dcdff2] dark:bg-[#1d2c4e]"
                   }`}
                 >
                   <span
-                    className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                    className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-[#FFFFFF] dark:bg-[#e6e9f7] transition-transform ${
                       !isSparkDismissed ? "translate-x-5" : ""
                     }`}
                   />
@@ -329,7 +329,7 @@ export const SettingsModal: React.FC = () => {
 
           {activeTab === "demo" && isDemo && (
             <div className="space-y-4 text-xs">
-              <p className="text-zinc-500 leading-relaxed">
+              <p className="text-[#5D6080] dark:text-[#BBBCE4] leading-relaxed">
                 You are currently exploring a demo account. You can reset your
                 practice history, sample deliverables, and progress back to
                 their initial state at any time.
@@ -340,7 +340,7 @@ export const SettingsModal: React.FC = () => {
                   setSettingsOpen(false);
                   setResetDemoModalOpen(true);
                 }}
-                className="px-4 py-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-medium transition-colors cursor-pointer"
+                className="px-4 py-2.5 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] text-[#06427D] dark:text-[#e6e9f7] font-semibold transition-colors cursor-pointer"
               >
                 Reset demo workspace
               </button>

@@ -70,17 +70,17 @@ export const DailyNudgeModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="relative w-full max-w-lg rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] p-6 sm:p-7 shadow-xl space-y-6 animate-in zoom-in-95 duration-150">
-        <div className="flex items-start justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800 pb-4">
+      <div className="relative w-full max-w-lg rounded-2xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] p-6 sm:p-7 shadow-xl space-y-6 animate-in zoom-in-95 duration-150">
+        <div className="flex items-start justify-between gap-4 border-b border-[#dcdff2] dark:border-[#1d2c4e] pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-700 dark:text-zinc-300">
+            <div className="w-9 h-9 rounded-xl bg-[#BBBCE4]/20 dark:bg-[#141d33] border border-[#BBBCE4]/40 dark:border-[#1d2c4e] flex items-center justify-center text-[#5420A6] dark:text-[#A9DAF5]">
               <Bell className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-zinc-950 dark:text-white">
+              <h2 className="text-base font-bold text-[#06427D] dark:text-[#e6e9f7]">
                 Daily reminders
               </h2>
-              <p className="text-xs text-zinc-500 mt-0.5">
+              <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4] mt-0.5">
                 A gentle check-in timed to when you prefer to focus.
               </p>
             </div>
@@ -88,19 +88,19 @@ export const DailyNudgeModal: React.FC = () => {
 
           <button
             onClick={() => setDailyNudgeModalOpen(false)}
-            className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+            className="p-1 rounded-lg text-[#5D6080] hover:text-[#06427D] dark:hover:text-[#BBBCE4] transition-colors cursor-pointer"
             aria-label="Close"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="flex items-center justify-between p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800">
+        <div className="flex items-center justify-between p-4 rounded-xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e]">
           <div className="space-y-0.5">
-            <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+            <span className="text-xs font-bold text-[#06427D] dark:text-[#e6e9f7]">
               Enable reminders
             </span>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4]">
               At most one notification per day, timed to your schedule.
             </p>
           </div>
@@ -111,12 +111,12 @@ export const DailyNudgeModal: React.FC = () => {
             }
             className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
               dailyNudgeSettings.enabled
-                ? "bg-indigo-600"
-                : "bg-zinc-300 dark:bg-zinc-700"
+                ? "bg-[#5420A6]"
+                : "bg-[#dcdff2] dark:bg-[#1d2c4e]"
             }`}
           >
             <span
-              className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${
+              className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-[#FFFFFF] dark:bg-[#e6e9f7] transition-transform ${
                 dailyNudgeSettings.enabled ? "translate-x-5" : ""
               }`}
             />
@@ -126,8 +126,8 @@ export const DailyNudgeModal: React.FC = () => {
         {dailyNudgeSettings.enabled && (
           <div className="space-y-5 animate-in fade-in duration-150">
             <div className="space-y-2.5">
-              <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-zinc-400" />
+              <label className="text-xs font-semibold text-[#06427D] dark:text-[#BBBCE4] flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-[#5420A6] dark:text-[#A9DAF5]" />
                 <span>Preferred time of day</span>
               </label>
 
@@ -142,12 +142,12 @@ export const DailyNudgeModal: React.FC = () => {
                       }
                       className={`p-3 rounded-xl border text-left transition-colors cursor-pointer ${
                         isSelected
-                          ? "border-indigo-600 bg-indigo-50/40 dark:bg-indigo-950/30 text-indigo-950 dark:text-indigo-200"
-                          : "border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-[#111218] text-zinc-700 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-700"
+                          ? "border-[#5420A6] bg-[#BBBCE4]/20 dark:bg-[#141d33] text-[#5420A6] dark:text-[#A9DAF5] font-bold"
+                          : "border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#141d33]/50 text-[#06427D] dark:text-[#e6e9f7] hover:border-[#5420A6]"
                       }`}
                     >
-                      <div className="font-medium text-xs">{opt.label}</div>
-                      <div className="text-[11px] text-zinc-500 mt-0.5">
+                      <div className="font-semibold text-xs">{opt.label}</div>
+                      <div className="text-[11px] text-[#5D6080] dark:text-[#BBBCE4] mt-0.5">
                         {opt.time}
                       </div>
                     </button>
@@ -157,7 +157,7 @@ export const DailyNudgeModal: React.FC = () => {
             </div>
 
             <div className="space-y-2.5">
-              <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+              <label className="text-xs font-semibold text-[#06427D] dark:text-[#BBBCE4]">
                 Reminder tone
               </label>
 
@@ -172,22 +172,22 @@ export const DailyNudgeModal: React.FC = () => {
                       }
                       className={`p-3.5 rounded-xl border cursor-pointer transition-colors ${
                         isSelected
-                          ? "border-indigo-600 bg-indigo-50/40 dark:bg-indigo-950/30"
-                          : "border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-[#111218] hover:border-zinc-300 dark:hover:border-zinc-700"
+                          ? "border-[#5420A6] bg-[#BBBCE4]/15 dark:bg-[#141d33]"
+                          : "border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#141d33]/50 hover:border-[#5420A6]"
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-medium text-xs text-zinc-900 dark:text-zinc-100">
+                        <span className="font-bold text-xs text-[#06427D] dark:text-[#e6e9f7]">
                           {vibe.title}
                         </span>
                         {isSelected && (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#5420A6] dark:text-[#A9DAF5]" />
                         )}
                       </div>
-                      <p className="text-[11px] text-zinc-500 mt-0.5">
+                      <p className="text-[11px] text-[#5D6080] dark:text-[#BBBCE4] mt-0.5">
                         {vibe.desc}
                       </p>
-                      <p className="text-[11px] text-zinc-600 dark:text-zinc-400 mt-1.5 italic">
+                      <p className="text-[11px] text-[#5D6080] dark:text-[#BBBCE4]/90 mt-1.5 italic">
                         "{vibe.sample}"
                       </p>
                     </div>
@@ -199,14 +199,14 @@ export const DailyNudgeModal: React.FC = () => {
             <div className="flex items-center justify-between pt-2">
               <button
                 onClick={handleTestTrigger}
-                className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-medium cursor-pointer"
+                className="text-xs text-[#5420A6] dark:text-[#A9DAF5] hover:underline font-semibold cursor-pointer"
               >
                 {testSent ? "Sample reminder triggered" : "Preview sample reminder"}
               </button>
 
               <button
                 onClick={() => setDailyNudgeModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-[#5420A6] hover:bg-[#45188d] text-[#FFFFFF] text-xs font-bold transition-colors cursor-pointer shadow-sm shadow-[#5420A6]/20"
               >
                 Done
               </button>

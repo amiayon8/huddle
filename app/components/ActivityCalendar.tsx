@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import {
   Calendar as CalendarIcon,
-  Flame,
   Clock,
   Target,
   ChevronLeft,
@@ -265,7 +264,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
         return "bg-emerald-600 dark:bg-emerald-400 text-white dark:text-zinc-950 border border-emerald-700/50 dark:border-emerald-300/50 ring-1 ring-emerald-500/30";
       case 0:
       default:
-        return "bg-zinc-100/90 dark:bg-zinc-800/60 border border-zinc-200/50 dark:border-zinc-800/80 text-transparent";
+        return "bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] text-transparent";
     }
   };
 
@@ -295,26 +294,26 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] p-6 space-y-4 animate-pulse">
-        <div className="h-6 w-48 bg-zinc-200 dark:bg-zinc-800 rounded-md" />
-        <div className="h-28 bg-zinc-100 dark:bg-zinc-800/40 rounded-xl" />
+      <div className="rounded-2xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] p-6 space-y-4 animate-pulse">
+        <div className="h-6 w-48 bg-[#dcdff2] dark:bg-[#1d2c4e] rounded-md" />
+        <div className="h-28 bg-[#f6f7fc] dark:bg-[#141d33] rounded-xl" />
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] p-5 sm:p-6 space-y-5 shadow-xs">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100 dark:border-zinc-800/80">
+    <div className="rounded-2xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] p-5 sm:p-6 space-y-5 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#dcdff2] dark:border-[#1d2c4e]">
         <div>
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
               <CalendarIcon className="w-4 h-4" />
             </div>
-            <h2 className="text-sm sm:text-base font-bold text-zinc-900 dark:text-zinc-100">
+            <h2 className="text-sm sm:text-base font-bold text-[#06427D] dark:text-[#e6e9f7]">
               Active Focus & Practice Calendar
             </h2>
           </div>
-          <p className="text-xs text-zinc-500 mt-1">
+          <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4] mt-1">
             Verified deliberate engineering focus and drills logged over the
             last 12 weeks.
           </p>
@@ -323,10 +322,10 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
         <div className="flex items-center gap-1.5 self-start sm:self-auto">
           <button
             onClick={() => setViewMode("heatmap")}
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
               viewMode === "heatmap"
-                ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900"
-                : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                ? "bg-[#5420A6] text-[#FFFFFF] shadow-xs"
+                : "bg-[#f6f7fc] dark:bg-[#141d33] text-[#5D6080] dark:text-[#BBBCE4] hover:text-[#06427D] dark:hover:text-[#e6e9f7]"
             }`}
           >
             <Grid className="w-3.5 h-3.5" />
@@ -334,10 +333,10 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
           </button>
           <button
             onClick={() => setViewMode("monthly")}
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
               viewMode === "monthly"
-                ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900"
-                : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
+                ? "bg-[#5420A6] text-[#FFFFFF] shadow-xs"
+                : "bg-[#f6f7fc] dark:bg-[#141d33] text-[#5D6080] dark:text-[#BBBCE4] hover:text-[#06427D] dark:hover:text-[#e6e9f7]"
             }`}
           >
             <BarChart3 className="w-3.5 h-3.5" />
@@ -347,57 +346,61 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 flex items-center gap-3">
+        <div className="p-3 rounded-xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
             <Clock className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+            <div className="text-sm font-bold text-[#06427D] dark:text-[#e6e9f7]">
               {stats.totalHours} hrs
             </div>
-            <div className="text-[11px] text-zinc-500 font-medium">
+            <div className="text-[11px] text-[#5D6080] dark:text-[#BBBCE4] font-medium">
               Total Focus
             </div>
           </div>
         </div>
 
-        <div className="p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+        <div className="p-3 rounded-xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-[#BBBCE4]/20 dark:bg-[#141d33] text-[#5420A6] dark:text-[#A9DAF5] flex items-center justify-center shrink-0">
             <Target className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+            <div className="text-sm font-bold text-[#06427D] dark:text-[#e6e9f7]">
               {stats.activeDaysCount} Days ({stats.activeDaysRatio})
             </div>
-            <div className="text-[11px] text-zinc-500 font-medium">
+            <div className="text-[11px] text-[#5D6080] dark:text-[#BBBCE4] font-medium">
               Active Consistency
             </div>
           </div>
         </div>
 
-        <div className="p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 flex items-center gap-3">
+        <div className="p-3 rounded-xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-            <Flame className="w-4 h-4" />
+            <img
+              src="/icons/meteor-svgrepo-com.svg"
+              alt="Streak"
+              className="w-4 h-4 object-contain"
+            />
           </div>
           <div>
-            <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+            <div className="text-sm font-bold text-[#06427D] dark:text-[#e6e9f7]">
               {stats.currentStreak} Days
             </div>
-            <div className="text-[11px] text-zinc-500 font-medium">
+            <div className="text-[11px] text-[#5D6080] dark:text-[#BBBCE4] font-medium">
               Current Streak
             </div>
           </div>
         </div>
 
-        <div className="p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/60 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+        <div className="p-3 rounded-xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-[#BBBCE4]/20 dark:bg-[#141d33] text-[#5420A6] dark:text-[#A9DAF5] flex items-center justify-center shrink-0">
             <Zap className="w-4 h-4" />
           </div>
           <div>
-            <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">
+            <div className="text-sm font-bold text-[#06427D] dark:text-[#e6e9f7] truncate">
               {formatMinutes(stats.bestDayMinutes)}
             </div>
-            <div className="text-[11px] text-zinc-500 font-medium">
+            <div className="text-[11px] text-[#5D6080] dark:text-[#BBBCE4] font-medium">
               Best Day Record
             </div>
           </div>
@@ -408,7 +411,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
         <div className="space-y-3">
           <div className="overflow-x-auto pb-2 pt-1 hide-scrollbar">
             <div className="min-w-[640px] space-y-1.5">
-              <div className="flex text-[11px] text-zinc-400 font-medium pl-8 relative h-4">
+              <div className="flex text-[11px] text-[#5D6080] dark:text-[#BBBCE4] font-semibold pl-8 relative h-4">
                 {monthLabels.map((m, idx) => (
                   <span
                     key={idx}
@@ -421,7 +424,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
               </div>
 
               <div className="flex gap-2 items-start">
-                <div className="flex flex-col justify-between text-[10px] text-zinc-400 font-medium h-[105px] pr-1 py-0.5 select-none shrink-0">
+                <div className="flex flex-col justify-between text-[10px] text-[#5D6080] dark:text-[#BBBCE4] font-medium h-[105px] pr-1 py-0.5 select-none shrink-0">
                   <span>Mon</span>
                   <span>Wed</span>
                   <span>Fri</span>
@@ -446,7 +449,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
                               isPad,
                             )} ${
                               isSelected
-                                ? "ring-2 ring-indigo-500 dark:ring-indigo-400 scale-125 z-10"
+                                ? "ring-2 ring-[#5420A6] dark:ring-[#A9DAF5] scale-125 z-10"
                                 : "hover:scale-115 hover:z-10"
                             }`}
                             title={
@@ -464,31 +467,31 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
             </div>
           </div>
 
-          <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="pt-2 border-t border-[#dcdff2] dark:border-[#1d2c4e] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             {activeSelected ? (
-              <div className="flex items-center gap-2.5 text-xs text-zinc-700 dark:text-zinc-300 animate-in fade-in">
-                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+              <div className="flex items-center gap-2.5 text-xs text-[#06427D] dark:text-[#e6e9f7] animate-in fade-in">
+                <span className="font-bold text-[#06427D] dark:text-[#e6e9f7]">
                   {formatFullDate(activeSelected.date)}:
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-200/60 dark:border-emerald-900/40">
                   {formatMinutes(activeSelected.activeMinutes)} active focus
                 </span>
                 {activeSelected.drillsCount > 0 && (
-                  <span className="text-zinc-500">
+                  <span className="text-[#5D6080] dark:text-[#BBBCE4]">
                     • {activeSelected.drillsCount} drill
                     {activeSelected.drillsCount > 1 ? "s" : ""} completed
                   </span>
                 )}
               </div>
             ) : (
-              <div className="text-xs text-zinc-400">
+              <div className="text-xs text-[#5D6080] dark:text-[#BBBCE4]">
                 Hover over any day cell to inspect active time.
               </div>
             )}
 
-            <div className="flex items-center gap-1.5 text-[11px] text-zinc-400 self-end sm:self-auto">
+            <div className="flex items-center gap-1.5 text-[11px] text-[#5D6080] dark:text-[#BBBCE4] self-end sm:self-auto">
               <span>Less</span>
-              <span className="w-3 h-3 rounded-[3px] bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-800" />
+              <span className="w-3 h-3 rounded-[3px] bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e]" />
               <span className="w-3 h-3 rounded-[3px] bg-emerald-200 dark:bg-emerald-950 border border-emerald-300/40 dark:border-emerald-800/40" />
               <span className="w-3 h-3 rounded-[3px] bg-emerald-400 dark:bg-emerald-800 border border-emerald-500/40 dark:border-emerald-700/50" />
               <span className="w-3 h-3 rounded-[3px] bg-emerald-500 dark:bg-emerald-600 border border-emerald-600/40 dark:border-emerald-500/50" />
@@ -500,13 +503,13 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
       ) : (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100">
+            <span className="font-bold text-sm text-[#06427D] dark:text-[#e6e9f7]">
               {monthlyCalendarData.monthLabel}
             </span>
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setMonthOffset((prev) => prev - 1)}
-                className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400 cursor-pointer"
+                className="p-1.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] text-[#06427D] dark:text-[#BBBCE4] cursor-pointer"
                 title="Previous Month"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -514,10 +517,10 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
               <button
                 onClick={() => setMonthOffset(0)}
                 disabled={monthOffset === 0}
-                className={`px-2 py-1 rounded-lg text-xs font-medium border border-zinc-200 dark:border-zinc-800 ${
+                className={`px-2 py-1 rounded-lg text-xs font-semibold border border-[#dcdff2] dark:border-[#1d2c4e] ${
                   monthOffset === 0
                     ? "opacity-40 cursor-not-allowed"
-                    : "hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer text-zinc-700 dark:text-zinc-300"
+                    : "hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] cursor-pointer text-[#06427D] dark:text-[#e6e9f7]"
                 }`}
               >
                 Current
@@ -525,10 +528,10 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
               <button
                 onClick={() => setMonthOffset((prev) => prev + 1)}
                 disabled={monthOffset >= 0}
-                className={`p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 ${
+                className={`p-1.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] text-[#06427D] dark:text-[#BBBCE4] ${
                   monthOffset >= 0
                     ? "opacity-40 cursor-not-allowed"
-                    : "hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                    : "hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] cursor-pointer"
                 }`}
                 title="Next Month"
               >
@@ -541,7 +544,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
             {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
               <span
                 key={d}
-                className="text-[11px] font-semibold text-zinc-400 py-1"
+                className="text-[11px] font-semibold text-[#5D6080] dark:text-[#BBBCE4] py-1"
               >
                 {d}
               </span>
@@ -552,7 +555,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
                 return (
                   <div
                     key={idx}
-                    className="h-14 rounded-lg bg-zinc-50/40 dark:bg-zinc-900/20"
+                    className="h-14 rounded-lg bg-[#f6f7fc]/40 dark:bg-[#141d33]/20"
                   />
                 );
               }
@@ -568,14 +571,14 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
                   className={`h-14 p-1.5 rounded-xl border flex flex-col justify-between items-start text-left transition-all cursor-pointer ${
                     hasActivity
                       ? "bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200/80 dark:border-emerald-900/40 hover:border-emerald-400"
-                      : "bg-white dark:bg-zinc-900/40 border-zinc-100 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700"
-                  } ${isSelected ? "ring-2 ring-indigo-500 shadow-xs" : ""}`}
+                      : "bg-[#FFFFFF] dark:bg-[#141d33]/40 border-[#dcdff2] dark:border-[#1d2c4e] hover:border-[#5420A6]"
+                  } ${isSelected ? "ring-2 ring-[#5420A6] shadow-xs" : ""}`}
                 >
                   <span
                     className={`text-[11px] font-bold ${
                       hasActivity
                         ? "text-emerald-700 dark:text-emerald-300"
-                        : "text-zinc-500 dark:text-zinc-400"
+                        : "text-[#5D6080] dark:text-[#BBBCE4]"
                     }`}
                   >
                     {cell.dayNum}
@@ -586,7 +589,7 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
                       {formatMinutes(data.activeMinutes)}
                     </span>
                   ) : (
-                    <span className="text-[9.5px] text-zinc-300 dark:text-zinc-600">
+                    <span className="text-[9.5px] text-[#5D6080]/40 dark:text-[#BBBCE4]/40">
                       Rest
                     </span>
                   )}
@@ -596,18 +599,18 @@ export const ActivityCalendar: React.FC<ActivityCalendarProps> = ({
           </div>
 
           {activeSelected && (
-            <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between text-xs">
+            <div className="p-3 rounded-xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] flex items-center justify-between text-xs">
               <div className="flex items-center gap-2">
                 <Zap className="w-4 h-4 text-emerald-500" />
-                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                <span className="font-bold text-[#06427D] dark:text-[#e6e9f7]">
                   {formatFullDate(activeSelected.date)}:
                 </span>
-                <span className="text-zinc-600 dark:text-zinc-300">
+                <span className="text-[#5D6080] dark:text-[#BBBCE4]">
                   {formatMinutes(activeSelected.activeMinutes)} active focus
                   time logged
                 </span>
               </div>
-              <span className="px-2 py-0.5 rounded bg-white dark:bg-zinc-800 text-[11px] font-medium text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+              <span className="px-2 py-0.5 rounded bg-[#FFFFFF] dark:bg-[#0e1526] text-[11px] font-semibold text-[#06427D] dark:text-[#BBBCE4] border border-[#dcdff2] dark:border-[#1d2c4e]">
                 {activeSelected.drillsCount} deliberate drill
                 {activeSelected.drillsCount !== 1 ? "s" : ""}
               </span>

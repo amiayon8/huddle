@@ -59,11 +59,11 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
 
   return (
     <div
-      className={`rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] p-4 sm:p-5 transition-colors ${className}`}
+      className={`rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] p-4 sm:p-5 transition-colors ${className}`}
     >
       <div className="flex flex-col sm:flex-row items-start gap-4">
         <div className="flex items-center gap-3 sm:block shrink-0">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-zinc-100 dark:bg-zinc-800/80 p-1 flex items-center justify-center border border-zinc-200/60 dark:border-zinc-700/60">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-[#BBBCE4]/20 dark:bg-[#141d33] p-1 flex items-center justify-center border border-[#BBBCE4]/40 dark:border-[#1d2c4e]">
             <img
               src={currentSvg}
               alt="Spark"
@@ -72,10 +72,10 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
           </div>
           <div className="sm:hidden">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+              <span className="text-xs font-bold text-[#06427D] dark:text-[#e6e9f7]">
                 Spark
               </span>
-              <span className="text-[10px] text-zinc-400 font-medium">
+              <span className="text-[10px] text-[#5D6080] dark:text-[#BBBCE4] font-medium">
                 AI Companion
               </span>
             </div>
@@ -83,21 +83,21 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
         </div>
 
         <div className="flex-1 min-w-0 space-y-2">
-          <div className="hidden sm:flex items-center justify-between gap-2 pb-1 border-b border-zinc-100 dark:border-zinc-800/60">
+          <div className="hidden sm:flex items-center justify-between gap-2 pb-1 border-b border-[#dcdff2] dark:border-[#1d2c4e]">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+              <span className="text-xs font-bold text-[#06427D] dark:text-[#e6e9f7]">
                 Spark
               </span>
-              <span className="text-[10px] text-zinc-400 font-medium">
+              <span className="text-[10px] text-[#5D6080] dark:text-[#BBBCE4] font-medium">
                 Your AI Companion
               </span>
             </div>
-            <span className="text-[11px] font-medium text-zinc-500">
+            <span className="text-[11px] font-semibold text-[#5D6080] dark:text-[#BBBCE4]">
               Lesson {sprint.currentDay || 1} • {progressPercent}% progress
             </span>
           </div>
 
-          <div className="text-xs sm:text-[13px] text-zinc-700 dark:text-zinc-300 leading-relaxed">
+          <div className="text-xs sm:text-[13px] text-[#06427D] dark:text-[#BBBCE4] leading-relaxed">
             <MarkdownRenderer content={defaultSpeech} />
           </div>
 
@@ -105,7 +105,7 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
             <div className="pt-2 flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setMascotOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#5420A6] hover:bg-[#45188d] text-[#FFFFFF] text-xs font-bold transition-colors cursor-pointer shadow-sm shadow-[#5420A6]/20"
               >
                 <MessageSquare className="w-3 h-3" />
                 <span>Ask Spark</span>
@@ -113,7 +113,7 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
 
               <button
                 onClick={() => setMascotOpen(true)}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 text-xs font-medium transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-[#06427D] dark:text-[#BBBCE4] hover:border-[#5420A6] text-xs font-medium transition-colors cursor-pointer"
               >
                 <span>{primaryHobby} analogy</span>
                 <ChevronRight className="w-3 h-3 opacity-50" />
@@ -121,7 +121,7 @@ export const DuolingoMascot: React.FC<DuolingoMascotProps> = ({
 
               <button
                 onClick={() => setMascotOpen(true)}
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 text-xs font-medium transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#141d33] text-[#06427D] dark:text-[#BBBCE4] hover:border-[#5420A6] text-xs font-medium transition-colors cursor-pointer"
               >
                 <span>{targetProfession} context</span>
                 <ChevronRight className="w-3 h-3 opacity-50" />

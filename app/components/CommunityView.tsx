@@ -150,7 +150,7 @@ export const CommunityView: React.FC = () => {
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#5420A6]/10 text-[#5420A6] dark:text-[#A9DAF5] border border-[#5420A6]/20">
             <MessageSquare className="w-3 h-3" />
             <span>Discussion</span>
           </span>
@@ -162,14 +162,14 @@ export const CommunityView: React.FC = () => {
     <div className="space-y-8 pb-12 animate-in fade-in duration-150">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#5420A6] dark:text-[#A9DAF5]">
             <Globe className="w-4 h-4" />
             <span>Open Forum & Topic Communities</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-950 dark:text-white mt-0.5">
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#06427D] dark:text-[#e6e9f7] mt-0.5">
             Communities
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-500 mt-1 max-w-2xl leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#5D6080] dark:text-[#BBBCE4]/80 mt-1 max-w-2xl leading-relaxed">
             Join topic-focused engineering communities, ask architectural
             questions, debate trade-offs, and share real-world implementation
             ideas.
@@ -181,7 +181,7 @@ export const CommunityView: React.FC = () => {
             onClick={() => setActiveTab("squad")}
             className="duo-button-secondary px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5"
           >
-            <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+            <Users className="w-3.5 h-3.5 text-[#5420A6] dark:text-[#A9DAF5]" />
             <span>View Micro Squad</span>
           </button>
 
@@ -195,12 +195,12 @@ export const CommunityView: React.FC = () => {
         </div>
       </div>
 
-      <div className="rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] p-5 sm:p-6 shadow-sm space-y-4">
+      <div className="rounded-3xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] p-5 sm:p-6 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-extrabold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+          <h2 className="text-xs font-extrabold uppercase tracking-wider text-[#5D6080] dark:text-[#BBBCE4]/70">
             Explore Communities ({communities.length})
           </h2>
-          <span className="text-[11px] font-medium text-indigo-600 dark:text-indigo-400">
+          <span className="text-[11px] font-medium text-[#5420A6] dark:text-[#A9DAF5]">
             You are a member of {joinedCommunities.length} communities
           </span>
         </div>
@@ -219,13 +219,13 @@ export const CommunityView: React.FC = () => {
                 }
                 className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
                   isSelected
-                    ? "border-indigo-600 bg-indigo-50/30 dark:bg-indigo-950/20 shadow-xs"
-                    : "border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/40 dark:bg-zinc-900/30 hover:border-zinc-300 dark:hover:border-zinc-700"
+                    ? "border-[#5420A6] bg-[#BBBCE4]/20 dark:bg-[#141d33] shadow-xs"
+                    : "border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#080c18]/50 hover:border-[#5420A6] dark:hover:border-[#A9DAF5]"
                 }`}
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-zinc-200/60 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#BBBCE4]/30 dark:bg-[#141d33] text-[#06427D] dark:text-[#BBBCE4]">
                       {community.category}
                     </span>
 
@@ -238,28 +238,28 @@ export const CommunityView: React.FC = () => {
                           joinCommunity(community.id);
                         }
                       }}
-                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors ${
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer ${
                         community.isJoined
                           ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
-                          : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
+                          : "bg-[#5420A6] hover:bg-[#45188d] text-[#FFFFFF] shadow-xs"
                       }`}
                     >
                       {community.isJoined ? "Joined" : "Join"}
                     </button>
                   </div>
 
-                  <h3 className="font-bold text-xs sm:text-sm text-zinc-950 dark:text-white leading-snug mt-2">
+                  <h3 className="font-bold text-xs sm:text-sm text-[#06427D] dark:text-[#e6e9f7] leading-snug mt-2">
                     {community.name}
                   </h3>
 
-                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
+                  <p className="text-[11px] text-[#5D6080] dark:text-[#BBBCE4]/75 mt-1 line-clamp-2 leading-relaxed">
                     {community.description}
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-zinc-200/50 dark:border-zinc-800/50 flex items-center justify-between text-[11px] text-zinc-400">
+                <div className="pt-2 border-t border-[#dcdff2]/60 dark:border-[#1d2c4e] flex items-center justify-between text-[11px] text-[#5D6080] dark:text-[#BBBCE4]/60">
                   <span className="flex items-center gap-1">
-                    <Users className="w-3 h-3 text-zinc-400" />
+                    <Users className="w-3 h-3 text-[#5D6080] dark:text-[#BBBCE4]/60" />
                     <span>{community.memberCount} members</span>
                   </span>
                   <span className="font-mono text-[10px]">
@@ -279,8 +279,8 @@ export const CommunityView: React.FC = () => {
               onClick={() => setSelectedCommunityId("all")}
               className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer ${
                 selectedCommunityId === "all"
-                  ? "bg-indigo-600 text-white shadow-xs"
-                  : "bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+                  ? "bg-[#5420A6] text-[#FFFFFF] shadow-xs"
+                  : "bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#BBBCE4]/80 hover:text-[#06427D] dark:hover:text-[#BBBCE4]"
               }`}
             >
               All Topics
@@ -290,14 +290,14 @@ export const CommunityView: React.FC = () => {
               onClick={() => setSelectedCommunityId("joined")}
               className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer ${
                 selectedCommunityId === "joined"
-                  ? "bg-indigo-600 text-white shadow-xs"
-                  : "bg-white dark:bg-[#111218] border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+                  ? "bg-[#5420A6] text-[#FFFFFF] shadow-xs"
+                  : "bg-[#FFFFFF] dark:bg-[#0e1526] border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#BBBCE4]/80 hover:text-[#06427D] dark:hover:text-[#BBBCE4]"
               }`}
             >
               My Communities ({joinedCommunities.length})
             </button>
 
-            <div className="h-4 w-px bg-zinc-200 dark:bg-zinc-800 mx-1 hidden sm:block" />
+            <div className="h-4 w-px bg-[#dcdff2] dark:bg-[#1d2c4e] mx-1 hidden sm:block" />
 
             {["all", "discussion", "question", "idea", "showcase"].map((cat) => (
               <button
@@ -305,8 +305,8 @@ export const CommunityView: React.FC = () => {
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-2.5 py-1 rounded-lg text-xs font-medium capitalize transition-colors cursor-pointer ${
                   selectedCategory === cat
-                    ? "bg-zinc-200 dark:bg-zinc-800 text-zinc-950 dark:text-white font-bold"
-                    : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                    ? "bg-[#BBBCE4]/30 dark:bg-[#141d33] text-[#06427D] dark:text-[#e6e9f7] font-bold"
+                    : "text-[#5D6080] hover:text-[#06427D] dark:text-[#BBBCE4]/70 dark:hover:text-[#BBBCE4]"
                 }`}
               >
                 {cat === "all" ? "All types" : cat}
@@ -315,24 +315,24 @@ export const CommunityView: React.FC = () => {
           </div>
 
           <div className="relative w-full sm:w-64">
-            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-3" />
+            <Search className="w-3.5 h-3.5 text-[#5D6080] dark:text-[#BBBCE4]/60 absolute left-3 top-3" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search discussions & questions..."
-              className="w-full pl-8 pr-3.5 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] text-xs text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full pl-8 pr-3.5 py-1.5 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] text-xs text-[#06427D] dark:text-[#e6e9f7] placeholder:text-[#5D6080]/60 focus:outline-none focus:ring-1 focus:ring-[#5420A6]"
             />
           </div>
         </div>
 
         {filteredPosts.length === 0 ? (
-          <div className="p-12 text-center rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] space-y-3">
-            <MessageSquare className="w-8 h-8 text-zinc-400 mx-auto" />
-            <h3 className="text-sm font-bold text-zinc-900 dark:text-white">
+          <div className="p-12 text-center rounded-3xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] space-y-3">
+            <MessageSquare className="w-8 h-8 text-[#5D6080] dark:text-[#BBBCE4]/60 mx-auto" />
+            <h3 className="text-sm font-bold text-[#06427D] dark:text-[#e6e9f7]">
               No discussions found
             </h3>
-            <p className="text-xs text-zinc-500 max-w-sm mx-auto">
+            <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4]/75 max-w-sm mx-auto">
               Be the first to post a question or architectural idea to this
               community.
             </p>
@@ -353,30 +353,30 @@ export const CommunityView: React.FC = () => {
               return (
                 <div
                   key={post.id}
-                  className="rounded-3xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-[#111218] p-5 sm:p-6 shadow-xs transition-colors space-y-4"
+                  className="rounded-3xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#0e1526] p-5 sm:p-6 shadow-xs transition-colors space-y-4"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3">
                       <img
                         src={post.authorAvatar}
                         alt={post.authorName}
-                        className="w-10 h-10 rounded-2xl object-cover ring-1 ring-zinc-200 dark:ring-zinc-800"
+                        className="w-10 h-10 rounded-2xl object-cover ring-1 ring-[#dcdff2] dark:ring-[#1d2c4e]"
                       />
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-xs text-zinc-950 dark:text-white">
+                          <span className="font-bold text-xs text-[#06427D] dark:text-[#e6e9f7]">
                             {post.authorName}
                           </span>
-                          <span className="text-[11px] text-zinc-400 font-medium">
+                          <span className="text-[11px] text-[#5D6080] dark:text-[#BBBCE4]/70 font-medium">
                             {post.authorHandle}
                           </span>
                           {post.authorRole && (
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 font-semibold">
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#BBBCE4]/20 dark:bg-[#141d33] text-[#5420A6] dark:text-[#A9DAF5] font-semibold">
                               {post.authorRole}
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center gap-2 text-[11px] text-zinc-400 mt-0.5">
+                        <div className="flex items-center gap-2 text-[11px] text-[#5D6080] dark:text-[#BBBCE4]/60 mt-0.5">
                           <span>{post.communityName || post.skillTitle}</span>
                           <span>•</span>
                           <span>{post.createdAt}</span>
@@ -390,10 +390,10 @@ export const CommunityView: React.FC = () => {
                   </div>
 
                   <div>
-                    <h3 className="text-base font-bold text-zinc-950 dark:text-white leading-snug">
+                    <h3 className="text-base font-bold text-[#06427D] dark:text-[#e6e9f7] leading-snug">
                       {post.title}
                     </h3>
-                    <p className="text-xs sm:text-[13px] text-zinc-700 dark:text-zinc-300 mt-2 leading-relaxed whitespace-pre-line">
+                    <p className="text-xs sm:text-[13px] text-[#5D6080] dark:text-[#BBBCE4] mt-2 leading-relaxed whitespace-pre-line">
                       {post.content}
                     </p>
                   </div>
@@ -403,7 +403,7 @@ export const CommunityView: React.FC = () => {
                       {post.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="px-2 py-0.5 rounded-md text-[10px] font-mono font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+                          className="px-2 py-0.5 rounded-md text-[10px] font-mono font-medium bg-[#f6f7fc] dark:bg-[#141d33] text-[#06427D] dark:text-[#BBBCE4] border border-[#dcdff2] dark:border-[#1d2c4e]"
                         >
                           #{tag}
                         </span>
@@ -411,19 +411,19 @@ export const CommunityView: React.FC = () => {
                     </div>
                   )}
 
-                  <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500">
+                  <div className="pt-3 border-t border-[#dcdff2]/70 dark:border-[#1d2c4e] flex items-center justify-between text-xs text-[#5D6080] dark:text-[#BBBCE4]/70">
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => toggleUpvotePost(post.id)}
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border font-bold text-xs transition-colors cursor-pointer ${
                           post.userUpvoted
-                            ? "bg-indigo-50 dark:bg-indigo-950/50 border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400"
-                            : "border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                            ? "bg-[#BBBCE4]/20 dark:bg-[#141d33] border-[#5420A6] text-[#5420A6] dark:text-[#A9DAF5]"
+                            : "border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#BBBCE4]/80 hover:bg-[#f6f7fc] dark:hover:bg-[#141d33]"
                         }`}
                       >
                         <ThumbsUp
                           className={`w-3.5 h-3.5 ${
-                            post.userUpvoted ? "fill-indigo-600 dark:fill-indigo-400" : ""
+                            post.userUpvoted ? "fill-[#5420A6] dark:fill-[#A9DAF5]" : ""
                           }`}
                         />
                         <span>{post.upvotes}</span>
@@ -433,7 +433,7 @@ export const CommunityView: React.FC = () => {
                         onClick={() =>
                           setExpandedPostId(isExpanded ? null : post.id)
                         }
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 font-bold text-xs transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#BBBCE4]/80 hover:bg-[#f6f7fc] dark:hover:bg-[#141d33] font-bold text-xs transition-colors cursor-pointer"
                       >
                         <MessageSquare className="w-3.5 h-3.5" />
                         <span>{replies.length} replies</span>
@@ -442,7 +442,7 @@ export const CommunityView: React.FC = () => {
 
                     <button
                       onClick={() => handleCopyLink(post.id)}
-                      className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg text-[#5D6080] hover:text-[#06427D] dark:hover:text-[#BBBCE4] transition-colors cursor-pointer"
                       title="Copy link to thread"
                     >
                       {copiedPostId === post.id ? (
@@ -454,13 +454,13 @@ export const CommunityView: React.FC = () => {
                   </div>
 
                   {isExpanded && (
-                    <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 space-y-4">
+                    <div className="pt-4 border-t border-[#dcdff2] dark:border-[#1d2c4e] space-y-4">
                       {replies.length > 0 && (
                         <div className="space-y-3">
                           {replies.map((reply) => (
                             <div
                               key={reply.id}
-                              className="p-3.5 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 space-y-1.5"
+                              className="p-3.5 rounded-2xl bg-[#f6f7fc] dark:bg-[#141d33] border border-[#dcdff2] dark:border-[#1d2c4e] space-y-1.5"
                             >
                               <div className="flex items-center justify-between text-xs">
                                 <div className="flex items-center gap-2">
@@ -469,18 +469,18 @@ export const CommunityView: React.FC = () => {
                                     alt={reply.authorName}
                                     className="w-5 h-5 rounded-md object-cover"
                                   />
-                                  <span className="font-bold text-zinc-950 dark:text-white">
+                                  <span className="font-bold text-[#06427D] dark:text-[#e6e9f7]">
                                     {reply.authorName}
                                   </span>
-                                  <span className="text-[11px] text-zinc-400">
+                                  <span className="text-[11px] text-[#5D6080] dark:text-[#BBBCE4]/60">
                                     {reply.authorHandle}
                                   </span>
                                 </div>
-                                <span className="text-[10px] text-zinc-400">
+                                <span className="text-[10px] text-[#5D6080] dark:text-[#BBBCE4]/60">
                                   {reply.createdAt}
                                 </span>
                               </div>
-                              <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed pl-7">
+                              <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4] leading-relaxed pl-7">
                                 {reply.content}
                               </p>
                             </div>
@@ -502,7 +502,7 @@ export const CommunityView: React.FC = () => {
                             if (e.key === "Enter") handleSendReply(post.id);
                           }}
                           placeholder="Write a technical answer or constructive comment..."
-                          className="flex-1 px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#0c0d12] text-xs text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 placeholder:text-zinc-400"
+                          className="flex-1 px-3.5 py-2 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#FFFFFF] dark:bg-[#080c18] text-xs text-[#06427D] dark:text-[#e6e9f7] focus:outline-none focus:ring-1 focus:ring-[#5420A6] placeholder:text-[#5D6080]/60"
                         />
                         <button
                           onClick={() => handleSendReply(post.id)}
@@ -522,21 +522,21 @@ export const CommunityView: React.FC = () => {
       </div>
 
       {isComposerOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="relative w-full max-w-lg rounded-3xl bg-white dark:bg-[#111218] border-2 border-indigo-500 shadow-2xl p-6 sm:p-8 space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="relative w-full max-w-lg rounded-3xl bg-[#FFFFFF] dark:bg-[#0e1526] border-2 border-[#5420A6] shadow-2xl p-6 sm:p-8 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-[#dcdff2] dark:border-[#1d2c4e]">
               <div>
-                <h3 className="text-base font-bold text-zinc-950 dark:text-white">
+                <h3 className="text-base font-bold text-[#06427D] dark:text-[#e6e9f7]">
                   Start a Community Discussion
                 </h3>
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-[#5D6080] dark:text-[#BBBCE4]/80">
                   Share an idea, ask a question, or discuss architectural
                   trade-offs
                 </p>
               </div>
               <button
                 onClick={() => setIsComposerOpen(false)}
-                className="p-1 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+                className="p-1 rounded-lg text-[#5D6080] hover:text-[#06427D] dark:hover:text-[#BBBCE4] cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -545,13 +545,13 @@ export const CommunityView: React.FC = () => {
             <form onSubmit={handleCreatePost} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                  <label className="text-xs font-bold text-[#06427D] dark:text-[#e6e9f7]">
                     Target Community
                   </label>
                   <select
                     value={newPostCommunityId}
                     onChange={(e) => setNewPostCommunityId(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#080c18] text-xs text-[#06427D] dark:text-[#e6e9f7] focus:outline-none focus:ring-1 focus:ring-[#5420A6]"
                   >
                     {communities.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -562,7 +562,7 @@ export const CommunityView: React.FC = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                  <label className="text-xs font-bold text-[#06427D] dark:text-[#e6e9f7]">
                     Category
                   </label>
                   <select
@@ -572,7 +572,7 @@ export const CommunityView: React.FC = () => {
                         e.target.value as "discussion" | "question" | "idea" | "showcase",
                       )
                     }
-                    className="w-full px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full px-3 py-2 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#080c18] text-xs text-[#06427D] dark:text-[#e6e9f7] focus:outline-none focus:ring-1 focus:ring-[#5420A6]"
                   >
                     <option value="discussion">Discussion</option>
                     <option value="question">Question</option>
@@ -583,7 +583,7 @@ export const CommunityView: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                <label className="text-xs font-bold text-[#06427D] dark:text-[#e6e9f7]">
                   Discussion Title
                 </label>
                 <input
@@ -591,12 +591,12 @@ export const CommunityView: React.FC = () => {
                   value={newPostTitle}
                   onChange={(e) => setNewPostTitle(e.target.value)}
                   placeholder="e.g. Dual-write outbox pattern vs listen/notify for CDC?"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#080c18] text-xs text-[#06427D] dark:text-[#e6e9f7] focus:outline-none focus:ring-1 focus:ring-[#5420A6]"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                <label className="text-xs font-bold text-[#06427D] dark:text-[#e6e9f7]">
                   Content & Context
                 </label>
                 <textarea
@@ -604,12 +604,12 @@ export const CommunityView: React.FC = () => {
                   value={newPostContent}
                   onChange={(e) => setNewPostContent(e.target.value)}
                   placeholder="Provide detailed architectural background, trade-offs considered, and specific questions..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none leading-relaxed"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#080c18] text-xs text-[#06427D] dark:text-[#e6e9f7] focus:outline-none focus:ring-1 focus:ring-[#5420A6] resize-none leading-relaxed"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                <label className="text-xs font-bold text-[#06427D] dark:text-[#e6e9f7]">
                   Topic Tags (comma-separated)
                 </label>
                 <input
@@ -617,11 +617,11 @@ export const CommunityView: React.FC = () => {
                   value={newPostTags}
                   onChange={(e) => setNewPostTags(e.target.value)}
                   placeholder="e.g. PostgreSQL, CDC, Microservices"
-                  className="w-full px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-xs text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f6f7fc] dark:bg-[#080c18] text-xs text-[#06427D] dark:text-[#e6e9f7] focus:outline-none focus:ring-1 focus:ring-[#5420A6] font-mono"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#dcdff2] dark:border-[#1d2c4e]">
                 <button
                   type="button"
                   onClick={() => setIsComposerOpen(false)}

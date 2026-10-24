@@ -2,36 +2,70 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+  --color-violet: #5420A6;
+  --color-muted-indigo: #5D6080;
+  --color-pastel-lavender: #BBBCE4;
+  --color-clean-white: #FFFFFF;
+  --color-powder-blue: #A9DAF5;
+  --color-deep-blue: #06427D;
+
+  --color-huddle-violet: #5420A6;
+  --color-huddle-violet-hover: #45188d;
+  --color-huddle-violet-light: #7234d8;
+  --color-huddle-muted-indigo: #5D6080;
+  --color-huddle-pastel-lavender: #BBBCE4;
+  --color-huddle-powder-blue: #A9DAF5;
+  --color-huddle-deep-blue: #06427D;
+
+  /* Aliasing indigo to Violet/Muted Indigo palette ensures any residual or utility indigo classes seamlessly adopt the new palette */
+  --color-indigo-50: #f6f1fc;
+  --color-indigo-100: #ede2fa;
+  --color-indigo-200: #BBBCE4;
+  --color-indigo-300: #a780e8;
+  --color-indigo-400: #8542e2;
+  --color-indigo-500: #6726d4;
+  --color-indigo-600: #5420A6;
+  --color-indigo-700: #45188d;
+  --color-indigo-800: #371272;
+  --color-indigo-900: #06427D;
+  --color-indigo-950: #080c18;
+}
+
 :root {
-  --background: #f8f9fc;
-  --foreground: #111827;
+  --background: #f6f7fc;
+  --foreground: #06427D;
   --surface: #ffffff;
-  --surface-hover: #f3f4f6;
+  --surface-hover: #f1f3fa;
   --surface-elevated: #ffffff;
-  --border: #e5e7eb;
-  --border-subtle: #f1f3f7;
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --text-muted: #9ca3af;
-  --accent: #4338ca;
-  --accent-hover: #3730a3;
-  --accent-subtle: rgba(67, 56, 202, 0.08);
+  --border: #dcdff2;
+  --border-subtle: #eceef8;
+  --text-primary: #06427D;
+  --text-secondary: #5D6080;
+  --text-muted: #8488ab;
+  --accent: #5420A6;
+  --accent-hover: #45188d;
+  --accent-subtle: rgba(84, 32, 166, 0.08);
+  --color-lavender-subtle: rgba(187, 188, 228, 0.22);
+  --color-powder-subtle: rgba(169, 218, 245, 0.22);
 }
 
 .dark {
-  --background: #090a0f;
-  --foreground: #f3f4f6;
-  --surface: #111218;
-  --surface-hover: #171821;
-  --surface-elevated: #1a1b26;
-  --border: #232533;
-  --border-subtle: #191a24;
-  --text-primary: #f9fafb;
-  --text-secondary: #9ca3af;
-  --text-muted: #6b7280;
-  --accent: #6366f1;
-  --accent-hover: #4f46e5;
-  --accent-subtle: rgba(99, 102, 241, 0.12);
+  --background: #080c18;
+  --foreground: #BBBCE4;
+  --surface: #0e1526;
+  --surface-hover: #151e36;
+  --surface-elevated: #18233f;
+  --border: #1d2c4e;
+  --border-subtle: #141f38;
+  --text-primary: #e6e9f7;
+  --text-secondary: #9aa0c4;
+  --text-muted: #656b8f;
+  --accent: #7839ee;
+  --accent-hover: #8b4ff2;
+  --accent-subtle: rgba(187, 188, 228, 0.14);
+  --color-lavender-subtle: rgba(187, 188, 228, 0.12);
+  --color-powder-subtle: rgba(169, 218, 245, 0.12);
 }
 
 body {
@@ -82,15 +116,21 @@ button {
 }
 
 .duo-button-primary {
-  background-color: #4f46e5;
+  background-color: #5420A6;
   color: #ffffff;
-  border-bottom: 4px solid #3730a3;
+  border-bottom: 4px solid #3b1478;
   transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
 }
 
+.dark .duo-button-primary {
+  background-color: #5420A6;
+  color: #e6e9f7;
+  border-bottom: 4px solid #340f6b;
+}
+
 .duo-button-primary:hover:not(:disabled) {
-  filter: brightness(1.08);
+  filter: brightness(1.1);
   transform: translateY(-1px);
   border-bottom-width: 5px;
 }
@@ -106,6 +146,11 @@ button {
   border-bottom: 4px solid #059669;
   transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
+}
+
+.dark .duo-button-success {
+  color: #e6e9f7;
+  border-bottom-color: #047857;
 }
 
 .duo-button-success:hover:not(:disabled) {
@@ -158,6 +203,10 @@ button {
   box-shadow: 0 10px 18px -4px rgba(16, 185, 129, 0.35);
 }
 
+.dark .duo-node-completed {
+  color: #e6e9f7;
+}
+
 .duo-node-completed:hover {
   transform: translateY(-2px) scale(1.03);
   border-bottom-width: 7px;
@@ -169,10 +218,14 @@ button {
 }
 
 .duo-node-active {
-  background: linear-gradient(145deg, #4f46e5 0%, #4338ca 100%);
+  background: linear-gradient(145deg, #6a2ec8 0%, #5420A6 100%);
   color: #ffffff;
-  border-bottom: 6px solid #312e81;
-  box-shadow: 0 12px 24px -4px rgba(79, 70, 229, 0.45);
+  border-bottom: 6px solid #381373;
+  box-shadow: 0 12px 24px -4px rgba(84, 32, 166, 0.45);
+}
+
+.dark .duo-node-active {
+  color: #e6e9f7;
 }
 
 .duo-node-active:hover {
@@ -186,15 +239,15 @@ button {
 }
 
 .duo-node-locked {
-  background-color: #e5e7eb;
-  color: #9ca3af;
-  border-bottom: 6px solid #d1d5db;
+  background-color: #eceef7;
+  color: #5D6080;
+  border-bottom: 6px solid #d4d8ea;
 }
 
 .dark .duo-node-locked {
-  background-color: #1e2230;
-  color: #64748b;
-  border-bottom: 6px solid #131722;
+  background-color: #12192c;
+  color: #656b8f;
+  border-bottom: 6px solid #090e1c;
 }
 
 .duo-node-locked:hover {
@@ -206,6 +259,10 @@ button {
   color: #ffffff;
   border-bottom: 6px solid #b45309;
   box-shadow: 0 12px 22px -4px rgba(245, 158, 11, 0.4);
+}
+
+.dark .duo-node-trophy {
+  color: #e6e9f7;
 }
 
 .duo-node-trophy:hover {
@@ -220,13 +277,13 @@ button {
 
 @keyframes pulseRipple {
   0% {
-    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.5);
+    box-shadow: 0 0 0 0 rgba(84, 32, 166, 0.5);
   }
   70% {
-    box-shadow: 0 0 0 16px rgba(79, 70, 229, 0);
+    box-shadow: 0 0 0 16px rgba(84, 32, 166, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+    box-shadow: 0 0 0 0 rgba(84, 32, 166, 0);
   }
 }
 

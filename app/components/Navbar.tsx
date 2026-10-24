@@ -14,7 +14,6 @@ import {
   ChevronDown,
   RotateCcw,
   Menu,
-  Flame,
   Zap,
   Map as MapIcon,
   Users,
@@ -98,33 +97,18 @@ export const Navbar: React.FC = () => {
   );
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-zinc-200/80 dark:border-zinc-800/80 bg-white/90 dark:bg-[#090a0f]/90 backdrop-blur-md transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-40 w-full border-b border-[#dcdff2]/80 dark:border-[#1d2c4e]/80 bg-white/95 dark:bg-[#080c18]/95 backdrop-blur-md transition-colors">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 h-14 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 md:gap-5 shrink-0">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="md:hidden p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors focus:outline-none cursor-pointer relative shrink-0"
+            className="md:hidden p-2 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#BBBCE4] hover:bg-[#f1f3fa] dark:hover:bg-[#141f36] transition-colors focus:outline-none cursor-pointer relative shrink-0"
             aria-label="Open sidebar navigation"
           >
             <Menu className="w-4 h-4" />
             {unreadNotificationCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-indigo-600" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#5420A6]" />
             )}
-          </button>
-
-          <button
-            onClick={() => setActiveTab("dashboard")}
-            className="flex items-center gap-2.5 group focus:outline-none cursor-pointer shrink-0"
-            aria-label="Huddle home"
-          >
-            <img
-              src="/logo.svg"
-              alt="Huddle"
-              className="w-7 h-7 rounded-lg object-contain shrink-0 group-hover:scale-105 transition-transform"
-            />
-            <span className="font-semibold text-base text-zinc-900 dark:text-white tracking-tight">
-              Huddle
-            </span>
           </button>
         </div>
 
@@ -135,15 +119,19 @@ export const Navbar: React.FC = () => {
                 className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs shrink-0 select-none"
                 title="Current streak"
               >
-                <Flame className="w-4 h-4 fill-amber-500 text-amber-500" />
+                <img
+                  src="/icons/meteor-svgrepo-com.svg"
+                  alt="Streak"
+                  className="w-4 h-4 object-contain"
+                />
                 <span>{user.streak || 1}</span>
               </div>
 
               <div
-                className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-bold text-xs shrink-0 select-none"
+                className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#5420A6]/10 border border-[#5420A6]/20 text-[#5420A6] dark:text-[#BBBCE4] font-bold text-xs shrink-0 select-none"
                 title="Mastery points"
               >
-                <Zap className="w-4 h-4 fill-indigo-500 text-indigo-500" />
+                <Zap className="w-4 h-4 fill-[#5420A6] text-[#5420A6] dark:fill-[#BBBCE4] dark:text-[#BBBCE4]" />
                 <span>{user.reputation || 180} XP</span>
               </div>
 
@@ -151,12 +139,12 @@ export const Navbar: React.FC = () => {
                 onClick={() => setActiveTab("squad")}
                 className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-colors cursor-pointer shrink-0 ${
                   activeTab === "squad"
-                    ? "bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 font-semibold"
-                    : "bg-zinc-50 dark:bg-zinc-900 border-zinc-200/70 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100"
+                    ? "bg-[#BBBCE4]/20 dark:bg-[#5420A6]/25 border-[#BBBCE4] dark:border-[#5420A6]/70 text-[#5420A6] dark:text-[#A9DAF5] font-semibold"
+                    : "bg-[#f8f9fd] dark:bg-[#0e1526] border-[#dcdff2]/80 dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#9aa0c4] hover:text-[#06427D] dark:hover:text-[#BBBCE4]"
                 }`}
                 title="Accountability squad"
               >
-                <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                <Users className="w-3.5 h-3.5 text-[#5420A6] dark:text-[#A9DAF5]" />
                 <span>Squad</span>
               </button>
             </div>
@@ -164,13 +152,13 @@ export const Navbar: React.FC = () => {
 
           <button
             onClick={() => setSearchOpen(true)}
-            className="flex items-center gap-2 p-2 sm:px-3 sm:py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 text-zinc-500 dark:text-zinc-400 text-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors shrink-0 cursor-pointer"
+            className="flex items-center gap-2 p-2 sm:px-3 sm:py-1.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] bg-[#f8f9fd]/60 dark:bg-[#0e1526]/60 text-[#5D6080] dark:text-[#9aa0c4] text-xs hover:border-[#BBBCE4] dark:hover:border-[#5420A6]/60 transition-colors shrink-0 cursor-pointer"
             aria-label="Search"
             title="Search"
           >
             <Search className="w-3.5 h-3.5" />
             <span className="hidden lg:inline text-xs">Search</span>
-            <kbd className="hidden lg:inline-block px-1.5 py-0.5 text-[10px] bg-zinc-200/60 dark:bg-zinc-800 rounded font-mono text-zinc-500">
+            <kbd className="hidden lg:inline-block px-1.5 py-0.5 text-[10px] bg-[#BBBCE4]/30 dark:bg-[#141f36] rounded font-mono text-[#5D6080] dark:text-[#9aa0c4]">
               Ctrl K
             </kbd>
           </button>
@@ -181,13 +169,13 @@ export const Navbar: React.FC = () => {
                 onClick={() =>
                   setNotificationDropdownOpen(!notificationDropdownOpen)
                 }
-                className="relative p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors shrink-0 cursor-pointer"
+                className="relative p-2 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#BBBCE4] hover:bg-[#f1f3fa] dark:hover:bg-[#141f36] transition-colors shrink-0 cursor-pointer"
                 aria-label="Notifications"
                 title="Notifications"
               >
                 <Bell className="w-4 h-4" />
                 {unreadNotificationCount > 0 && (
-                  <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-indigo-600" />
+                  <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#5420A6]" />
                 )}
               </button>
 
@@ -197,20 +185,20 @@ export const Navbar: React.FC = () => {
                     className="fixed inset-0 z-40 sm:hidden bg-black/20"
                     onClick={() => setNotificationDropdownOpen(false)}
                   />
-                  <div className="fixed inset-x-4 top-16 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-88 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] shadow-lg p-4 z-50 animate-in fade-in duration-100">
-                    <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
-                      <h3 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
+                  <div className="fixed inset-x-4 top-16 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-88 rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-white dark:bg-[#0e1526] shadow-lg p-4 z-50 animate-in fade-in duration-100">
+                    <div className="flex items-center justify-between pb-3 border-b border-[#dcdff2]/60 dark:border-[#1d2c4e]">
+                      <h3 className="text-xs font-semibold text-[#06427D] dark:text-[#BBBCE4]">
                         Notifications
                       </h3>
                       {unreadNotificationCount > 0 && (
-                        <span className="text-[11px] text-zinc-500 font-medium">
+                        <span className="text-[11px] text-[#5420A6] dark:text-[#A9DAF5] font-medium">
                           {unreadNotificationCount} unread
                         </span>
                       )}
                     </div>
                     <div className="mt-2 space-y-1.5 max-h-72 overflow-y-auto">
                       {notifications.length === 0 ? (
-                        <div className="py-6 text-center text-xs text-zinc-500">
+                        <div className="py-6 text-center text-xs text-[#5D6080] dark:text-[#9aa0c4]">
                           You are all caught up.
                         </div>
                       ) : (
@@ -220,17 +208,17 @@ export const Navbar: React.FC = () => {
                             onClick={() => markNotificationRead(notification.id)}
                             className={`p-3 rounded-lg cursor-pointer text-xs transition-colors ${
                               notification.read
-                                ? "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900"
-                                : "bg-indigo-50/50 dark:bg-indigo-950/20 text-zinc-900 dark:text-zinc-100 border border-indigo-100/70 dark:border-indigo-900/30"
+                                ? "text-[#5D6080] dark:text-[#9aa0c4] hover:bg-[#f1f3fa] dark:hover:bg-[#141f36]"
+                                : "bg-[#BBBCE4]/15 dark:bg-[#5420A6]/20 text-[#06427D] dark:text-[#e6e9f7] border border-[#BBBCE4]/50 dark:border-[#5420A6]/40"
                             }`}
                           >
-                            <div className="font-medium text-zinc-900 dark:text-zinc-100">
+                            <div className="font-medium text-[#06427D] dark:text-[#e6e9f7]">
                               {notification.title}
                             </div>
-                            <div className="mt-0.5 leading-relaxed text-[11px] text-zinc-600 dark:text-zinc-400">
+                            <div className="mt-0.5 leading-relaxed text-[11px] text-[#5D6080] dark:text-[#9aa0c4]">
                               {notification.description}
                             </div>
-                            <div className="mt-1 text-[10px] text-zinc-400">
+                            <div className="mt-1 text-[10px] text-[#5D6080]/70 dark:text-[#9aa0c4]/70">
                               {notification.timestamp}
                             </div>
                           </div>
@@ -245,14 +233,14 @@ export const Navbar: React.FC = () => {
 
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors shrink-0 cursor-pointer"
+            className="p-2 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] text-[#5D6080] dark:text-[#BBBCE4] hover:bg-[#f1f3fa] dark:hover:bg-[#141f36] transition-colors shrink-0 cursor-pointer"
             title="Toggle theme"
             aria-label="Toggle theme"
           >
             {theme === "dark" ? (
-              <Sun className="w-4 h-4" />
+              <Sun className="w-4 h-4 text-[#A9DAF5]" />
             ) : (
-              <Moon className="w-4 h-4" />
+              <Moon className="w-4 h-4 text-[#5420A6]" />
             )}
           </button>
 
@@ -260,15 +248,15 @@ export const Navbar: React.FC = () => {
             <div className="relative" ref={profileMenuRef}>
               <button
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="flex items-center gap-1.5 p-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-colors focus:outline-none cursor-pointer shrink-0"
+                className="flex items-center gap-1.5 p-1 rounded-lg hover:bg-[#f1f3fa] dark:hover:bg-[#141f36] transition-colors focus:outline-none cursor-pointer shrink-0"
                 aria-label="Open user profile menu"
               >
                 <img
                   src={getUserAvatarUrl(user, 64)}
                   alt={user.name}
-                  className="w-7 h-7 rounded-lg object-cover ring-1 ring-zinc-200 dark:ring-zinc-800"
+                  className="w-7 h-7 rounded-lg object-cover ring-1 ring-[#dcdff2] dark:ring-[#1d2c4e]"
                 />
-                <ChevronDown className="w-3.5 h-3.5 text-zinc-400 hidden xs:block" />
+                <ChevronDown className="w-3.5 h-3.5 text-[#5D6080] hidden xs:block" />
               </button>
 
               {profileDropdownOpen && (
@@ -277,12 +265,12 @@ export const Navbar: React.FC = () => {
                     className="fixed inset-0 z-40 sm:hidden bg-black/20"
                     onClick={() => setProfileDropdownOpen(false)}
                   />
-                  <div className="absolute right-0 top-full mt-2 w-56 max-w-[calc(100vw-1.5rem)] rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#111218] shadow-lg p-1.5 z-50 animate-in fade-in duration-100">
-                    <div className="px-3 py-2.5 border-b border-zinc-100 dark:border-zinc-800">
-                      <div className="font-semibold text-xs text-zinc-900 dark:text-zinc-100 truncate">
+                  <div className="absolute right-0 top-full mt-2 w-56 max-w-[calc(100vw-1.5rem)] rounded-xl border border-[#dcdff2] dark:border-[#1d2c4e] bg-white dark:bg-[#0e1526] shadow-lg p-1.5 z-50 animate-in fade-in duration-100">
+                    <div className="px-3 py-2.5 border-b border-[#dcdff2]/60 dark:border-[#1d2c4e]">
+                      <div className="font-semibold text-xs text-[#06427D] dark:text-[#BBBCE4] truncate">
                         {user.name}
                       </div>
-                      <div className="text-[11px] text-zinc-500 truncate mt-0.5">
+                      <div className="text-[11px] text-[#5D6080] dark:text-[#9aa0c4] truncate mt-0.5">
                         {user.handle}
                       </div>
                     </div>
@@ -293,9 +281,9 @@ export const Navbar: React.FC = () => {
                           setActiveTab("profile");
                           setProfileDropdownOpen(false);
                         }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 text-left transition-colors cursor-pointer"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-[#5D6080] dark:text-[#9aa0c4] hover:bg-[#f1f3fa] dark:hover:bg-[#141f36] hover:text-[#06427D] dark:hover:text-[#BBBCE4] text-left transition-colors cursor-pointer"
                       >
-                        <UserIcon className="w-4 h-4 text-zinc-500" />
+                        <UserIcon className="w-4 h-4 text-[#5D6080]" />
                         <span>Profile and projects</span>
                       </button>
 
@@ -304,9 +292,9 @@ export const Navbar: React.FC = () => {
                           setOnboardingActive(true);
                           setProfileDropdownOpen(false);
                         }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 text-left transition-colors cursor-pointer"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-[#5D6080] dark:text-[#9aa0c4] hover:bg-[#f1f3fa] dark:hover:bg-[#141f36] hover:text-[#06427D] dark:hover:text-[#BBBCE4] text-left transition-colors cursor-pointer"
                       >
-                        <RotateCcw className="w-4 h-4 text-zinc-500" />
+                        <RotateCcw className="w-4 h-4 text-[#5D6080]" />
                         <span>Update skill preferences</span>
                       </button>
 
@@ -315,13 +303,13 @@ export const Navbar: React.FC = () => {
                           setSettingsOpen(true);
                           setProfileDropdownOpen(false);
                         }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 text-left transition-colors cursor-pointer"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-[#5D6080] dark:text-[#9aa0c4] hover:bg-[#f1f3fa] dark:hover:bg-[#141f36] hover:text-[#06427D] dark:hover:text-[#BBBCE4] text-left transition-colors cursor-pointer"
                       >
-                        <Settings className="w-4 h-4 text-zinc-500" />
+                        <Settings className="w-4 h-4 text-[#5D6080]" />
                         <span>Settings</span>
                       </button>
 
-                      <div className="my-1 border-t border-zinc-100 dark:border-zinc-800" />
+                      <div className="my-1 border-t border-[#dcdff2]/60 dark:border-[#1d2c4e]" />
 
                       <button
                         onClick={async () => {
@@ -343,13 +331,13 @@ export const Navbar: React.FC = () => {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => router.push("/auth/login")}
-                className="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer"
+                className="px-3 py-1.5 rounded-lg border border-[#dcdff2] dark:border-[#1d2c4e] text-xs font-medium text-[#06427D] dark:text-[#BBBCE4] hover:bg-[#f1f3fa] dark:hover:bg-[#141f36] transition-colors cursor-pointer"
               >
                 Sign in
               </button>
               <button
                 onClick={() => router.push("/auth/signup")}
-                className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors cursor-pointer"
+                className="px-3 py-1.5 rounded-lg bg-[#5420A6] hover:bg-[#45188d] text-white dark:text-[#e6e9f7] text-xs font-medium transition-colors cursor-pointer shadow-sm"
               >
                 Get started
               </button>
